@@ -1,0 +1,116 @@
+@import "tailwindcss";
+* {
+  outline: none;
+}
+body {
+  background: rgb(221, 221, 221) !important;
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Remove Ant Design Button focus outline */
+.ant-btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.ant-btn:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+/* Hide main page scrollbar */
+html {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+html::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+body {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+/* Cart Sidebar Animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth transitions for cart sidebar */
+.cart-sidebar-enter {
+  animation: slideInRight 0.2s ease-out forwards;
+}
+
+.cart-sidebar-exit {
+  animation: slideOutRight 0.2s ease-out forwards;
+}
+
+.cart-overlay-enter {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.cart-overlay-exit {
+  animation: fadeOut 0.2s ease-out forwards;
+}
