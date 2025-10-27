@@ -1,31 +1,72 @@
-import { Inter } from "next/font/google";
-import "../../app/globals.css";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { ConfigProvider } from "antd";
-import Header from "../components/layout/header/Header";
-import Footer from "../components/layout/Footer";
+"use client";
 
-// Cấu hình font
-const inter = Inter({ subsets: ["latin"] });
+import { useState, useRef, useEffect } from "react";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import AdminSidebar from "./components/AdminSidebar";
+import AdminHeader from "./components/AdminHeader";
 
-// Component Layout chính
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const [collapsed, setCollapsed] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(64);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      if (headerRef.current) {
+        const height = headerRef.current.offsetHeight;
+        setHeaderHeight(height);
+      }
+    };
+
+    // Sử dụng ResizeObserver để theo dõi thay đổi kích thước của header
+    const resizeObserver = new ResizeObserver(() => {
+      updateHeaderHeight();
+    });
+
+    if (headerRef.current) {
+      resizeObserver.observe(headerRef.current);
+      updateHeaderHeight();
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   return (
-    <html lang="vi">
-      <head>
-        {/* Nếu bạn cần thêm script hoặc meta thủ công */}
-        <meta name="theme-color" content="#ffffff" />
-        <link rel="icon" href="/favicon.ico" />
-        {/* Font Awesome CDN */}
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-      </head>
-      <body className={inter.className}>
-        <AntdRegistry>
-          <ConfigProvider>
-            <main>{children}</main>
-          </ConfigProvider>
-        </AntdRegistry>
-      </body>
-    </html>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      {/* Header cố định ở trên */}
+      <AdminHeader ref={headerRef} collapsed={collapsed} setCollapsed={setCollapsed} />
+
+      {/* Phần dưới chia 2 cột: sidebar và content */}
+      <div style={{ display: "flex", flex: 1, marginTop: `${headerHeight}px` }}>
+        <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} headerHeight={headerHeight} />
+        <main
+          className="p-4"
+          style={{
+            flex: 1,
+            background: "#f0f2f5",
+            minHeight: `calc(100vh - ${headerHeight}px)`,
+            marginLeft: collapsed ? 80 : 250,
+            transition: "margin-left 0.2s",
+          }}
+        >
+          {children}
+        </main>
+      </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+    </div>
   );
 }
