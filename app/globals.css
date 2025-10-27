@@ -2,9 +2,7 @@
 * {
   outline: none;
 }
-body {
-  background: rgb(221, 221, 221) !important;
-}
+
 
 /* Hide scrollbar but keep functionality */
 .hide-scrollbar {
