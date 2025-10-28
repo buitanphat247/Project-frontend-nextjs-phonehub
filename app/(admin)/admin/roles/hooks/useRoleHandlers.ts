@@ -23,7 +23,7 @@ export function useRoleHandlers() {
   const handleView = (role: Role) => {
     setSelectedRole(role);
     setModalVisible(true);
-  };
+  }; 
 
   const handleCloseViewModal = () => {
     setModalVisible(false);

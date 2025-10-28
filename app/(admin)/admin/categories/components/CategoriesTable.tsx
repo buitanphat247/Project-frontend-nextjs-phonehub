@@ -8,10 +8,11 @@ interface CategoriesTableProps {
   categories: Category[];
   searchText: string;
   onView: (category: Category) => void;
+  onEdit: (category: Category) => void;
   onDelete: (id: number) => void;
 }
 
-export default function CategoriesTable({ categories, searchText, onView, onDelete }: CategoriesTableProps) {
+export default function CategoriesTable({ categories, searchText, onView, onEdit, onDelete }: CategoriesTableProps) {
   const columns: ColumnsType<Category> = [
     {
       title: 'ID',
@@ -62,7 +63,7 @@ export default function CategoriesTable({ categories, searchText, onView, onDele
             type="primary"
             icon={<EditOutlined />}
             size="small"
-            onClick={() => toast.info('This feature is under development')}
+            onClick={() => onEdit(record)}
           >
             Sửa
           </Button>
