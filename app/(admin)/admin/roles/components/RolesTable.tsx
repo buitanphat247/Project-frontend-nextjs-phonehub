@@ -1,20 +1,22 @@
+'use client';
+
+import React from 'react';
 import { Table, Button, Space, Tag, Popconfirm } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import type { ColumnsType } from 'antd/es/table';
-import { User } from '../interface/IUser';
-import { roleMap } from '../mock/usersData';
+import { Role } from '../interface/IRole';
 
-interface UsersTableProps {
-  users: User[];
+interface RolesTableProps {
+  roles: Role[];
   searchText: string;
-  onView: (user: User) => void;
-  onEdit: (user: User) => void;
+  onView: (role: Role) => void;
+  onEdit: (role: Role) => void;
   onDelete: (id: number) => void;
 }
 
-export default function UsersTable({ users, searchText, onView, onEdit, onDelete }: UsersTableProps) {
-  const columns: ColumnsType<User> = [
+export default function RolesTable({ roles, searchText, onView, onEdit, onDelete }: RolesTableProps) {
+  const columns: ColumnsType<Role> = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -22,36 +24,25 @@ export default function UsersTable({ users, searchText, onView, onEdit, onDelete
       width: 80,
     },
     {
-      title: 'Username',
-      dataIndex: 'username',
-      key: 'username',
+      title: 'Tên vai trò',
+      dataIndex: 'name',
+      key: 'name',
       filteredValue: searchText ? [searchText] : null,
       onFilter: (value, record) =>
-        record.username.toLowerCase().includes(value as string) ||
-        record.email.toLowerCase().includes(value as string),
+        record.name.toLowerCase().includes(value as string),
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
+      title: 'Mô tả',
+      dataIndex: 'description',
+      key: 'description',
     },
     {
-      title: 'Số điện thoại',
-      dataIndex: 'phone',
-      key: 'phone',
-    },
-    {
-      title: 'Địa chỉ',
-      dataIndex: 'address',
-      key: 'address',
-    },
-    {
-      title: 'Vai trò',
-      dataIndex: 'role_id',
-      key: 'role_id',
-      render: (roleId: number) => (
-        <Tag color={roleId === 1 ? 'red' : roleId === 2 ? 'orange' : 'blue'}>
-          {roleMap[roleId] || 'User'}
+      title: 'Quyền',
+      dataIndex: 'permissions',
+      key: 'permissions',
+      render: (permissions: string) => (
+        <Tag color={permissions === 'all' ? 'red' : 'blue'}>
+          {permissions}
         </Tag>
       ),
     },
@@ -84,8 +75,8 @@ export default function UsersTable({ users, searchText, onView, onEdit, onDelete
             Sửa
           </Button>
           <Popconfirm
-            title="Xóa người dùng"
-            description="Bạn có chắc chắn muốn xóa người dùng này?"
+            title="Xóa vai trò"
+            description="Bạn có chắc chắn muốn xóa vai trò này?"
             onConfirm={() => onDelete(record.id)}
             okText="Xóa"
             cancelText="Hủy"
@@ -107,14 +98,13 @@ export default function UsersTable({ users, searchText, onView, onEdit, onDelete
   return (
     <Table
       columns={columns}
-      dataSource={users}
+      dataSource={roles}
       rowKey="id"
       pagination={{
         pageSize: 10,
         showSizeChanger: true,
-        showTotal: (total) => `Tổng ${total} người dùng`,
+        showTotal: (total) => `Tổng ${total} vai trò`,
       }}
     />
   );
 }
-

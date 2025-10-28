@@ -10,6 +10,7 @@ import {
   UserOutlined,
   SettingOutlined,
   AppstoreOutlined,
+  SecurityScanOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -36,6 +37,7 @@ export default function AdminSidebar({ collapsed, setCollapsed, headerHeight = 6
       children: [
         {
           key: '/admin/products',
+          icon: <ShopOutlined />,
           label: <Link href="/admin/products">Quản lý sản phẩm</Link>,
         },
         {
@@ -54,6 +56,11 @@ export default function AdminSidebar({ collapsed, setCollapsed, headerHeight = 6
       key: '/admin/users',
       icon: <UserOutlined />,
       label: <Link href="/admin/users">Quản lý người dùng</Link>,
+    },
+    {
+      key: '/admin/roles',
+      icon: <SecurityScanOutlined />,
+      label: <Link href="/admin/roles">Quản lý vai trò</Link>,
     },
     {
       key: '/admin/settings',
