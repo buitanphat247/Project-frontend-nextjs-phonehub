@@ -11,7 +11,7 @@ export default function CreateRoleModal({ visible, onClose, onSubmit }: CreateRo
   const [form] = Form.useForm();
 
   const handleSubmit = () => {
-    form.validateFields.jupiter(values => {
+    form.validateFields().then(values => {
       onSubmit(values);
       form.resetFields();
       onClose();

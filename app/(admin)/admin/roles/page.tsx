@@ -8,11 +8,15 @@ import { useRoleHandlers } from './hooks/useRoleHandlers';
 export default function RolesPage() {
   const {
     roles,
+    loading,
     searchText,
     modalVisible,
     createModalVisible,
     editModalVisible,
     selectedRole,
+    currentPage,
+    pageSize,
+    totalElements,
     handleSearch,
     handleDelete,
     handleView,
@@ -23,12 +27,24 @@ export default function RolesPage() {
     handleCloseEditModal,
     handleCreateRole,
     handleEditRole,
+    handlePageChange,
   } = useRoleHandlers();
 
   return (
     <div>
       <RolesHeader searchValue={searchText} onSearchChange={handleSearch} onCreateClick={handleCreateClick} />
-      <RolesTable roles={roles} searchText={searchText} onView={handleView} onEdit={handleEditClick} onDelete={handleDelete} />
+      <RolesTable 
+        roles={roles} 
+        searchText={searchText}
+        loading={loading}
+        currentPage={currentPage + 1}
+        pageSize={pageSize}
+        total={totalElements}
+        onView={handleView} 
+        onEdit={handleEditClick} 
+        onDelete={handleDelete}
+        onPageChange={handlePageChange}
+      />
       <RoleModals
         selectedRole={selectedRole}
         modalVisible={modalVisible}

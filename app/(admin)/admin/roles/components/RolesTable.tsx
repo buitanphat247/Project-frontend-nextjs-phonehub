@@ -6,16 +6,33 @@ import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import type { ColumnsType } from 'antd/es/table';
 import { Role } from '../interface/IRole';
+import { capitalizeFirst } from '../../../../../lib/utils/string';
 
 interface RolesTableProps {
   roles: Role[];
   searchText: string;
+  loading?: boolean;
+  currentPage?: number;
+  pageSize?: number;
+  total?: number;
   onView: (role: Role) => void;
   onEdit: (role: Role) => void;
   onDelete: (id: number) => void;
+  onPageChange?: (page: number, size: number) => void;
 }
 
-export default function RolesTable({ roles, searchText, onView, onEdit, onDelete }: RolesTableProps) {
+export default function RolesTable({ 
+  roles, 
+  searchText, 
+  loading = false,
+  currentPage = 1,
+  pageSize = 10,
+  total = 0,
+  onView, 
+  onEdit, 
+  onDelete,
+  onPageChange,
+}: RolesTableProps) {
   const columns: ColumnsType<Role> = [
     {
       title: 'ID',
@@ -30,26 +47,18 @@ export default function RolesTable({ roles, searchText, onView, onEdit, onDelete
       filteredValue: searchText ? [searchText] : null,
       onFilter: (value, record) =>
         record.name.toLowerCase().includes(value as string),
-    },
-    {
-      title: 'Mô tả',
-      dataIndex: 'description',
-      key: 'description',
-    },
-    {
-      title: 'Quyền',
-      dataIndex: 'permissions',
-      key: 'permissions',
-      render: (permissions: string) => (
-        <Tag color={permissions === 'all' ? 'red' : 'blue'}>
-          {permissions}
-        </Tag>
-      ),
+      render: (name: string) => capitalizeFirst(name),
     },
     {
       title: 'Ngày tạo',
-      dataIndex: 'created_at',
-      key: 'created_at',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (date: string) => new Date(date).toLocaleDateString('vi-VN'),
+    },
+    {
+      title: 'Ngày cập nhật',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
       render: (date: string) => new Date(date).toLocaleDateString('vi-VN'),
     },
     {
@@ -100,10 +109,19 @@ export default function RolesTable({ roles, searchText, onView, onEdit, onDelete
       columns={columns}
       dataSource={roles}
       rowKey="id"
+      loading={loading}
       pagination={{
-        pageSize: 10,
+        current: currentPage,
+        pageSize: pageSize,
+        total: total,
         showSizeChanger: true,
-        showTotal: (total) => `Tổng ${total} vai trò`,
+        showTotal: (total, range) => {
+          if (loading) return 'Đang tải...';
+          if (total === 0) return 'Không có dữ liệu';
+          return `${range[0]}-${range[1]} của ${total} vai trò`;
+        },
+        onChange: onPageChange ? (page, size) => onPageChange(page, size || 10) : undefined,
+        onShowSizeChange: onPageChange ? (current, size) => onPageChange(current, size) : undefined,
       }}
     />
   );
