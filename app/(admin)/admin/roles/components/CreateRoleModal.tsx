@@ -18,6 +18,16 @@ export default function CreateRoleModal({ visible, onClose, onSubmit }: CreateRo
     });
   };
 
+  const handleFinish = (values: any) => {
+    onSubmit(values);
+    form.resetFields();
+    onClose();
+  };
+
+  const handlePressEnter = () => {
+    form.submit();
+  };
+
   return (
     <Modal
       title="Tạo vai trò mới"
@@ -25,17 +35,32 @@ export default function CreateRoleModal({ visible, onClose, onSubmit }: CreateRo
       onCancel={onClose}
       footer={[
         <Button key="cancel" onClick={onClose}>Hủy</Button>,
-        <Button key="submit" type="primary" onClick={handleSubmit}>Tạo</Button>,
+        <Button key="submit" type="primary" htmlType="submit" onClick={handleSubmit}>Tạo</Button>,
       ]}
       width={500}
     >
-      <Form form={form} layout="vertical">
+      <Form 
+        form={form} 
+        layout="vertical" 
+        autoComplete="off"
+        onFinish={handleFinish}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            form.submit();
+          }
+        }}
+      >
         <Form.Item
           label="Tên vai trò"
           name="name"
           rules={[{ required: true, message: 'Vui lòng nhập tên vai trò' }]}
         >
-          <Input placeholder="Nhập tên vai trò" />
+          <Input 
+            placeholder="Nhập tên vai trò" 
+            autoComplete="off"
+            onPressEnter={handlePressEnter}
+          />
         </Form.Item>
       </Form>
     </Modal>

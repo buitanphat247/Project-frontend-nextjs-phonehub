@@ -3,17 +3,39 @@ import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import type { ColumnsType } from 'antd/es/table';
 import { User } from '../interface/IUser';
-import { roleMap } from '../mock/usersData';
+import { capitalizeFirst } from '../../../../../lib/utils/string';
+
+const roleMap: Record<number, string> = {
+  1: 'Admin',
+  2: 'Staff',
+  3: 'User',
+};
 
 interface UsersTableProps {
   users: User[];
   searchText: string;
+  loading?: boolean;
+  currentPage?: number;
+  pageSize?: number;
+  total?: number;
   onView: (user: User) => void;
   onEdit: (user: User) => void;
   onDelete: (id: number) => void;
+  onPageChange?: (page: number, size: number) => void;
 }
 
-export default function UsersTable({ users, searchText, onView, onEdit, onDelete }: UsersTableProps) {
+export default function UsersTable({ 
+  users, 
+  searchText,
+  loading = false,
+  currentPage = 1,
+  pageSize = 10,
+  total = 0,
+  onView, 
+  onEdit, 
+  onDelete,
+  onPageChange,
+}: UsersTableProps) {
   const columns: ColumnsType<User> = [
     {
       title: 'ID',
@@ -47,18 +69,18 @@ export default function UsersTable({ users, searchText, onView, onEdit, onDelete
     },
     {
       title: 'Vai trò',
-      dataIndex: 'role_id',
-      key: 'role_id',
-      render: (roleId: number) => (
+      dataIndex: 'roleId',
+      key: 'roleId',
+      render: (roleId: number, record: User) => (
         <Tag color={roleId === 1 ? 'red' : roleId === 2 ? 'orange' : 'blue'}>
-          {roleMap[roleId] || 'User'}
+          {capitalizeFirst(record.roleName || roleMap[roleId] || 'User')}
         </Tag>
       ),
     },
     {
       title: 'Ngày tạo',
-      dataIndex: 'created_at',
-      key: 'created_at',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
       render: (date: string) => new Date(date).toLocaleDateString('vi-VN'),
     },
     {
@@ -109,10 +131,18 @@ export default function UsersTable({ users, searchText, onView, onEdit, onDelete
       columns={columns}
       dataSource={users}
       rowKey="id"
+      loading={loading}
       pagination={{
-        pageSize: 10,
-        showSizeChanger: true,
-        showTotal: (total) => `Tổng ${total} người dùng`,
+        current: currentPage,
+        pageSize: pageSize,
+        total: total,
+        showSizeChanger: false,
+        showTotal: (total, range) => {
+          if (loading) return 'Đang tải...';
+          if (total === 0) return 'Không có dữ liệu';
+          return `${range[0]}-${range[1]} của ${total} người dùng`;
+        },
+        onChange: onPageChange ? (page) => onPageChange(page, pageSize) : undefined,
       }}
     />
   );

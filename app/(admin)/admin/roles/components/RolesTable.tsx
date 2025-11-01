@@ -114,14 +114,13 @@ export default function RolesTable({
         current: currentPage,
         pageSize: pageSize,
         total: total,
-        showSizeChanger: true,
+        showSizeChanger: false,
         showTotal: (total, range) => {
           if (loading) return 'Đang tải...';
           if (total === 0) return 'Không có dữ liệu';
           return `${range[0]}-${range[1]} của ${total} vai trò`;
         },
-        onChange: onPageChange ? (page, size) => onPageChange(page, size || 10) : undefined,
-        onShowSizeChange: onPageChange ? (current, size) => onPageChange(current, size) : undefined,
+        onChange: onPageChange ? (page) => onPageChange(page, pageSize) : undefined,
       }}
     />
   );

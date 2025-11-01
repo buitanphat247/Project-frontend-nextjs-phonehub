@@ -18,6 +18,7 @@ export default function RolesHeader({ searchValue, onSearchChange, onCreateClick
           onChange={(e) => onSearchChange(e.target.value)}
           style={{ width: 300 }}
           allowClear
+          autoComplete="off"
         />
         <Button type="primary" icon={<PlusOutlined />} onClick={onCreateClick}>
           Tạo vai trò

@@ -5,9 +5,9 @@ export interface User {
   phone: string;
   address: string;
   avatar: string;
-  role_id: number;
-  role_name?: string;
-  created_at: string;
-  updated_at: string;
+  roleId: number;
+  roleName?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 

@@ -94,3 +94,34 @@ export async function deleteRole(id: number): Promise<ApiResponse<void>> {
   return response.json();
 }
 
+// Get all roles without pagination (for dropdowns)
+export async function getAllRoles(): Promise<ApiResponse<RoleResponse[]>> {
+  const url = buildApiUrl('/roles');
+  // Request a large size to get all roles
+  const queryParams = new URLSearchParams({
+    page: '0',
+    size: '1000',
+  });
+
+  const response = await fetch(`${url}?${queryParams}`, {
+    ...defaultFetchOptions,
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch roles: ${response.statusText}`);
+  }
+
+  const result = await response.json();
+  
+  // Transform paginated response to array
+  if (result.success && result.data && result.data.content) {
+    return {
+      ...result,
+      data: result.data.content,
+    };
+  }
+
+  return result;
+}
+

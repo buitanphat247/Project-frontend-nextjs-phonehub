@@ -27,3 +27,19 @@ export function capitalizeWords(str: string): string {
     .join(' ');
 }
 
+/**
+ * Get color for HTTP status code
+ * @param status - HTTP status code
+ * @returns Color name for Ant Design Tag component
+ * @example
+ * getStatusColor(200) // returns 'success'
+ * getStatusColor(404) // returns 'error'
+ */
+export function getStatusColor(status?: number): 'default' | 'success' | 'warning' | 'error' {
+  if (!status) return 'default';
+  if (status >= 200 && status < 300) return 'success';
+  if (status >= 300 && status < 400) return 'warning';
+  if (status >= 400) return 'error';
+  return 'default';
+}
+

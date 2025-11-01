@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Layout, Menu } from 'antd';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Layout, Menu } from "antd";
 import {
   DashboardOutlined,
   ShopOutlined,
@@ -13,7 +13,7 @@ import {
   SecurityScanOutlined,
   PictureOutlined,
   ApiOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 
 const { Sider } = Layout;
 
@@ -28,54 +28,49 @@ export default function AdminSidebar({ collapsed, setCollapsed, headerHeight = 6
 
   const menuItems = [
     {
-      key: '/dashboard',
+      key: "/dashboard",
       icon: <DashboardOutlined />,
       label: <Link href="/dashboard">Dashboard</Link>,
     },
     {
-      key: 'products',
+      key: "products",
       icon: <ShopOutlined />,
-      label: 'Sản phẩm',
+      label: "Sản phẩm",
       children: [
         {
-          key: '/admin/products',
+          key: "/admin/products",
           icon: <ShopOutlined />,
           label: <Link href="/admin/products">Quản lý sản phẩm</Link>,
         },
         {
-          key: '/admin/categories',
+          key: "/admin/categories",
           icon: <AppstoreOutlined />,
-          label: <Link href="/admin/categories">Danh mục</Link>,
-        },
-        {
-          key: '/admin/images',
-          icon: <PictureOutlined />,
-          label: <Link href="/admin/images">Quản lý hình ảnh</Link>,
+          label: <Link href="/admin/categories">Quản lý danh mục</Link>,
         },
       ],
     },
     {
-      key: '/admin/orders',
+      key: "/admin/orders",
       icon: <ShoppingCartOutlined />,
       label: <Link href="/admin/orders">Quản lý đơn hàng</Link>,
     },
     {
-      key: '/admin/users',
+      key: "/admin/users",
       icon: <UserOutlined />,
       label: <Link href="/admin/users">Quản lý người dùng</Link>,
     },
     {
-      key: '/admin/roles',
+      key: "/admin/roles",
       icon: <SecurityScanOutlined />,
       label: <Link href="/admin/roles">Quản lý vai trò</Link>,
     },
     {
-      key: '/admin/settings',
+      key: "/admin/settings",
       icon: <SettingOutlined />,
       label: <Link href="/admin/settings">Cài đặt</Link>,
     },
     {
-      key: '/admin/test-connection',
+      key: "/admin/test-connection",
       icon: <ApiOutlined />,
       label: <Link href="/admin/test-connection">Kiểm tra kết nối</Link>,
     },
@@ -89,25 +84,18 @@ export default function AdminSidebar({ collapsed, setCollapsed, headerHeight = 6
       width={250}
       theme="light"
       style={{
-        overflow: 'auto',
+        overflow: "auto",
         height: `calc(100vh - ${headerHeight}px)`,
-        position: 'fixed',
+        position: "fixed",
         left: 0,
         top: `${headerHeight}px`,
         bottom: 0,
       }}
     >
       <div className="border-b border-gray-200 py-2 text-center">
-        <h2 className="text-2xl font-bold text-blue-600">
-          {collapsed ? 'A' : 'Admin'}
-        </h2>
+        <h2 className="text-2xl font-bold text-blue-600">{collapsed ? "A" : "Admin"}</h2>
       </div>
-      <Menu
-        theme="light"
-        mode="inline"
-        selectedKeys={[pathname]}
-        items={menuItems}
-      />
+      <Menu theme="light" mode="inline" selectedKeys={[pathname]} items={menuItems} />
     </Sider>
   );
 }

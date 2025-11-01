@@ -1,22 +1,49 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { message } from 'antd';
 import { Role } from '../interface/IRole';
 import { getRoles, createRole, updateRole, deleteRole } from '../../../../../lib/api/roles';
 import type { RoleResponse } from '../../../../../lib/api/roles';
+import { notifyRoleChanged } from '../../users/hooks/useRolesForSelect';
+
+// Helper to get URL params
+const getUrlParams = () => {
+  if (typeof window === 'undefined') return { page: 0, size: 10, search: '' };
+  const params = new URLSearchParams(window.location.search);
+  return {
+    page: parseInt(params.get('page') || '0'),
+    size: parseInt(params.get('size') || '10'),
+    search: params.get('search') || '',
+  };
+};
 
 export function useRoleHandlers() {
+  const router = useRouter();
+  const urlParams = getUrlParams();
+  
   const [roles, setRoles] = useState<Role[]>([]);
-  const [loading, setLoading] = useState(true); // Set loading to true initially
-  const [searchText, setSearchText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState(urlParams.search);
   const [modalVisible, setModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  // Pagination state - initialized from URL
+  const [currentPage, setCurrentPage] = useState(urlParams.page);
+  const [pageSize, setPageSize] = useState(urlParams.size);
   const [totalElements, setTotalElements] = useState(0);
+  
+  // Update URL when pagination changes
+  const updateUrlParams = useCallback((page: number, size: number, search: string) => {
+    const params = new URLSearchParams();
+    if (page > 0) params.set('page', page.toString());
+    if (size !== 10) params.set('size', size.toString());
+    if (search) params.set('search', search);
+    const queryString = params.toString();
+    const newUrl = `/admin/roles${queryString ? `?${queryString}` : ''}`;
+    router.push(newUrl, { scroll: false });
+  }, [router]);
 
   // Fetch roles from API
   const fetchRoles = async (page: number = currentPage, size: number = pageSize) => {
@@ -46,15 +73,33 @@ export function useRoleHandlers() {
     }
   };
 
-  // Load roles on mount and when pagination changes
+  // Load roles on mount and sync with URL params
   useEffect(() => {
-    fetchRoles();
+    const params = getUrlParams();
+    setCurrentPage(params.page);
+    setPageSize(params.size);
+    setSearchText(params.search);
+    fetchRoles(params.page, params.size);
+  }, []);
+
+  // Listen for URL changes (e.g., browser back/forward)
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = getUrlParams();
+      setCurrentPage(params.page);
+      setPageSize(params.size);
+      setSearchText(params.search);
+      fetchRoles(params.page, params.size);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   const handleSearch = (value: string) => {
     setSearchText(value);
-    // Reset to first page when searching
     setCurrentPage(0);
+    updateUrlParams(0, pageSize, value);
   };
 
   const handleDelete = async (id: number) => {
@@ -63,6 +108,8 @@ export function useRoleHandlers() {
       message.success('Xóa vai trò thành công');
       // Reload roles after deletion
       await fetchRoles(currentPage, pageSize);
+      // Notify other components that roles have changed
+      notifyRoleChanged();
     } catch (error: any) {
       console.error('Error deleting role:', error);
       message.error('Không thể xóa vai trò: ' + (error.message || 'Lỗi không xác định'));
@@ -109,6 +156,8 @@ export function useRoleHandlers() {
       setCreateModalVisible(false);
       // Reload roles after creation
       await fetchRoles(currentPage, pageSize);
+      // Notify other components that roles have changed
+      notifyRoleChanged();
     } catch (error: any) {
       console.error('Error creating role:', error);
       message.error('Không thể tạo vai trò: ' + (error.message || 'Lỗi không xác định'));
@@ -128,6 +177,8 @@ export function useRoleHandlers() {
       setSelectedRole(null);
       // Reload roles after update
       await fetchRoles(currentPage, pageSize);
+      // Notify other components that roles have changed
+      notifyRoleChanged();
     } catch (error: any) {
       console.error('Error updating role:', error);
       message.error('Không thể cập nhật vai trò: ' + (error.message || 'Lỗi không xác định'));
@@ -135,9 +186,11 @@ export function useRoleHandlers() {
   };
 
   const handlePageChange = (page: number, size: number) => {
-    setCurrentPage(page - 1); // Ant Design pagination is 1-based, API is 0-based
+    const apiPage = page - 1; // Ant Design pagination is 1-based, API is 0-based
+    setCurrentPage(apiPage);
     setPageSize(size);
-    fetchRoles(page - 1, size);
+    updateUrlParams(apiPage, size, searchText);
+    fetchRoles(apiPage, size);
   };
 
   // Filter roles based on search text

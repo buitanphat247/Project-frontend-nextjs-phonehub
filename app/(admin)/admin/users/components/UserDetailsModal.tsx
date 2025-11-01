@@ -1,6 +1,12 @@
 import { Modal, Button, Descriptions, Tag } from 'antd';
 import { User } from '../interface/IUser';
-import { roleMap } from '../mock/usersData';
+import { capitalizeFirst } from '../../../../../lib/utils/string';
+
+const roleMap: Record<number, string> = {
+  1: 'Admin',
+  2: 'Staff',
+  3: 'User',
+};
 
 interface UserDetailsModalProps {
   user: User | null;
@@ -29,11 +35,11 @@ export default function UserDetailsModal({ user, visible, onClose }: UserDetails
           <Descriptions.Item label="Số điện thoại">{user.phone}</Descriptions.Item>
           <Descriptions.Item label="Địa chỉ">{user.address}</Descriptions.Item>
           <Descriptions.Item label="Vai trò">
-            <Tag color={user.role_id === 1 ? 'red' : user.role_id === 2 ? 'orange' : 'blue'}>
-              {roleMap[user.role_id] || 'User'}
+            <Tag color={user.roleId === 1 ? 'red' : user.roleId === 2 ? 'orange' : 'blue'}>
+              {capitalizeFirst(user.roleName || roleMap[user.roleId] || 'User')}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Ngày tạo">{new Date(user.created_at).toLocaleString('vi-VN')}</Descriptions.Item>
+          <Descriptions.Item label="Ngày tạo">{new Date(user.createdAt).toLocaleString('vi-VN')}</Descriptions.Item>
         </Descriptions>
       )}
     </Modal>

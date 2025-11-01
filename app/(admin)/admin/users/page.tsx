@@ -8,11 +8,15 @@ import { useUserHandlers } from './hooks/useUserHandlers';
 export default function UsersPage() {
   const {
     users,
+    loading,
     searchText,
     modalVisible,
     createModalVisible,
     editModalVisible,
     selectedUser,
+    currentPage,
+    pageSize,
+    totalElements,
     handleSearch,
     handleDelete,
     handleView,
@@ -23,12 +27,24 @@ export default function UsersPage() {
     handleCloseEditModal,
     handleCreateUser,
     handleEditUser,
+    handlePageChange,
   } = useUserHandlers();
 
   return (
     <div className="space-y-4">
       <UsersHeader searchValue={searchText} onSearchChange={handleSearch} onCreateClick={handleCreateClick} />
-      <UsersTable users={users} searchText={searchText} onView={handleView} onEdit={handleEditClick} onDelete={handleDelete} />
+      <UsersTable 
+        users={users} 
+        searchText={searchText}
+        loading={loading}
+        currentPage={currentPage + 1}
+        pageSize={pageSize}
+        total={totalElements}
+        onView={handleView} 
+        onEdit={handleEditClick} 
+        onDelete={handleDelete}
+        onPageChange={handlePageChange}
+      />
       <UserModals
         selectedUser={selectedUser}
         modalVisible={modalVisible}
