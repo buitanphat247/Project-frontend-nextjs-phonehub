@@ -7,12 +7,28 @@ import { Category } from '../interface/ICategory';
 interface CategoriesTableProps {
   categories: Category[];
   searchText: string;
+  loading?: boolean;
+  currentPage?: number;
+  pageSize?: number;
+  total?: number;
   onView: (category: Category) => void;
   onEdit: (category: Category) => void;
   onDelete: (id: number) => void;
+  onPageChange?: (page: number, size: number) => void;
 }
 
-export default function CategoriesTable({ categories, searchText, onView, onEdit, onDelete }: CategoriesTableProps) {
+export default function CategoriesTable({ 
+  categories, 
+  searchText,
+  loading = false,
+  currentPage = 1,
+  pageSize = 10,
+  total = 0,
+  onView, 
+  onEdit, 
+  onDelete,
+  onPageChange,
+}: CategoriesTableProps) {
   const columns: ColumnsType<Category> = [
     {
       title: 'ID',
@@ -35,14 +51,15 @@ export default function CategoriesTable({ categories, searchText, onView, onEdit
       key: 'slug',
     },
     {
-      title: 'Người tạo',
-      dataIndex: 'created_by',
-      key: 'created_by',
+      title: 'Ngày tạo',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (date: string) => new Date(date).toLocaleDateString('vi-VN'),
     },
     {
-      title: 'Ngày tạo',
-      dataIndex: 'created_at',
-      key: 'created_at',
+      title: 'Ngày cập nhật',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
       render: (date: string) => new Date(date).toLocaleDateString('vi-VN'),
     },
     {
@@ -93,10 +110,18 @@ export default function CategoriesTable({ categories, searchText, onView, onEdit
       columns={columns}
       dataSource={categories}
       rowKey="id"
+      loading={loading}
       pagination={{
-        pageSize: 10,
-        showSizeChanger: true,
-        showTotal: (total) => `Tổng ${total} danh mục`,
+        current: currentPage,
+        pageSize: pageSize,
+        total: total,
+        showSizeChanger: false,
+        showTotal: (total, range) => {
+          if (loading) return 'Đang tải...';
+          if (total === 0) return 'Không có dữ liệu';
+          return `${range[0]}-${range[1]} của ${total} danh mục`;
+        },
+        onChange: onPageChange ? (page) => onPageChange(page, pageSize) : undefined,
       }}
     />
   );

@@ -8,11 +8,15 @@ import { useCategoryHandlers } from './hooks/useCategoryHandlers';
 export default function CategoriesPage() {
   const {
     categories,
+    loading,
     searchText,
     modalVisible,
     createModalVisible,
     editModalVisible,
     selectedCategory,
+    currentPage,
+    pageSize,
+    totalElements,
     handleSearch,
     handleDelete,
     handleView,
@@ -23,12 +27,24 @@ export default function CategoriesPage() {
     handleCloseEditModal,
     handleCreateCategory,
     handleEditCategory,
+    handlePageChange,
   } = useCategoryHandlers();
 
   return (
     <div>
       <CategoriesHeader searchValue={searchText} onSearchChange={handleSearch} onCreateClick={handleCreateClick} />
-      <CategoriesTable categories={categories} searchText={searchText} onView={handleView} onEdit={handleEditClick} onDelete={handleDelete} />
+      <CategoriesTable 
+        categories={categories} 
+        searchText={searchText}
+        loading={loading}
+        currentPage={currentPage + 1}
+        pageSize={pageSize}
+        total={totalElements}
+        onView={handleView} 
+        onEdit={handleEditClick} 
+        onDelete={handleDelete}
+        onPageChange={handlePageChange}
+      />
       <CategoryModals
         selectedCategory={selectedCategory}
         modalVisible={modalVisible}

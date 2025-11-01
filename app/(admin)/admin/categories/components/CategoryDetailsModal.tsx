@@ -25,8 +25,8 @@ export default function CategoryDetailsModal({ category, visible, onClose }: Cat
           <Descriptions.Item label="ID">{category.id}</Descriptions.Item>
           <Descriptions.Item label="Tên danh mục">{category.name}</Descriptions.Item>
           <Descriptions.Item label="Slug">{category.slug}</Descriptions.Item>
-          <Descriptions.Item label="Người tạo">{category.created_by}</Descriptions.Item>
-          <Descriptions.Item label="Ngày tạo">{new Date(category.created_at).toLocaleString('vi-VN')}</Descriptions.Item>
+          <Descriptions.Item label="Ngày tạo">{new Date(category.createdAt).toLocaleString('vi-VN')}</Descriptions.Item>
+          <Descriptions.Item label="Ngày cập nhật">{new Date(category.updatedAt).toLocaleString('vi-VN')}</Descriptions.Item>
         </Descriptions>
       )}
     </Modal>

@@ -35,9 +35,11 @@ export default function TestConnectionForm({
             placeholder="http://localhost:8080/api/v1"
             value={apiUrl}
             onChange={(e) => onApiUrlChange(e.target.value)}
+            onPressEnter={onTest}
             style={{ marginTop: 8 }}
             prefix={<ApiOutlined />}
             disabled={loading}
+            autoComplete="off"
           />
           <Paragraph type="secondary" style={{ marginTop: 4, fontSize: '12px' }}>
             Base URL đã bao gồm <Text code>/api/v1</Text>
@@ -50,9 +52,11 @@ export default function TestConnectionForm({
             placeholder="/database/health"
             value={endpoint}
             onChange={(e) => onEndpointChange(e.target.value)}
+            onPressEnter={onTest}
             style={{ marginTop: 8 }}
             prefix={<DatabaseOutlined />}
             disabled={true}
+            autoComplete="off"
           />
           <Paragraph type="secondary" style={{ marginTop: 4, fontSize: '12px' }}>
             Đường dẫn endpoint (bắt đầu bằng <Text code>/</Text>)

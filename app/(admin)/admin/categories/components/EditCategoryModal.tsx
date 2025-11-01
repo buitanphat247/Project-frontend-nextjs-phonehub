@@ -16,28 +16,28 @@ export default function EditCategoryModal({ category, visible, onClose, onSubmit
     if (category && visible) {
       form.setFieldsValue({
         name: category.name,
+        slug: category.slug,
       });
     }
   }, [category, visible, form]);
 
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
-  };
 
   const handleSubmit = () => {
     form.validateFields().then(values => {
-      const slug = generateSlug(values.name || '');
-      onSubmit({ ...values, slug });
+      onSubmit(values);
       form.resetFields();
       onClose();
     });
+  };
+
+  const handleFinish = (values: any) => {
+    onSubmit(values);
+    form.resetFields();
+    onClose();
+  };
+
+  const handlePressEnter = () => {
+    form.submit();
   };
 
   return (
@@ -47,17 +47,44 @@ export default function EditCategoryModal({ category, visible, onClose, onSubmit
       onCancel={onClose}
       footer={[
         <Button key="cancel" onClick={onClose}>Hủy</Button>,
-        <Button key="submit" type="primary" onClick={handleSubmit}>Cập nhật</Button>,
+        <Button key="submit" type="primary" htmlType="submit" onClick={handleSubmit}>Cập nhật</Button>,
       ]}
       width={400}
     >
-      <Form form={form} layout="vertical">
+      <Form 
+        form={form} 
+        layout="vertical" 
+        autoComplete="off"
+        onFinish={handleFinish}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            form.submit();
+          }
+        }}
+      >
         <Form.Item
           label="Tên danh mục"
           name="name"
           rules={[{ required: true, message: 'Vui lòng nhập tên danh mục' }]}
         >
-          <Input placeholder="Nhập tên danh mục" />
+          <Input 
+            placeholder="Nhập tên danh mục" 
+            autoComplete="off"
+            onPressEnter={handlePressEnter}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Slug"
+          name="slug"
+          rules={[{ required: true, message: 'Vui lòng nhập slug' }]}
+        >
+          <Input 
+            placeholder="Nhập slug" 
+            autoComplete="off"
+            onPressEnter={handlePressEnter}
+          />
         </Form.Item>
       </Form>
     </Modal>
