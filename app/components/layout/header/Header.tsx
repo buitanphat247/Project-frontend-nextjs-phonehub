@@ -19,7 +19,8 @@ export default function Header() {
       price: 29990000,
       quantity: 1,
       image: '📱',
-      color: 'Titanium Natural'
+      color: 'Titanium Natural',
+      brand: 'Apple'
     },
     {
       id: 2,
@@ -27,7 +28,8 @@ export default function Header() {
       price: 24990000,
       quantity: 1,
       image: '📱',
-      color: 'Titanium Black'
+      color: 'Titanium Black',
+      brand: 'Samsung'
     }
   ]
 

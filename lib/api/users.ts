@@ -38,6 +38,31 @@ export async function getUsers(page: number = 0, size: number = 10): Promise<Api
   return response.json();
 }
 
+// Search users by keyword (username or email) with pagination
+export async function searchUsers(
+  keyword: string,
+  page: number = 0,
+  size: number = 10
+): Promise<ApiResponse<PaginatedResponse<UserResponse>>> {
+  const url = buildApiUrl('/users/search');
+  const queryParams = new URLSearchParams({
+    keyword: keyword,
+    page: page.toString(),
+    size: size.toString(),
+  });
+
+  const response = await fetch(`${url}?${queryParams}`, {
+    ...defaultFetchOptions,
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to search users: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
 // Get user by ID
 export async function getUserById(id: number): Promise<ApiResponse<UserResponse>> {
   const url = buildApiUrl(`/users/${id}`);

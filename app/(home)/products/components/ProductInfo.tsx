@@ -19,15 +19,19 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
       <div>
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-500 uppercase tracking-wide">{product.brand}</span>
-          {/* Rating */}
-          <span className="text-gray-600">({product.reviews} đánh giá)</span>
-          <div className="flex items-center">
-            {[...Array(5)].map((_, i) => (
-              <span key={i} className={`text-lg ${i < Math.floor(product.rating) ? "text-yellow-400" : "text-gray-300"}`}>
-                ★
-              </span>
-            ))}
-          </div>
+          {/* Rating - chỉ hiển thị nếu có */}
+          {product.reviews && product.rating && (
+            <>
+              <span className="text-gray-600">({product.reviews} đánh giá)</span>
+              <div className="flex items-center">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className={`text-lg ${i < Math.floor(product.rating || 0) ? "text-yellow-400" : "text-gray-300"}`}>
+                    ★
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
@@ -46,6 +50,28 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
           </div>
         )}
       </div>
+
+      {/* Colors */}
+      {product.colors && product.colors.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">Màu sắc</h3>
+          <div className="flex flex-wrap gap-3">
+            {product.colors.map((color) => (
+              <div
+                key={color.id}
+                className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-blue-500 transition-colors cursor-pointer"
+                style={{ borderColor: color.hexColor }}
+              >
+                <div
+                  className="w-6 h-6 rounded-full border border-gray-300"
+                  style={{ backgroundColor: color.hexColor }}
+                />
+                <span className="text-gray-700">{color.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Description */}
       <div>

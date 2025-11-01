@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { Spin } from 'antd'
-import ProductCard from '../products/components/ProductCard'
-import LaptopsFilters from './components/LaptopsFilters'
-import Pagination from '../products/components/Pagination'
-import { useLaptops } from './hooks/useLaptops'
+import { Spin } from "antd";
+import ProductCard from "../products/components/ProductCard";
+import SmartwatchesFilters from "./components/SmartwatchesFilters";
+import Pagination from "../products/components/Pagination";
+import { useSmartwatches } from "./hooks/useSmartwatches";
 
-const LaptopsPage = () => {
+const SmartwatchesPage = () => {
   const {
     filteredProducts,
     currentProducts,
@@ -20,7 +20,7 @@ const LaptopsPage = () => {
     handleFilterChange,
     handlePageChange,
     isLoading,
-  } = useLaptops()
+  } = useSmartwatches();
 
   if (isLoading) {
     return (
@@ -30,7 +30,7 @@ const LaptopsPage = () => {
           <p className="text-gray-600 mt-4">Đang tải sản phẩm...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -38,9 +38,7 @@ const LaptopsPage = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Laptop
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Đồng hồ thông minh</h1>
           <p className="text-gray-600">
             {totalElements} sản phẩm
           </p>
@@ -49,12 +47,7 @@ const LaptopsPage = () => {
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
           <div className="lg:col-span-1">
-            <LaptopsFilters 
-              onFilterChange={handleFilterChange}
-              currentFilters={filters}
-              brands={brands}
-              loadingBrands={searching}
-            />
+            <SmartwatchesFilters onFilterChange={handleFilterChange} currentFilters={filters} brands={brands} loadingBrands={searching} />
           </div>
 
           {/* Products Grid */}
@@ -68,21 +61,13 @@ const LaptopsPage = () => {
                     ))}
                   </div>
 
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
+                  <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
                 </>
               ) : (
                 <div className="text-center py-16">
                   <div className="text-6xl mb-4">🔍</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Không tìm thấy sản phẩm
-                  </h3>
-                  <p className="text-gray-600">
-                    Hãy thử thay đổi bộ lọc để tìm sản phẩm khác
-                  </p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy sản phẩm</h3>
+                  <p className="text-gray-600">Hãy thử thay đổi bộ lọc để tìm sản phẩm khác</p>
                 </div>
               )}
             </Spin>
@@ -90,8 +75,8 @@ const LaptopsPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LaptopsPage
+export default SmartwatchesPage;
 

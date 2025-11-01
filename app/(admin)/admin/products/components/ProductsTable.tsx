@@ -7,57 +7,116 @@ import { Product } from '../interface/IProduct';
 interface ProductsTableProps {
   products: Product[];
   searchText: string;
+  loading?: boolean;
+  currentPage?: number;
+  pageSize?: number;
+  total?: number;
   onView: (product: Product) => void;
   onDelete: (id: number) => void;
+  onPageChange?: (page: number, size: number) => void;
 }
 
-export default function ProductsTable({ products, searchText, onView, onDelete }: ProductsTableProps) {
+export default function ProductsTable({ 
+  products, 
+  searchText,
+  loading = false,
+  currentPage = 1,
+  pageSize = 10,
+  total = 0,
+  onView, 
+  onDelete,
+  onPageChange,
+}: ProductsTableProps) {
   const columns: ColumnsType<Product> = [
     {
       title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
+      key: 'index',
       width: 80,
+      render: (_: any, __: Product, index: number) => {
+        return (currentPage - 1) * pageSize + index + 1;
+      },
     },
     {
       title: 'Tên sản phẩm',
       dataIndex: 'name',
       key: 'name',
-      filteredValue: searchText ? [searchText] : null,
-      onFilter: (value, record) =>
-        record.name.toLowerCase().includes(value as string) ||
-        record.slug.toLowerCase().includes(value as string),
+      width: 300,
+      render: (name: string) => (
+        <div
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            maxWidth: 300,
+          }}
+          title={name}
+        >
+          {name}
+        </div>
+      ),
+    },
+    {
+      title: 'Thương hiệu',
+      dataIndex: 'brand',
+      key: 'brand',
+      width: 150,
     },
     {
       title: 'Danh mục',
-      dataIndex: 'category_name',
-      key: 'category_name',
+      dataIndex: 'categoryName',
+      key: 'categoryName',
+      width: 150,
     },
     {
-      title: 'Giá',
+      title: 'Giá mới',
       dataIndex: 'price',
       key: 'price',
-      render: (price: number) => `${price.toLocaleString('vi-VN')} ₫`,
+      width: 120,
+      align: 'right',
+      render: (price: number) => (
+        <div style={{ fontWeight: 500, color: '#1890ff' }}>
+          {price.toLocaleString('vi-VN')} ₫
+        </div>
+      ),
     },
     {
-      title: 'Tồn kho',
-      dataIndex: 'stock',
-      key: 'stock',
+      title: 'Giá cũ',
+      dataIndex: 'priceOld',
+      key: 'priceOld',
+      width: 120,
+      align: 'right',
+      render: (priceOld: number) => (
+        priceOld > 0 ? (
+          <div style={{ textDecoration: 'line-through', color: '#8c8c8c' }}>
+            {priceOld.toLocaleString('vi-VN')} ₫
+          </div>
+        ) : (
+          <span style={{ color: '#8c8c8c' }}>-</span>
+        )
+      ),
+    },
+    {
+      title: 'Giảm giá',
+      dataIndex: 'discount',
+      key: 'discount',
+      width: 100,
+      align: 'center',
+      render: (discount: string) => discount ? <Tag color="red">{discount}</Tag> : '-',
     },
     {
       title: 'Trạng thái',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => (
-        <Tag color={status === 'active' ? 'green' : 'default'}>
-          {status === 'active' ? 'Hoạt động' : 'Không hoạt động'}
+      dataIndex: 'isPublished',
+      key: 'isPublished',
+      render: (isPublished: boolean) => (
+        <Tag color={isPublished ? 'green' : 'default'}>
+          {isPublished ? 'Đã xuất bản' : 'Chưa xuất bản'}
         </Tag>
       ),
     },
     {
       title: 'Ngày tạo',
-      dataIndex: 'created_at',
-      key: 'created_at',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
       render: (date: string) => new Date(date).toLocaleDateString('vi-VN'),
     },
     {
@@ -108,10 +167,18 @@ export default function ProductsTable({ products, searchText, onView, onDelete }
       columns={columns}
       dataSource={products}
       rowKey="id"
+      loading={loading}
       pagination={{
-        pageSize: 10,
-        showSizeChanger: true,
-        showTotal: (total) => `Tổng ${total} sản phẩm`,
+        current: currentPage,
+        pageSize: pageSize,
+        total: total,
+        showSizeChanger: false,
+        showTotal: (total, range) => {
+          if (loading) return 'Đang tải...';
+          if (total === 0) return 'Không có dữ liệu';
+          return `${range[0]}-${range[1]} của ${total} sản phẩm`;
+        },
+        onChange: onPageChange ? (page) => onPageChange(page, pageSize) : undefined,
       }}
     />
   );

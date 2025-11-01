@@ -1,6 +1,8 @@
+'use client'
+
 import React from "react";
 import Link from "next/link";
-import { Button } from "antd";
+import { Button, Spin } from "antd";
 import {
   ShoppingCartOutlined,
   HeartOutlined,
@@ -13,280 +15,11 @@ import {
   SafetyOutlined,
   AudioOutlined,
 } from "@ant-design/icons";
-import { Product } from "./products/interface/IProduct";
 import ProductCard from "./products/components/ProductCard";
+import { useHomeProducts } from "./hooks/useHomeProducts";
 
 const HomePage = () => {
-  // Sample products for each category
-  const sampleProducts: Product[] = [
-    // Phones
-    {
-      id: 1,
-      name: "iPhone 15 Pro Max",
-      price: 29990000,
-      originalPrice: 32990000,
-      image: "📱",
-      brand: "Apple",
-      category: "phones",
-      discountPercent: 9,
-      isOnSale: true,
-      rating: 4.8,
-      reviews: 1247,
-    },
-    {
-      id: 2,
-      name: "Samsung Galaxy S24 Ultra",
-      price: 24990000,
-      originalPrice: 27990000,
-      image: "📱",
-      brand: "Samsung",
-      category: "phones",
-      discountPercent: 11,
-      isOnSale: false,
-      rating: 4.6,
-      reviews: 892,
-    },
-    {
-      id: 3,
-      name: "Xiaomi 14 Pro",
-      price: 19990000,
-      originalPrice: 22990000,
-      image: "📱",
-      brand: "Xiaomi",
-      category: "phones",
-      discountPercent: 13,
-      isOnSale: true,
-      rating: 4.4,
-      reviews: 634,
-    },
-    {
-      id: 4,
-      name: "Google Pixel 8 Pro",
-      price: 22990000,
-      originalPrice: 25990000,
-      image: "📱",
-      brand: "Google",
-      category: "phones",
-      discountPercent: 12,
-      isOnSale: false,
-      rating: 4.5,
-      reviews: 456,
-    },
-    {
-      id: 5,
-      name: "OnePlus 12",
-      price: 18990000,
-      originalPrice: 21990000,
-      image: "📱",
-      brand: "OnePlus",
-      category: "phones",
-      discountPercent: 14,
-      isOnSale: true,
-      rating: 4.3,
-      reviews: 378,
-    },
-
-    // Laptops
-    {
-      id: 6,
-      name: "MacBook Pro M3",
-      price: 45990000,
-      originalPrice: 49990000,
-      image: "💻",
-      brand: "Apple",
-      category: "laptops",
-      discountPercent: 8,
-      isOnSale: false,
-      rating: 4.9,
-      reviews: 567,
-    },
-    {
-      id: 7,
-      name: "Dell XPS 15",
-      price: 38990000,
-      originalPrice: 42990000,
-      image: "💻",
-      brand: "Dell",
-      category: "laptops",
-      discountPercent: 9,
-      isOnSale: true,
-      rating: 4.7,
-      reviews: 423,
-    },
-    {
-      id: 8,
-      name: "HP Spectre x360",
-      price: 32990000,
-      originalPrice: 36990000,
-      image: "💻",
-      brand: "HP",
-      category: "laptops",
-      discountPercent: 11,
-      isOnSale: false,
-      rating: 4.5,
-      reviews: 312,
-    },
-    {
-      id: 9,
-      name: "Lenovo ThinkPad X1",
-      price: 35990000,
-      originalPrice: 39990000,
-      image: "💻",
-      brand: "Lenovo",
-      category: "laptops",
-      discountPercent: 10,
-      isOnSale: true,
-      rating: 4.6,
-      reviews: 289,
-    },
-    {
-      id: 10,
-      name: "ASUS ROG Strix",
-      price: 27990000,
-      originalPrice: 31990000,
-      image: "💻",
-      brand: "ASUS",
-      category: "laptops",
-      discountPercent: 13,
-      isOnSale: false,
-      rating: 4.4,
-      reviews: 198,
-    },
-
-    // iPads
-    {
-      id: 11,
-      name: "iPad Pro 12.9",
-      price: 22990000,
-      originalPrice: 25990000,
-      image: "📱",
-      brand: "Apple",
-      category: "ipads",
-      discountPercent: 12,
-      isOnSale: true,
-      rating: 4.8,
-      reviews: 445,
-    },
-    {
-      id: 12,
-      name: "iPad Air 5",
-      price: 17990000,
-      originalPrice: 20990000,
-      image: "📱",
-      brand: "Apple",
-      category: "ipads",
-      discountPercent: 14,
-      isOnSale: false,
-      rating: 4.6,
-      reviews: 334,
-    },
-    {
-      id: 13,
-      name: "iPad mini 6",
-      price: 12990000,
-      originalPrice: 15990000,
-      image: "📱",
-      brand: "Apple",
-      category: "ipads",
-      discountPercent: 19,
-      isOnSale: true,
-      rating: 4.5,
-      reviews: 267,
-    },
-    {
-      id: 14,
-      name: "Samsung Galaxy Tab S9",
-      price: 19990000,
-      originalPrice: 22990000,
-      image: "📱",
-      brand: "Samsung",
-      category: "ipads",
-      discountPercent: 13,
-      isOnSale: false,
-      rating: 4.4,
-      reviews: 189,
-    },
-    {
-      id: 15,
-      name: "Microsoft Surface Pro",
-      price: 24990000,
-      originalPrice: 27990000,
-      image: "📱",
-      brand: "Microsoft",
-      category: "ipads",
-      discountPercent: 11,
-      isOnSale: true,
-      rating: 4.3,
-      reviews: 156,
-    },
-
-    // Accessories
-    {
-      id: 16,
-      name: "AirPods Pro 2",
-      price: 5990000,
-      originalPrice: 6990000,
-      image: "🎧",
-      brand: "Apple",
-      category: "accessories",
-      discountPercent: 14,
-      isOnSale: true,
-      rating: 4.7,
-      reviews: 892,
-    },
-    {
-      id: 17,
-      name: "Sony WH-1000XM5",
-      price: 7990000,
-      originalPrice: 8990000,
-      image: "🎧",
-      brand: "Sony",
-      category: "accessories",
-      discountPercent: 11,
-      isOnSale: false,
-      rating: 4.8,
-      reviews: 567,
-    },
-    {
-      id: 18,
-      name: "Magic Mouse 3",
-      price: 2990000,
-      originalPrice: 3490000,
-      image: "🖱️",
-      brand: "Apple",
-      category: "accessories",
-      discountPercent: 14,
-      isOnSale: true,
-      rating: 4.2,
-      reviews: 234,
-    },
-    {
-      id: 19,
-      name: "Logitech MX Master 3S",
-      price: 2490000,
-      originalPrice: 2990000,
-      image: "🖱️",
-      brand: "Logitech",
-      category: "accessories",
-      discountPercent: 17,
-      isOnSale: false,
-      rating: 4.6,
-      reviews: 345,
-    },
-    {
-      id: 20,
-      name: "Samsung Galaxy Watch 6",
-      price: 6990000,
-      originalPrice: 7990000,
-      image: "⌚",
-      brand: "Samsung",
-      category: "accessories",
-      discountPercent: 13,
-      isOnSale: true,
-      rating: 4.5,
-      reviews: 278,
-    },
-  ];
+  const { phonesProducts, laptopsProducts, ipadsProducts, smartwatchesProducts, loading } = useHomeProducts();
 
   const categories = [
     {
@@ -314,9 +47,9 @@ const HomePage = () => {
       iconColor: "text-purple-600",
     },
     {
-      name: "Phụ kiện",
+      name: "Đồng hồ thông minh",
       icon: <AudioOutlined className="text-4xl" />,
-      link: "/accessories",
+      link: "/smartwatches",
       color: "from-orange-500 to-orange-600",
       bgColor: "bg-orange-50",
       iconColor: "text-orange-600",
@@ -428,14 +161,17 @@ const HomePage = () => {
                 Xem tất cả →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {sampleProducts
-                .filter((p) => p.category === "phones")
-                .slice(0, 5)
-                .map((product) => (
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <Spin size="large" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                {phonesProducts.slice(0, 5).map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Laptops Section */}
@@ -449,14 +185,17 @@ const HomePage = () => {
                 Xem tất cả →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {sampleProducts
-                .filter((p) => p.category === "laptops")
-                .slice(0, 5)
-                .map((product) => (
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <Spin size="large" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                {laptopsProducts.slice(0, 5).map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* iPads Section */}
@@ -470,35 +209,41 @@ const HomePage = () => {
                 Xem tất cả →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {sampleProducts
-                .filter((p) => p.category === "ipads")
-                .slice(0, 5)
-                .map((product) => (
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <Spin size="large" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                {ipadsProducts.slice(0, 5).map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
-            </div>
+              </div>
+            )}
           </div>
 
-          {/* Accessories Section */}
+          {/* Smartwatches Section */}
           <div className="mb-16">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-2xl font-bold text-gray-900 flex items-center">
                 <AudioOutlined className="mr-3 text-orange-600" />
-                Phụ kiện
+                Đồng hồ thông minh
               </h3>
-              <Link href="/accessories" className="text-orange-600 hover:text-orange-700 font-medium">
+              <Link href="/smartwatches" className="text-orange-600 hover:text-orange-700 font-medium">
                 Xem tất cả →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {sampleProducts
-                .filter((p) => p.category === "accessories")
-                .slice(0, 5)
-                .map((product) => (
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <Spin size="large" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                {smartwatchesProducts.slice(0, 5).map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

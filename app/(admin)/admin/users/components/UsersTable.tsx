@@ -47,10 +47,6 @@ export default function UsersTable({
       title: 'Username',
       dataIndex: 'username',
       key: 'username',
-      filteredValue: searchText ? [searchText] : null,
-      onFilter: (value, record) =>
-        record.username.toLowerCase().includes(value as string) ||
-        record.email.toLowerCase().includes(value as string),
     },
     {
       title: 'Email',

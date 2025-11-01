@@ -19,24 +19,25 @@ interface ProductImageProps {
 const ProductImage = ({ product }: ProductImageProps) => {
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
 
-  // Tạo array ảnh cho carousel với ảnh thật
-  const images = [
-    "https://cdn-media.sforum.vn/storage/app/media/anh-dep-83.jpg",
-    "https://cdn-media.sforum.vn/storage/app/media/anh-dep-82.jpg",
-    "https://baogiaothong.mediacdn.vn/upload/2-2022/images/2022-05-25/1-1653445668-308-width740height476.jpg",
-    "https://cdn-media.sforum.vn/storage/app/media/anh-dep-83.jpg",
-    "https://cdn-media.sforum.vn/storage/app/media/anh-dep-82.jpg",
-    "https://baogiaothong.mediacdn.vn/upload/2-2022/images/2022-05-25/1-1653445668-308-width740height476.jpg",
-    "https://cdn-media.sforum.vn/storage/app/media/anh-dep-83.jpg",
-    "https://cdn-media.sforum.vn/storage/app/media/anh-dep-82.jpg",
-    "https://baogiaothong.mediacdn.vn/upload/2-2022/images/2022-05-25/1-1653445668-308-width740height476.jpg",
-    "https://cdn-media.sforum.vn/storage/app/media/anh-dep-83.jpg",
-    "https://cdn-media.sforum.vn/storage/app/media/anh-dep-82.jpg",
-    "https://baogiaothong.mediacdn.vn/upload/2-2022/images/2022-05-25/1-1653445668-308-width740height476.jpg",
-  ];
+  // Lấy images từ product, nếu không có thì dùng thumbnailImage
+  const images = product.images && product.images.length > 0
+    ? product.images.map(img => img.url)
+    : product.thumbnailImage
+      ? [product.thumbnailImage]
+      : [];
+
+  if (images.length === 0) {
+    return (
+      <div className="bg-white rounded-lg overflow-hidden">
+        <div className="h-96 flex items-center justify-center bg-gray-100">
+          <span className="text-6xl">{product.image || "📱"}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white  rounded-lg overflow-hidden">
+    <div className="bg-white rounded-lg overflow-hidden">
       <style jsx>{`
         .thumbs-swiper .swiper-slide-thumb-active img {
           border-color: #3b82f6 !important;
@@ -47,20 +48,20 @@ const ProductImage = ({ product }: ProductImageProps) => {
         <Swiper
           modules={[Thumbs, FreeMode, Autoplay]}
           spaceBetween={10}
-          navigation={true}
-          thumbs={{ swiper: thumbsSwiper }}
+          navigation={images.length > 1}
+          thumbs={{ swiper: thumbsSwiper && images.length > 1 ? thumbsSwiper : null }}
           className="main-swiper"
           touchRatio={1}
           touchAngle={45}
           grabCursor={true}
           allowTouchMove={true}
           simulateTouch={true}
-          autoplay={{
+          autoplay={images.length > 1 ? {
             delay: 1500,
             disableOnInteraction: false,
             pauseOnMouseEnter: true
-          }}
-          loop={true}
+          } : false}
+          loop={images.length > 1}
         >
           {images.map((image, index) => (
             <SwiperSlide key={index}>
@@ -77,8 +78,8 @@ const ProductImage = ({ product }: ProductImageProps) => {
             </SwiperSlide>
           ))}
         </Swiper>
-        <div className="mt-1 h-[70px]">
-          {images.length > 1 && (
+        {images.length > 1 && (
+          <div className="mt-1 h-[70px]">
             <Swiper
               onSwiper={setThumbsSwiper}
               slidesPerView={6}
@@ -86,20 +87,20 @@ const ProductImage = ({ product }: ProductImageProps) => {
               freeMode={true}
               watchSlidesProgress={true}
               modules={[FreeMode, Thumbs]}
-              className="thumbs-swiper h-full "
+              className="thumbs-swiper h-full"
             >
               {images.map((image, index) => (
-                <SwiperSlide key={index} >
+                <SwiperSlide key={index}>
                   <img
                     src={image}
                     alt={`Thumbnail ${index + 1}`}
-                    className="w-full object-cover h-full"
+                    className="w-full object-contain h-full"
                   />
                 </SwiperSlide>
               ))}
             </Swiper>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

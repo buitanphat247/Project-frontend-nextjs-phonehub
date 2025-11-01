@@ -53,7 +53,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         className={`px-3 py-2 rounded-lg text-sm font-medium ${
           currentPage === 1
             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 cursor-pointer'
         }`}
       >
         Trước
@@ -67,10 +67,10 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
           disabled={page === '...'}
           className={`px-3 py-2 rounded-lg text-sm font-medium ${
             page === currentPage
-              ? 'bg-blue-600 text-white'
+              ? 'bg-blue-600 text-white cursor-pointer'
               : page === '...'
               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 cursor-pointer'
           }`}
         >
           {page}
@@ -84,7 +84,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         className={`px-3 py-2 rounded-lg text-sm font-medium ${
           currentPage === totalPages
             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 cursor-pointer'
         }`}
       >
         Sau

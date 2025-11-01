@@ -17,7 +17,7 @@ interface PageProps {
   }>;
 }
 
-const LaptopDetailPage = ({ params }: PageProps) => {
+const SmartwatchDetailPage = ({ params }: PageProps) => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [id, setId] = useState<number>(0);
@@ -116,7 +116,7 @@ const LaptopDetailPage = ({ params }: PageProps) => {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Không tìm thấy sản phẩm</h1>
           <p className="text-gray-600 mb-6">Sản phẩm bạn tìm kiếm không tồn tại.</p>
-          <a href="/laptops" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+          <a href="/smartwatches" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
             Quay lại danh sách
           </a>
         </div>
@@ -193,4 +193,5 @@ const LaptopDetailPage = ({ params }: PageProps) => {
   );
 };
 
-export default LaptopDetailPage;
+export default SmartwatchDetailPage;
+

@@ -9,7 +9,7 @@ const navigation = [
   { name: "Phones", href: "/phones" },
   { name: "Laptops", href: "/laptops" },
   { name: "iPads", href: "/ipads" },
-  { name: "Accessories", href: "/accessories" },
+  { name: "Smartwatches", href: "/smartwatches" },
   { name: "About Us", href: "/about" },
 ];
 

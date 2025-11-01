@@ -9,6 +9,7 @@ export default function UsersPage() {
   const {
     users,
     loading,
+    searching,
     searchText,
     modalVisible,
     createModalVisible,
@@ -32,7 +33,12 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-4">
-      <UsersHeader searchValue={searchText} onSearchChange={handleSearch} onCreateClick={handleCreateClick} />
+      <UsersHeader 
+        searchValue={searchText}
+        searching={searching}
+        onSearchChange={handleSearch} 
+        onCreateClick={handleCreateClick} 
+      />
       <UsersTable 
         users={users} 
         searchText={searchText}
