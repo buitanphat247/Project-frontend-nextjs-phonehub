@@ -9,7 +9,7 @@ import { Product } from '../../../(home)/products/interface/IProduct'
 import { getCategoryRoute } from '../../../(home)/products/utils/categoryUtils'
 import { Spin, Dropdown, Button } from 'antd'
 import type { MenuProps } from 'antd'
-import { UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons'
+import { UserOutlined, LogoutOutlined, SettingOutlined, HeartOutlined } from '@ant-design/icons'
 import { isAuthenticated, getAuthData, clearAuthData } from '../../../../lib/utils/cookie'
 
 interface AuthState {
@@ -76,6 +76,8 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     if (e.key === 'account') {
       router.push('/account?tab=account')
+    } else if (e.key === 'favorites') {
+      router.push('/favourite')
     } else if (e.key === 'settings') {
       router.push('/account?tab=settings')
     }
@@ -87,7 +89,11 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
       icon: <UserOutlined />,
       label: 'Tài khoản của tôi',
     },
-    
+    {
+      key: 'favorites',
+      icon: <HeartOutlined />,
+      label: 'Sản phẩm yêu thích',
+    },
     {
       type: 'divider',
     },
