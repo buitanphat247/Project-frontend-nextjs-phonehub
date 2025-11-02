@@ -1,4 +1,5 @@
-import { buildApiUrl, defaultFetchOptions, ApiResponse, PaginatedResponse } from './config';
+import { ApiResponse, PaginatedResponse } from './config';
+import { apiGet } from '../utils/apiClient';
 
 // Category interface for nested category in product
 export interface ProductCategoryResponse {
@@ -63,22 +64,12 @@ export interface ProductResponse {
 
 // Get products with pagination
 export async function getProducts(page: number = 0, size: number = 10): Promise<ApiResponse<PaginatedResponse<ProductResponse>>> {
-  const url = buildApiUrl('/products');
   const queryParams = new URLSearchParams({
     page: page.toString(),
     size: size.toString(),
   });
 
-  const response = await fetch(`${url}?${queryParams}`, {
-    ...defaultFetchOptions,
-    method: 'GET',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch products: ${response.statusText}`);
-  }
-
-  return response.json();
+  return apiGet<PaginatedResponse<ProductResponse>>(`/products?${queryParams}`);
 }
 
 // Search products by name with pagination (optional categoryId for more accurate filtering)
@@ -88,7 +79,6 @@ export async function searchProducts(
   size: number = 10,
   categoryId?: number
 ): Promise<ApiResponse<PaginatedResponse<ProductResponse>>> {
-  const url = buildApiUrl('/products/search');
   const queryParams = new URLSearchParams({
     name: name,
     page: page.toString(),
@@ -100,32 +90,12 @@ export async function searchProducts(
     queryParams.set('categoryId', categoryId.toString());
   }
 
-  const response = await fetch(`${url}?${queryParams}`, {
-    ...defaultFetchOptions,
-    method: 'GET',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to search products: ${response.statusText}`);
-  }
-
-  return response.json();
+  return apiGet<PaginatedResponse<ProductResponse>>(`/products/search?${queryParams}`);
 }
 
 // Get product by ID
 export async function getProductById(id: number): Promise<ApiResponse<ProductResponse>> {
-  const url = buildApiUrl(`/products/${id}`);
-  
-  const response = await fetch(url, {
-    ...defaultFetchOptions,
-    method: 'GET',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch product: ${response.statusText}`);
-  }
-
-  return response.json();
+  return apiGet<ProductResponse>(`/products/${id}`);
 }
 
 // Get published products by category ID with pagination
@@ -134,22 +104,12 @@ export async function getProductsByCategory(
   page: number = 0,
   size: number = 10
 ): Promise<ApiResponse<PaginatedResponse<ProductResponse>>> {
-  const url = buildApiUrl(`/products/published/category/${categoryId}`);
   const queryParams = new URLSearchParams({
     page: page.toString(),
     size: size.toString(),
   });
 
-  const response = await fetch(`${url}?${queryParams}`, {
-    ...defaultFetchOptions,
-    method: 'GET',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch products by category: ${response.statusText}`);
-  }
-
-  return response.json();
+  return apiGet<PaginatedResponse<ProductResponse>>(`/products/published/category/${categoryId}?${queryParams}`);
 }
 
 // Get published products by brand with pagination (optional categoryId for more precise filtering)
@@ -159,7 +119,6 @@ export async function getProductsByBrand(
   size: number = 10,
   categoryId?: number
 ): Promise<ApiResponse<PaginatedResponse<ProductResponse>>> {
-  const url = buildApiUrl('/products/published/brand');
   const queryParams = new URLSearchParams({
     brand: brand,
     page: page.toString(),
@@ -171,31 +130,11 @@ export async function getProductsByBrand(
     queryParams.set('categoryId', categoryId.toString());
   }
 
-  const response = await fetch(`${url}?${queryParams}`, {
-    ...defaultFetchOptions,
-    method: 'GET',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch products by brand: ${response.statusText}`);
-  }
-
-  return response.json();
+  return apiGet<PaginatedResponse<ProductResponse>>(`/products/published/brand?${queryParams}`);
 }
 
 // Get brands by category ID
 export async function getBrandsByCategory(categoryId: number): Promise<ApiResponse<string[]>> {
-  const url = buildApiUrl(`/products/brands/category/${categoryId}`);
-  
-  const response = await fetch(url, {
-    ...defaultFetchOptions,
-    method: 'GET',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch brands by category: ${response.statusText}`);
-  }
-
-  return response.json();
+  return apiGet<string[]>(`/products/brands/category/${categoryId}`);
 }
 

@@ -4,11 +4,24 @@ export const API_CONFIG = {
   TIMEOUT: 30000, // 30 seconds
 };
 
-// Helper function to build API URL
-export const buildApiUrl = (endpoint: string): string => {
+// Use Next.js proxy in client-side to avoid CORS issues
+// In production, you can use direct API URL if CORS is configured
+const getApiBaseUrl = (): string => {
+  // Check if we're on client-side
+  if (typeof window !== 'undefined') {
+    // Use Next.js proxy to avoid CORS in development
+    return '/api/proxy';
+  }
+  // Server-side can use direct URL
   const baseUrl = API_CONFIG.BASE_URL.endsWith('/') 
     ? API_CONFIG.BASE_URL.slice(0, -1) 
     : API_CONFIG.BASE_URL;
+  return baseUrl;
+};
+
+// Helper function to build API URL
+export const buildApiUrl = (endpoint: string): string => {
+  const baseUrl = getApiBaseUrl();
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   return `${baseUrl}${cleanEndpoint}`;
 };

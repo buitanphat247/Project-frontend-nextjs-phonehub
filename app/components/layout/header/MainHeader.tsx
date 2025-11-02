@@ -7,14 +7,26 @@ import { searchProducts } from '../../../../lib/api/products'
 import type { ProductResponse } from '../../../../lib/api/products'
 import { Product } from '../../../(home)/products/interface/IProduct'
 import { getCategoryRoute } from '../../../(home)/products/utils/categoryUtils'
-import { Spin } from 'antd'
+import { Spin, Dropdown, Button } from 'antd'
+import type { MenuProps } from 'antd'
+import { UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons'
+import { isAuthenticated, getAuthData, clearAuthData } from '../../../../lib/utils/cookie'
+
+interface AuthState {
+  authenticated: boolean
+  userData: {
+    username: string
+    email: string
+  } | null
+}
 
 interface MainHeaderProps {
+  initialAuth: AuthState
   totalItems: number
   onCartClick: () => void
 }
 
-export default function MainHeader({ totalItems, onCartClick }: MainHeaderProps) {
+export default function MainHeader({ initialAuth, totalItems, onCartClick }: MainHeaderProps) {
   const router = useRouter()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -23,6 +35,66 @@ export default function MainHeader({ totalItems, onCartClick }: MainHeaderProps)
   const [showResults, setShowResults] = useState(false)
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const searchContainerRef = useRef<HTMLDivElement>(null)
+  const [authenticated, setAuthenticated] = useState(initialAuth.authenticated)
+  const [userData, setUserData] = useState<{ username: string; email: string } | null>(initialAuth.userData)
+
+  // Use useEffect for event listeners and interval
+  useEffect(() => {
+    const checkAuth = () => {
+      const auth = isAuthenticated()
+      setAuthenticated(auth)
+      if (auth) {
+        const data = getAuthData()
+        if (data) {
+          setUserData({ username: data.username, email: data.email })
+        }
+      } else {
+        setUserData(null)
+      }
+    }
+
+    const handleStorageChange = () => {
+      checkAuth()
+    }
+    
+    window.addEventListener('storage', handleStorageChange)
+    const interval = setInterval(checkAuth, 1000)
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      clearInterval(interval)
+    }
+  }, [])
+
+  const handleLogout = () => {
+    clearAuthData()
+    setAuthenticated(false)
+    setUserData(null)
+    window.location.reload()
+  }
+
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: 'account',
+      icon: <UserOutlined />,
+      label: <Link href="/account">Tài khoản của tôi</Link>,
+    },
+    {
+      key: 'settings',
+      icon: <SettingOutlined />,
+      label: <Link href="/account">Cài đặt</Link>,
+    },
+    {
+      type: 'divider',
+    },
+    {
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: 'Đăng xuất',
+      danger: true,
+      onClick: handleLogout,
+    },
+  ]
 
   // Transform API response to Product
   const transformProduct = (product: ProductResponse): Product => {
@@ -157,8 +229,31 @@ export default function MainHeader({ totalItems, onCartClick }: MainHeaderProps)
               </span>
             )}
             
+            {/* Search Results Loading Skeleton */}
+            {isSearching && (
+              <div 
+                className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50"
+              >
+                {[...Array(5)].map((_, index) => (
+                  <div
+                    key={index}
+                    className="p-4 border-b border-gray-100 last:border-b-0"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-16 h-16 shrink-0 bg-gray-200 rounded-lg animate-pulse" />
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <div className="h-3 bg-gray-200 rounded animate-pulse w-1/4" />
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-full" />
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-1/3" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
             {/* Search Results Dropdown */}
-            {showResults && searchResults.length > 0 && (
+            {!isSearching && showResults && searchResults.length > 0 && (
               <div 
                 className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl max-h-96 overflow-y-auto z-50 search-results-scrollbar"
                 onWheel={(e) => {
@@ -248,27 +343,39 @@ export default function MainHeader({ totalItems, onCartClick }: MainHeaderProps)
             <span className="text-xl">🔍</span>
           </button>
 
-          {/* User Account */}
-          <Link 
-            href="/account" 
-            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Tài khoản"
-          >
-            <span className="text-xl">👤</span>
-          </Link>
+          {/* User Account - Only show when authenticated */}
+          {authenticated && userData && (
+            <Dropdown
+              menu={{ items: userMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <button
+                className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
+                title={`Xin chào, ${userData.username}`}
+              >
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                  {userData.username.charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden sm:block text-sm font-medium">{userData.username}</span>
+              </button>
+            </Dropdown>
+          )}
 
-          {/* Shopping Cart */}
-          <button
-            onClick={onCartClick}
-            className="relative cursor-pointer p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Giỏ hàng"
-            aria-label={`Giỏ hàng có ${totalItems} sản phẩm`}
-          >
-            <span className="text-xl">🛒</span>
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-              {totalItems}
-            </span>
-          </button>
+          {/* Shopping Cart - Only show when authenticated */}
+          {authenticated && (
+            <button
+              onClick={onCartClick}
+              className="relative cursor-pointer p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Giỏ hàng"
+              aria-label={`Giỏ hàng có ${totalItems} sản phẩm`}
+            >
+              <span className="text-xl">🛒</span>
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                {totalItems}
+              </span>
+            </button>
+          )}
         </div>
       </div>
 

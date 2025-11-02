@@ -62,14 +62,15 @@ const ProductImage = ({ product }: ProductImageProps) => {
             pauseOnMouseEnter: true
           } : false}
           loop={images.length > 1}
+          
         >
           {images.map((image, index) => (
             <SwiperSlide key={index}>
-              <div className="h-96 flex items-center justify-center">
+              <div className="h-96 flex items-center justify-center ">
                 <Image
                   src={image}
                   alt={`${product.name} - ${index + 1}`}
-                  className="max-w-full max-h-full object-contain"
+                  className="max-w-full max-h-full object-contain "
                   preview={{
                     mask: "Click để phóng to",
                   }}
@@ -79,7 +80,7 @@ const ProductImage = ({ product }: ProductImageProps) => {
           ))}
         </Swiper>
         {images.length > 1 && (
-          <div className="mt-1 h-[70px]">
+          <div className="mt-1 h-[70px] ">
             <Swiper
               onSwiper={setThumbsSwiper}
               slidesPerView={6}

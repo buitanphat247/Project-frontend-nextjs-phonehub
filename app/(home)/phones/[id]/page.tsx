@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Spin } from "antd";
 import { Product } from "../../products/interface/IProduct";
 import ProductBreadcrumb from "../../products/components/ProductBreadcrumb";
 import ProductImage from "../../products/components/ProductImage";
 import ProductInfo from "../../products/components/ProductInfo";
 import RelatedProducts from "../../products/components/RelatedProducts";
+import ProductDetailSkeleton from "../../products/components/ProductDetailSkeleton";
 import { getProductById } from "../../../../lib/api/products";
 import type { ProductResponse } from "../../../../lib/api/products";
 import { getCategoryRoute } from "../../products/utils/categoryUtils";
@@ -100,14 +100,7 @@ const PhoneDetailPage = ({ params }: PageProps) => {
   }, [id]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Spin size="large" />
-          <p className="text-gray-600 mt-4">Đang tải sản phẩm...</p>
-        </div>
-      </div>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (!product) {

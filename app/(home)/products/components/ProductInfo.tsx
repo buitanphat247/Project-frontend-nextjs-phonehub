@@ -1,4 +1,9 @@
+"use client";
+
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 import { Product } from "../interface/IProduct";
+import { isAuthenticated } from "../../../../lib/utils/cookie";
 
 interface ProductInfoProps {
   product: Product;
@@ -6,11 +11,24 @@ interface ProductInfoProps {
 }
 
 const ProductInfo = ({ product, category }: ProductInfoProps) => {
+  const router = useRouter();
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(price);
+  };
+
+  const handleActionClick = (actionName: string) => {
+    const authenticated = isAuthenticated();
+    
+    if (!authenticated) {
+      toast.warn("Vui lòng đăng nhập!");
+      return;
+    }
+    // TODO: Implement action logic here
+    console.log(`${actionName} clicked for product ${product.id}`);
   };
 
   return (
@@ -108,19 +126,31 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
       {/* Actions */}
       <div className="space-y-4">
         <div className="flex space-x-4">
-          <button className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors cursor-pointer">
+          <button 
+            onClick={() => handleActionClick("Thêm vào giỏ hàng")}
+            className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors cursor-pointer"
+          >
             Thêm vào giỏ hàng
           </button>
-          <button className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors cursor-pointer">
+          <button 
+            onClick={() => handleActionClick("Mua ngay")}
+            className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors cursor-pointer"
+          >
             Mua ngay
           </button>
         </div>
 
         <div className="flex space-x-4">
-          <button className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors cursor-pointer">
+          <button 
+            onClick={() => handleActionClick("Yêu thích")}
+            className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors cursor-pointer"
+          >
             Yêu thích
           </button>
-          <button className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors cursor-pointer">
+          <button 
+            onClick={() => handleActionClick("So sánh")}
+            className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors cursor-pointer"
+          >
             So sánh
           </button>
         </div>

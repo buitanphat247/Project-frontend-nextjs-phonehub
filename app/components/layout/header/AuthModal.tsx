@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Modal, Tabs, Form, Input, Button, Checkbox, Divider, Space, message } from 'antd'
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
+import { signIn } from '../../../../lib/api/auth'
+import { saveAuthData } from '../../../../lib/utils/cookie'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -13,6 +15,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [activeTab, setActiveTab] = useState('signin')
   const [signInForm] = Form.useForm()
   const [signUpForm] = Form.useForm()
+  const [loading, setLoading] = useState(false)
 
   // Control body scroll when modal is open
   useEffect(() => {
@@ -47,14 +50,31 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   }, [isOpen, onClose])
 
-  const handleSignIn = async (values: any) => {
+  const handleSignIn = async (values: { username: string; password: string }) => {
     try {
-      console.log('Sign in:', values)
-      message.success('Đăng nhập thành công!')
-      onClose()
-      signInForm.resetFields()
-    } catch (error) {
-      message.error('Đăng nhập thất bại!')
+      setLoading(true)
+      const response = await signIn({
+        username: values.username,
+        password: values.password,
+      })
+
+      if (response.success && response.data) {
+        // Save auth data to cookie
+        saveAuthData(response.data)
+        message.success(response.message || 'Đăng nhập thành công!')
+        onClose()
+        signInForm.resetFields()
+        
+        // Reload page to update authentication state
+        window.location.reload()
+      } else {
+        message.error(response.message || 'Đăng nhập thất bại!')
+      }
+    } catch (error: any) {
+      console.error('Sign in error:', error)
+      message.error(error.message || 'Đăng nhập thất bại!')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -90,16 +110,16 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           size="large"
         >
           <Form.Item
-            name="email"
+            name="username"
             rules={[
-              { required: true, message: 'Vui lòng nhập email!' },
-              { type: 'email', message: 'Email không hợp lệ!' }
+              { required: true, message: 'Vui lòng nhập tên đăng nhập!' }
             ]}
           >
             <Input
-              prefix={<MailOutlined />}
-              placeholder="Email"
+              prefix={<UserOutlined />}
+              placeholder="Tên đăng nhập"
               className="h-12"
+              autoComplete="off"
             />
           </Form.Item>
 
@@ -111,6 +131,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               prefix={<LockOutlined />}
               placeholder="Mật khẩu"
               className="h-12"
+              autoComplete="new-password"
             />
           </Form.Item>
 
@@ -130,6 +151,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               type="primary"
               htmlType="submit"
               className="w-full h-12 bg-blue-600 hover:bg-blue-700"
+              loading={loading}
+              disabled={loading}
             >
               Đăng nhập
             </Button>
@@ -157,6 +180,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 prefix={<UserOutlined />}
                 placeholder="Họ"
                 className="h-12"
+                autoComplete="off"
               />
             </Form.Item>
             <Form.Item
@@ -167,6 +191,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 prefix={<UserOutlined />}
                 placeholder="Tên"
                 className="h-12"
+                autoComplete="off"
               />
             </Form.Item>
           </div>
@@ -182,6 +207,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               prefix={<MailOutlined />}
               placeholder="Email"
               className="h-12"
+              autoComplete="off"
             />
           </Form.Item>
 
@@ -196,6 +222,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               prefix={<PhoneOutlined />}
               placeholder="Số điện thoại"
               className="h-12"
+              autoComplete="off"
             />
           </Form.Item>
 
@@ -210,6 +237,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               prefix={<LockOutlined />}
               placeholder="Mật khẩu"
               className="h-12"
+              autoComplete="new-password"
             />
           </Form.Item>
 
@@ -232,6 +260,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               prefix={<LockOutlined />}
               placeholder="Xác nhận mật khẩu"
               className="h-12"
+              autoComplete="new-password"
             />
           </Form.Item>
 

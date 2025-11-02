@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Button, Spin } from "antd";
+import { Button } from "antd";
 import {
   ShoppingCartOutlined,
   HeartOutlined,
@@ -16,6 +16,7 @@ import {
   AudioOutlined,
 } from "@ant-design/icons";
 import ProductCard from "./products/components/ProductCard";
+import ProductCardSkeleton from "./products/components/ProductCardSkeleton";
 import { useHomeProducts } from "./hooks/useHomeProducts";
 
 const HomePage = () => {
@@ -48,7 +49,7 @@ const HomePage = () => {
     },
     {
       name: "Đồng hồ thông minh",
-      icon: <AudioOutlined className="text-4xl" />,
+      icon: <span className="text-4xl">⌚</span>,
       link: "/smartwatches",
       color: "from-orange-500 to-orange-600",
       bgColor: "bg-orange-50",
@@ -162,8 +163,10 @@ const HomePage = () => {
               </Link>
             </div>
             {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <Spin size="large" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                {[...Array(5)].map((_, index) => (
+                  <ProductCardSkeleton key={index} />
+                ))}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -186,8 +189,10 @@ const HomePage = () => {
               </Link>
             </div>
             {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <Spin size="large" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                {[...Array(5)].map((_, index) => (
+                  <ProductCardSkeleton key={index} />
+                ))}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -210,8 +215,10 @@ const HomePage = () => {
               </Link>
             </div>
             {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <Spin size="large" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                {[...Array(5)].map((_, index) => (
+                  <ProductCardSkeleton key={index} />
+                ))}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -226,7 +233,7 @@ const HomePage = () => {
           <div className="mb-16">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-2xl font-bold text-gray-900 flex items-center">
-                <AudioOutlined className="mr-3 text-orange-600" />
+                <span className="mr-3 text-orange-600 text-2xl">⌚</span>
                 Đồng hồ thông minh
               </h3>
               <Link href="/smartwatches" className="text-orange-600 hover:text-orange-700 font-medium">
@@ -234,8 +241,10 @@ const HomePage = () => {
               </Link>
             </div>
             {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <Spin size="large" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                {[...Array(5)].map((_, index) => (
+                  <ProductCardSkeleton key={index} />
+                ))}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">

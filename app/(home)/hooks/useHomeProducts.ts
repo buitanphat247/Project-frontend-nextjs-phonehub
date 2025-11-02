@@ -54,29 +54,58 @@ export function useHomeProducts() {
         
         // Fetch top 5 products for each category
         const [phonesRes, laptopsRes, ipadsRes, smartwatchesRes] = await Promise.all([
-          getProductsByCategory(PHONES_CATEGORY_ID, 0, 5),
-          getProductsByCategory(LAPTOPS_CATEGORY_ID, 0, 5),
-          getProductsByCategory(IPADS_CATEGORY_ID, 0, 5),
-          getProductsByCategory(SMARTWATCHES_CATEGORY_ID, 0, 5),
+          getProductsByCategory(PHONES_CATEGORY_ID, 0, 5).catch(err => {
+            console.error(`Error fetching phones (category ${PHONES_CATEGORY_ID}):`, err)
+            return { success: false, data: null }
+          }),
+          getProductsByCategory(LAPTOPS_CATEGORY_ID, 0, 5).catch(err => {
+            console.error(`Error fetching laptops (category ${LAPTOPS_CATEGORY_ID}):`, err)
+            return { success: false, data: null }
+          }),
+          getProductsByCategory(IPADS_CATEGORY_ID, 0, 5).catch(err => {
+            console.error(`Error fetching ipads (category ${IPADS_CATEGORY_ID}):`, err)
+            return { success: false, data: null }
+          }),
+          getProductsByCategory(SMARTWATCHES_CATEGORY_ID, 0, 5).catch(err => {
+            console.error(`Error fetching smartwatches (category ${SMARTWATCHES_CATEGORY_ID}):`, err)
+            return { success: false, data: null }
+          }),
         ])
 
         if (phonesRes.success && phonesRes.data) {
           setPhonesProducts(transformProducts(phonesRes.data.content))
+        } else {
+          console.warn('Phones response failed or empty:', phonesRes)
+          setPhonesProducts([])
         }
 
         if (laptopsRes.success && laptopsRes.data) {
           setLaptopsProducts(transformProducts(laptopsRes.data.content))
+        } else {
+          console.warn('Laptops response failed or empty:', laptopsRes)
+          setLaptopsProducts([])
         }
 
         if (ipadsRes.success && ipadsRes.data) {
           setIpadProducts(transformProducts(ipadsRes.data.content))
+        } else {
+          console.warn('iPads response failed or empty:', ipadsRes)
+          setIpadProducts([])
         }
 
         if (smartwatchesRes.success && smartwatchesRes.data) {
           setSmartwatchesProducts(transformProducts(smartwatchesRes.data.content))
+        } else {
+          console.warn('Smartwatches response failed or empty:', smartwatchesRes)
+          setSmartwatchesProducts([])
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching home products:', error)
+        // Set empty arrays on error
+        setPhonesProducts([])
+        setLaptopsProducts([])
+        setIpadProducts([])
+        setSmartwatchesProducts([])
       } finally {
         setLoading(false)
       }
