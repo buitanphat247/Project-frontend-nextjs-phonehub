@@ -11,7 +11,7 @@ import SettingsTab from "./components/SettingsTab";
 import ChangePasswordModal from "./components/ChangePasswordModal";
 import AccountSkeleton from "./components/AccountSkeleton";
 import { getUserById } from "../../../lib/api/users";
-import { getAuthData } from "../../../lib/utils/cookie";
+import { getAuthData, updateAuthData } from "../../../lib/utils/cookie";
 
 const AccountPage = () => {
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
@@ -82,6 +82,12 @@ const AccountPage = () => {
     // Update state immediately for UI
     setUserInfo(updatedUserInfo);
     
+    // Update auth_data cookie with new username and email
+    updateAuthData({
+      username: updatedUserInfo.name,
+      email: updatedUserInfo.email,
+    });
+    
     // Optionally reload fresh data from API to ensure consistency
     try {
       const authData = getAuthData();
@@ -107,6 +113,12 @@ const AccountPage = () => {
             totalOrders: updatedUserInfo.totalOrders,
             totalSpent: updatedUserInfo.totalSpent,
             loyaltyPoints: updatedUserInfo.loyaltyPoints,
+          });
+
+          // Update cookie again with fresh data from API
+          updateAuthData({
+            username: userData.username,
+            email: userData.email,
           });
         }
       }

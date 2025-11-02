@@ -105,6 +105,13 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
       <div>
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-500 uppercase tracking-wide">{product.brand}</span>
+          {product.quantity !== undefined && (
+            <span className={`text-sm font-medium ${
+              product.quantity > 0 ? 'text-green-600' : 'text-red-600'
+            }`}>
+              (Còn {product.quantity.toLocaleString('vi-VN')} sản phẩm)
+            </span>
+          )}
           {/* Rating - chỉ hiển thị nếu có */}
           {product.reviews && product.rating && (
             <>

@@ -40,6 +40,7 @@ export interface Product {
   rating?: number
   reviews?: number
   isPublished: boolean
+  quantity?: number
   specifications?: ProductSpecification[]
   colors?: ProductColor[]
   images?: ProductImage[]

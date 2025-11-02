@@ -62,10 +62,12 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, onClo
       maskClosable={true}
       destroyOnClose={true}
       centered={true}
-      maskStyle={{
-        backdropFilter: 'blur(3px)',
-        WebkitBackdropFilter: 'blur(3px)',
-        backgroundColor: 'rgba(0, 0, 0, 0.3)'
+      styles={{
+        mask: {
+          backdropFilter: 'blur(3px)',
+          WebkitBackdropFilter: 'blur(3px)',
+          backgroundColor: 'rgba(0, 0, 0, 0.3)'
+        }
       }}
     >
       <Form

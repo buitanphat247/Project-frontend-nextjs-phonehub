@@ -66,11 +66,11 @@ const ProductImage = ({ product }: ProductImageProps) => {
         >
           {images.map((image, index) => (
             <SwiperSlide key={index}>
-              <div className="h-96 flex items-center justify-center ">
+              <div className="h-96 flex items-center justify-center bg-gray-50">
                 <Image
                   src={image}
                   alt={`${product.name} - ${index + 1}`}
-                  className="max-w-full max-h-full object-contain "
+                  className="max-w-full max-h-full object-contain"
                   preview={{
                     mask: "Click để phóng to",
                   }}
@@ -92,11 +92,13 @@ const ProductImage = ({ product }: ProductImageProps) => {
             >
               {images.map((image, index) => (
                 <SwiperSlide key={index}>
-                  <img
-                    src={image}
-                    alt={`Thumbnail ${index + 1}`}
-                    className="w-full object-contain h-full"
-                  />
+                  <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded border border-gray-200 overflow-hidden">
+                    <img
+                      src={image}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
                 </SwiperSlide>
               ))}
             </Swiper>

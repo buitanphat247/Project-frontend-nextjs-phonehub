@@ -9,7 +9,7 @@ import { Product } from '../../../(home)/products/interface/IProduct'
 import { getCategoryRoute } from '../../../(home)/products/utils/categoryUtils'
 import { Spin, Dropdown, Button, App } from 'antd'
 import type { MenuProps } from 'antd'
-import { UserOutlined, LogoutOutlined, SettingOutlined, HeartOutlined, ExclamationCircleOutlined, ShoppingCartOutlined } from '@ant-design/icons'
+import { UserOutlined, LogoutOutlined, SettingOutlined, HeartOutlined, ExclamationCircleOutlined, ShoppingCartOutlined, SearchOutlined, MobileOutlined } from '@ant-design/icons'
 import { isAuthenticated, getAuthData, clearAuthData } from '../../../../lib/utils/cookie'
 
 interface AuthState {
@@ -249,7 +249,9 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
               }}
               className="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
             />
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <SearchOutlined className="text-lg" />
+            </span>
             {isSearching && (
               <span className="absolute right-3 top-1/2 transform -translate-y-1/2">
                 <Spin size="small" />
@@ -335,8 +337,8 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
                             }}
                           />
                         ) : null}
-                        <span className={`text-2xl ${product.thumbnailImage ? 'hidden' : ''}`}>
-                          {product.image || '📱'}
+                        <span className={`${product.thumbnailImage ? 'hidden' : ''} flex items-center justify-center text-gray-400`}>
+                          {product.image || <MobileOutlined className="text-2xl" />}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
@@ -367,7 +369,7 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
             onClick={() => setIsSearchOpen(!isSearchOpen)}
             className="md:hidden p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <span className="text-xl">🔍</span>
+            <SearchOutlined className="text-xl" />
           </button>
 
           {/* User Account - Only show when authenticated */}
@@ -422,7 +424,9 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
               }}
               className="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
             />
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <SearchOutlined className="text-lg" />
+            </span>
             {isSearching && (
               <span className="absolute right-3 top-1/2 transform -translate-y-1/2">
                 <Spin size="small" />
@@ -466,8 +470,8 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
                             }}
                           />
                         ) : null}
-                        <span className={`text-2xl ${product.thumbnailImage ? 'hidden' : ''}`}>
-                          {product.image || '📱'}
+                        <span className={`${product.thumbnailImage ? 'hidden' : ''} flex items-center justify-center text-gray-400`}>
+                          {product.image || <MobileOutlined className="text-2xl" />}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">

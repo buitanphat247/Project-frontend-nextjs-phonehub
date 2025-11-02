@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { ShoppingCartOutlined, CloseOutlined, MinusOutlined, PlusOutlined, DeleteOutlined, CreditCardOutlined, CarOutlined, ShoppingOutlined } from '@ant-design/icons'
 
 interface CartItem {
   id: number
@@ -139,7 +140,7 @@ export default function CartSidebar({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <i className="fas fa-shopping-cart text-white"></i>
+                <ShoppingCartOutlined className="text-white text-lg" />
               </div>
               <div>
                 <h2 className="text-xl font-bold">Giỏ hàng</h2>
@@ -151,7 +152,7 @@ export default function CartSidebar({
               className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-all duration-200"
               aria-label="Đóng giỏ hàng"
             >
-              <i className="fas fa-times text-white"></i>
+              <CloseOutlined className="text-white" />
             </button>
           </div>
         </div>
@@ -200,7 +201,7 @@ export default function CartSidebar({
                                onClick={() => updateQuantity(item.id, (quantities[item.id] || item.quantity) - 1)}
                                className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-600 transition-colors cursor-pointer"
                              >
-                               <i className="fas fa-minus text-xs"></i>
+                               <MinusOutlined className="text-xs" />
                              </button>
                              <span className="text-sm font-bold w-6 text-center">
                                {quantities[item.id] || item.quantity}
@@ -209,7 +210,7 @@ export default function CartSidebar({
                                onClick={() => updateQuantity(item.id, (quantities[item.id] || item.quantity) + 1)}
                                className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center hover:bg-green-100 hover:text-green-600 transition-colors cursor-pointer"
                              >
-                               <i className="fas fa-plus text-xs"></i>
+                               <PlusOutlined className="text-xs" />
                              </button>
                           </div>
                           
@@ -217,7 +218,7 @@ export default function CartSidebar({
                              onClick={() => removeItem(item.id)}
                              className="text-red-500 hover:text-red-700 transition-colors cursor-pointer"
                            >
-                             <i className="fas fa-trash text-xs"></i>
+                             <DeleteOutlined className="text-xs" />
                            </button>
                         </div>
                       </div>
@@ -240,18 +241,18 @@ export default function CartSidebar({
                 <div className="space-y-3">
                   <Link
                     href="/cart"
-                    className="block w-full bg-linear-to-r from-blue-600 to-blue-700 text-white text-center py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 hover:shadow-lg"
+                    className="flex w-full items-center justify-center bg-linear-to-r from-blue-600 to-blue-700  py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 hover:shadow-lg text-white!"
                     onClick={onClose}
                   >
-                    <i className="fas fa-shopping-cart mr-2"></i>
+                    <ShoppingCartOutlined className="mr-2 text-white!" />
                     Xem giỏ hàng
                   </Link>
                   <Link
                     href="/checkout"
-                    className="block w-full bg-white text-blue-600 border-2 border-blue-600 text-center py-3 px-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300"
+                    className="flex w-full items-center justify-center bg-white border-2 border-blue-600 py-3 px-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300"
                     onClick={onClose}
                   >
-                    <i className="fas fa-credit-card mr-2"></i>
+                    <CreditCardOutlined className="mr-2 " />
                     Thanh toán
                   </Link>
                 </div>
@@ -259,7 +260,7 @@ export default function CartSidebar({
                 {/* Free shipping notice */}
                 <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-center text-green-600 text-sm">
-                    <i className="fas fa-truck mr-2"></i>
+                    <CarOutlined className="mr-2" />
                     <span>Miễn phí vận chuyển cho đơn hàng từ 500.000 VNĐ</span>
                   </div>
                 </div>
@@ -269,7 +270,7 @@ export default function CartSidebar({
             /* Empty Cart */
             <div className="flex-1 flex flex-col items-center justify-center p-8">
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                <i className="fas fa-shopping-cart text-3xl text-gray-400"></i>
+                <ShoppingCartOutlined className="text-3xl text-gray-400" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Giỏ hàng trống</h3>
               <p className="text-gray-500 text-center mb-8 max-w-xs">
@@ -277,10 +278,10 @@ export default function CartSidebar({
               </p>
               <Link
                 href="/products"
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center"
                 onClick={onClose}
               >
-                <i className="fas fa-shopping-bag mr-2"></i>
+                <ShoppingOutlined className="mr-2 text-white" />
                 Mua sắm ngay
               </Link>
             </div>

@@ -102,3 +102,21 @@ export function isAuthenticated(): boolean {
   return !!getToken()
 }
 
+/**
+ * Update auth data in cookie (partial update)
+ */
+export function updateAuthData(updates: Partial<AuthData>): void {
+  const currentAuthData = getAuthData()
+  if (!currentAuthData) {
+    console.error('No auth data found to update')
+    return
+  }
+  
+  const updatedAuthData: AuthData = {
+    ...currentAuthData,
+    ...updates,
+  }
+  
+  saveAuthData(updatedAuthData)
+}
+
