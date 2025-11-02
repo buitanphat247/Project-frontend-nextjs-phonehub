@@ -1,8 +1,10 @@
-'use client'
+"use client";
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "antd";
+import { toast } from "react-toastify";
 import {
   ShoppingCartOutlined,
   HeartOutlined,
@@ -14,13 +16,24 @@ import {
   TruckOutlined,
   SafetyOutlined,
   AudioOutlined,
+  ClockCircleOutlined,
 } from "@ant-design/icons";
 import ProductCard from "./products/components/ProductCard";
 import ProductCardSkeleton from "./products/components/ProductCardSkeleton";
 import { useHomeProducts } from "./hooks/useHomeProducts";
+import { isAuthenticated } from "../../lib/utils/cookie";
 
 const HomePage = () => {
+  const router = useRouter();
   const { phonesProducts, laptopsProducts, ipadsProducts, smartwatchesProducts, loading } = useHomeProducts();
+
+  const handleFavoriteClick = () => {
+    if (isAuthenticated()) {
+      router.push("/favourite");
+    } else {
+      toast.warn("Vui lòng đăng nhập!");
+    }
+  };
 
   const categories = [
     {
@@ -49,7 +62,7 @@ const HomePage = () => {
     },
     {
       name: "Đồng hồ thông minh",
-      icon: <span className="text-4xl">⌚</span>,
+      icon: <ClockCircleOutlined className="text-4xl" />,
       link: "/smartwatches",
       color: "from-orange-500 to-orange-600",
       bgColor: "bg-orange-50",
@@ -107,7 +120,11 @@ const HomePage = () => {
                 <ShoppingCartOutlined className="mr-2" />
                 Mua sắm ngay
               </Button>
-              <Button size="large" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 h-auto">
+              <Button
+                size="large"
+                className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 h-auto cursor-pointer"
+                onClick={handleFavoriteClick}
+              >
                 <HeartOutlined className="mr-2" />
                 Yêu thích
               </Button>
@@ -129,16 +146,18 @@ const HomePage = () => {
             <p className="text-gray-600 text-lg">Khám phá các sản phẩm công nghệ đa dạng</p>
           </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {categories.map((category, index) => (
-                <Link key={index} href={category.link}>
-                  <div className={`${category.bgColor} rounded-2xl p-8 text-center border border-gray-200 hover:border-gray-300 hover:scale-105 transition-all duration-300 cursor-pointer group`}>
-                    <div className={`${category.iconColor} mb-4 group-hover:scale-110 transition-transform duration-300`}>{category.icon}</div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{category.name}</h3>
-                    <div className={`w-12 h-1 bg-linear-to-r ${category.color} mx-auto rounded-full`}></div>
-                  </div>
-                </Link>
-              ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {categories.map((category, index) => (
+              <Link key={index} href={category.link}>
+                <div
+                  className={`${category.bgColor} rounded-2xl p-8 text-center border border-gray-200 hover:border-gray-300 hover:scale-105 transition-all duration-300 cursor-pointer group`}
+                >
+                  <div className={`${category.iconColor} mb-4 group-hover:scale-110 transition-transform duration-300`}>{category.icon}</div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{category.name}</h3>
+                  <div className={`w-12 h-1 bg-linear-to-r ${category.color} mx-auto rounded-full`}></div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </div>
@@ -233,7 +252,7 @@ const HomePage = () => {
           <div className="mb-16">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 text-orange-600 text-2xl">⌚</span>
+                <ClockCircleOutlined className="mr-3 text-purple-600" />
                 Đồng hồ thông minh
               </h3>
               <Link href="/smartwatches" className="text-orange-600 hover:text-orange-700 font-medium">
@@ -276,9 +295,7 @@ const HomePage = () => {
                   <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Điện thoại</span>
                   <span className="text-gray-500 text-sm ml-auto">2 ngày trước</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                  iPhone 16 Pro Max ra mắt với camera 48MP mới
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">iPhone 16 Pro Max ra mắt với camera 48MP mới</h3>
                 <p className="text-gray-600 text-sm line-clamp-3">
                   Apple vừa chính thức ra mắt iPhone 16 Pro Max với camera chính 48MP, chip A18 Pro mạnh mẽ và thiết kế titan cao cấp...
                 </p>
@@ -295,9 +312,7 @@ const HomePage = () => {
                   <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Laptop</span>
                   <span className="text-gray-500 text-sm ml-auto">3 ngày trước</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                  MacBook Pro M4 với hiệu năng vượt trội
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">MacBook Pro M4 với hiệu năng vượt trội</h3>
                 <p className="text-gray-600 text-sm line-clamp-3">
                   Chip M4 mới của Apple mang lại hiệu năng xử lý nhanh hơn 40% so với thế hệ trước, tiết kiệm pin và hỗ trợ AI...
                 </p>
@@ -314,9 +329,7 @@ const HomePage = () => {
                   <span className="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Phụ kiện</span>
                   <span className="text-gray-500 text-sm ml-auto">5 ngày trước</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                  AirPods Pro 3 với chống ồn cải tiến
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">AirPods Pro 3 với chống ồn cải tiến</h3>
                 <p className="text-gray-600 text-sm line-clamp-3">
                   Thế hệ mới của AirPods Pro được nâng cấp với công nghệ chống ồn thông minh, thời lượng pin lên đến 8 giờ...
                 </p>
@@ -333,9 +346,7 @@ const HomePage = () => {
                   <span className="bg-orange-100 text-orange-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Công nghệ</span>
                   <span className="text-gray-500 text-sm ml-auto">1 tuần trước</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                  Samsung Galaxy S25 Ultra với màn hình 6.8 inch
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">Samsung Galaxy S25 Ultra với màn hình 6.8 inch</h3>
                 <p className="text-gray-600 text-sm line-clamp-3">
                   Samsung chuẩn bị ra mắt Galaxy S25 Ultra với màn hình Dynamic AMOLED 2X 6.8 inch, camera 200MP và pin 5000mAh...
                 </p>
@@ -352,9 +363,7 @@ const HomePage = () => {
                   <span className="bg-teal-100 text-teal-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Smartwatch</span>
                   <span className="text-gray-500 text-sm ml-auto">1 tuần trước</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                  Apple Watch Series 10 với màn hình lớn hơn
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">Apple Watch Series 10 với màn hình lớn hơn</h3>
                 <p className="text-gray-600 text-sm line-clamp-3">
                   Apple Watch Series 10 sẽ có màn hình 2.1 inch, chip S10 mới, theo dõi sức khỏe nâng cao và thời lượng pin 2 ngày...
                 </p>
@@ -371,9 +380,7 @@ const HomePage = () => {
                   <span className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Gaming</span>
                   <span className="text-gray-500 text-sm ml-auto">2 tuần trước</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                  PlayStation 5 Pro với hiệu năng 4K 120fps
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">PlayStation 5 Pro với hiệu năng 4K 120fps</h3>
                 <p className="text-gray-600 text-sm line-clamp-3">
                   Sony ra mắt PlayStation 5 Pro với GPU mạnh hơn 45%, hỗ trợ 4K 120fps, SSD 2TB và thiết kế mới hoàn toàn...
                 </p>
@@ -383,16 +390,12 @@ const HomePage = () => {
 
           {/* View More Button */}
           <div className="text-center mt-12">
-            <Button 
-              size="large" 
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 h-auto border-0"
-            >
+            <Button size="large" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 h-auto border-0">
               Xem tất cả tin tức
             </Button>
           </div>
         </div>
       </div>
-    
     </div>
   );
 };

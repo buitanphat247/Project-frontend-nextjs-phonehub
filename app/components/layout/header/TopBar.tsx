@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { UserOutlined, HeartOutlined, CustomerServiceOutlined, LogoutOutlined } from "@ant-design/icons";
+import { App } from "antd";
+import { UserOutlined, HeartOutlined, CustomerServiceOutlined, LogoutOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import MyButton from "../../MyButton";
 import AuthModal from "./AuthModal";
 import { isAuthenticated, getAuthData, clearAuthData } from "../../../../lib/utils/cookie";
@@ -20,6 +21,7 @@ interface TopBarProps {
 }
 
 export default function TopBar({ initialAuth }: TopBarProps) {
+  const { modal } = App.useApp();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authenticated, setAuthenticated] = useState(initialAuth.authenticated);
   const [userData, setUserData] = useState<{ username: string; email: string } | null>(initialAuth.userData);
@@ -55,10 +57,22 @@ export default function TopBar({ initialAuth }: TopBarProps) {
   }, []);
 
   const handleLogout = () => {
-    clearAuthData();
-    setAuthenticated(false);
-    setUserData(null);
-    window.location.reload();
+    modal.confirm({
+      title: 'Xác nhận đăng xuất',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Bạn có chắc chắn muốn đăng xuất không?',
+      okText: 'Đăng xuất',
+      cancelText: 'Hủy',
+      okButtonProps: { danger: true },
+      maskClosable: true,
+      keyboard: true,
+      onOk() {
+        clearAuthData();
+        setAuthenticated(false);
+        setUserData(null);
+        window.location.reload();
+      },
+    });
   };
 
   return (
@@ -77,13 +91,13 @@ export default function TopBar({ initialAuth }: TopBarProps) {
                       <span className="text-white/70 ml-2">({userData.email})</span>
                     </span>
                   </div>
-                  <button
+                  {/* <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-1 px-3 py-1 text-sm bg-white/10 hover:bg-white/20 border border-white/20 rounded transition-colors"
+                    className="flex items-center space-x-1 px-3 py-1 text-sm bg-white/10 hover:bg-white/20 border border-white/20 rounded transition-colors cursor-pointer"
                   >
                     <LogoutOutlined />
                     <span>Đăng xuất</span>
-                  </button>
+                  </button> */}
                 </>
               ) : (
                 <MyButton 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Layout, Button, Badge, Space, Avatar, Dropdown } from 'antd';
+import { Layout, Button, Badge, Space, Avatar, Dropdown, App } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -8,9 +8,12 @@ import {
   UserOutlined,
   LogoutOutlined,
   DownOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { forwardRef } from 'react';
+import { useRouter } from 'next/navigation';
 import type { MenuProps } from 'antd';
+import { clearAuthData } from '../../../lib/utils/cookie';
 
 const { Header } = Layout;
 
@@ -20,6 +23,27 @@ interface AdminHeaderProps {
 }
 
 const AdminHeader = forwardRef<HTMLDivElement, AdminHeaderProps>(({ collapsed, setCollapsed }, ref) => {
+  const { modal } = App.useApp();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    modal.confirm({
+      title: 'Xác nhận đăng xuất',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Bạn có chắc chắn muốn đăng xuất không?',
+      okText: 'Đăng xuất',
+      cancelText: 'Hủy',
+      okButtonProps: { danger: true },
+      maskClosable: true,
+      keyboard: true,
+      onOk() {
+        clearAuthData();
+        router.push('/');
+        window.location.reload();
+      },
+    });
+  };
+
   const userMenuItems: MenuProps['items'] = [
     {
       key: 'profile',
@@ -39,8 +63,7 @@ const AdminHeader = forwardRef<HTMLDivElement, AdminHeaderProps>(({ collapsed, s
 
   const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
     if (key === 'logout') {
-      console.log('Logout clicked');
-      // Xử lý đăng xuất ở đây
+      handleLogout();
     }
   };
 

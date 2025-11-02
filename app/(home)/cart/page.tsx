@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Button } from 'antd'
-import { MinusOutlined, PlusOutlined, DeleteOutlined, ShoppingOutlined } from '@ant-design/icons'
+import { MinusOutlined, PlusOutlined, DeleteOutlined, ShoppingOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import ProtectedRoute from '../../components/auth/ProtectedRoute'
 import CartSkeleton from './components/CartSkeleton'
 
@@ -136,7 +136,7 @@ const CartPage = () => {
         {cartItems.length === 0 ? (
           /* Empty Cart */
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">🛒</div>
+            <div className="text-6xl mb-4"><ShoppingCartOutlined />🛒</div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Giỏ hàng trống</h2>
             <p className="text-gray-600 mb-8">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
             <Button 

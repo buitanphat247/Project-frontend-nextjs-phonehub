@@ -7,9 +7,9 @@ import { searchProducts } from '../../../../lib/api/products'
 import type { ProductResponse } from '../../../../lib/api/products'
 import { Product } from '../../../(home)/products/interface/IProduct'
 import { getCategoryRoute } from '../../../(home)/products/utils/categoryUtils'
-import { Spin, Dropdown, Button } from 'antd'
+import { Spin, Dropdown, Button, App } from 'antd'
 import type { MenuProps } from 'antd'
-import { UserOutlined, LogoutOutlined, SettingOutlined, HeartOutlined } from '@ant-design/icons'
+import { UserOutlined, LogoutOutlined, SettingOutlined, HeartOutlined, ExclamationCircleOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import { isAuthenticated, getAuthData, clearAuthData } from '../../../../lib/utils/cookie'
 
 interface AuthState {
@@ -27,6 +27,7 @@ interface MainHeaderProps {
 }
 
 export default function MainHeader({ initialAuth, totalItems, onCartClick }: MainHeaderProps) {
+  const { modal } = App.useApp()
   const router = useRouter()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -67,10 +68,22 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
   }, [])
 
   const handleLogout = () => {
-    clearAuthData()
-    setAuthenticated(false)
-    setUserData(null)
-    window.location.reload()
+    modal.confirm({
+      title: 'Xác nhận đăng xuất',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Bạn có chắc chắn muốn đăng xuất không?',
+      okText: 'Đăng xuất',
+      cancelText: 'Hủy',
+      okButtonProps: { danger: true },
+      maskClosable: true,
+      keyboard: true,
+      onOk() {
+        clearAuthData()
+        setAuthenticated(false)
+        setUserData(null)
+        window.location.reload()
+      },
+    })
   }
 
   const handleMenuClick: MenuProps['onClick'] = (e) => {
@@ -80,6 +93,8 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
       router.push('/favourite')
     } else if (e.key === 'settings') {
       router.push('/account?tab=settings')
+    } else if (e.key === 'logout') {
+      handleLogout()
     }
   }
 
@@ -88,13 +103,24 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
       key: 'account',
       icon: <UserOutlined />,
       label: 'Tài khoản của tôi',
+      className: 'cursor-pointer',
     },
     {
       key: 'favorites',
       icon: <HeartOutlined />,
       label: 'Sản phẩm yêu thích',
+      className: 'cursor-pointer',
     },
-   
+    {
+      type: 'divider',
+    },
+    {
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: 'Đăng xuất',
+      danger: true,
+      className: 'cursor-pointer',
+    },
   ]
 
   // Transform API response to Product
@@ -352,7 +378,7 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
               trigger={['click']}
             >
               <button
-                className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                 title={`Xin chào, ${userData.username}`}
               >
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
@@ -363,20 +389,20 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
             </Dropdown>
           )}
 
-          {/* Shopping Cart - Only show when authenticated */}
-          {authenticated && (
-            <button
-              onClick={onCartClick}
-              className="relative cursor-pointer p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
-              title="Giỏ hàng"
-              aria-label={`Giỏ hàng có ${totalItems} sản phẩm`}
-            >
-              <span className="text-xl">🛒</span>
+          {/* Shopping Cart */}
+          <button
+            onClick={onCartClick}
+            className="relative cursor-pointer p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Giỏ hàng"
+            aria-label={authenticated ? `Giỏ hàng có ${totalItems} sản phẩm` : "Giỏ hàng"}
+          >
+            <span className="text-xl"><ShoppingCartOutlined /></span>
+            {authenticated && totalItems > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
                 {totalItems}
               </span>
-            </button>
-          )}
+            )}
+          </button>
         </div>
       </div>
 
