@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Modal, Tabs, Form, Input, Button, Checkbox, Divider, Space, message } from 'antd'
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
 import { signIn } from '../../../../lib/api/auth'
@@ -12,6 +13,7 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState('signin')
   const [signInForm] = Form.useForm()
   const [signUpForm] = Form.useForm()
@@ -65,8 +67,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         onClose()
         signInForm.resetFields()
         
-        // Reload page to update authentication state
-        window.location.reload()
+        // Redirect to protected route if exists, otherwise reload
+        const urlParams = new URLSearchParams(window.location.search)
+        const redirect = urlParams.get('redirect')
+        if (redirect) {
+          router.push(redirect)
+        } else {
+          window.location.reload()
+        }
       } else {
         message.error(response.message || 'Đăng nhập thất bại!')
       }

@@ -73,17 +73,21 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
     window.location.reload()
   }
 
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    if (e.key === 'account') {
+      router.push('/account?tab=account')
+    } else if (e.key === 'settings') {
+      router.push('/account?tab=settings')
+    }
+  }
+
   const userMenuItems: MenuProps['items'] = [
     {
       key: 'account',
       icon: <UserOutlined />,
-      label: <Link href="/account">Tài khoản của tôi</Link>,
+      label: 'Tài khoản của tôi',
     },
-    {
-      key: 'settings',
-      icon: <SettingOutlined />,
-      label: <Link href="/account">Cài đặt</Link>,
-    },
+    
     {
       type: 'divider',
     },
@@ -346,7 +350,7 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
           {/* User Account - Only show when authenticated */}
           {authenticated && userData && (
             <Dropdown
-              menu={{ items: userMenuItems }}
+              menu={{ items: userMenuItems, onClick: handleMenuClick }}
               placement="bottomRight"
               trigger={['click']}
             >

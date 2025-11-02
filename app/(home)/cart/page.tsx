@@ -1,8 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from 'antd'
 import { MinusOutlined, PlusOutlined, DeleteOutlined, ShoppingOutlined } from '@ant-design/icons'
+import ProtectedRoute from '../../components/auth/ProtectedRoute'
+import CartSkeleton from './components/CartSkeleton'
 
 interface CartItem {
   id: number
@@ -18,44 +20,60 @@ interface CartItem {
 }
 
 const CartPage = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      name: 'iPhone 15 Pro Max',
-      price: 29990000,
-      originalPrice: 32990000,
-      image: '📱',
-      brand: 'Apple',
-      category: 'phones',
-      quantity: 1,
-      discountPercent: 9,
-      isOnSale: true
-    },
-    {
-      id: 2,
-      name: 'MacBook Pro 16-inch',
-      price: 45990000,
-      originalPrice: 49990000,
-      image: '💻',
-      brand: 'Apple',
-      category: 'laptops',
-      quantity: 1,
-      discountPercent: 8,
-      isOnSale: false
-    },
-    {
-      id: 3,
-      name: 'AirPods Pro 2nd Gen',
-      price: 5990000,
-      originalPrice: 6990000,
-      image: '🎧',
-      brand: 'Apple',
-      category: 'accessories',
-      quantity: 2,
-      discountPercent: 14,
-      isOnSale: true
+  const [cartItems, setCartItems] = useState<CartItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // TODO: Fetch cart items từ API
+    // Tạm thời giữ sample data để demo
+    const fetchCartItems = async () => {
+      setLoading(true)
+      // Simulate API call
+      setTimeout(() => {
+        setCartItems([
+          {
+            id: 1,
+            name: 'iPhone 15 Pro Max',
+            price: 29990000,
+            originalPrice: 32990000,
+            image: '📱',
+            brand: 'Apple',
+            category: 'phones',
+            quantity: 1,
+            discountPercent: 9,
+            isOnSale: true
+          },
+          {
+            id: 2,
+            name: 'MacBook Pro 16-inch',
+            price: 45990000,
+            originalPrice: 49990000,
+            image: '💻',
+            brand: 'Apple',
+            category: 'laptops',
+            quantity: 1,
+            discountPercent: 8,
+            isOnSale: false
+          },
+          {
+            id: 3,
+            name: 'AirPods Pro 2nd Gen',
+            price: 5990000,
+            originalPrice: 6990000,
+            image: '🎧',
+            brand: 'Apple',
+            category: 'accessories',
+            quantity: 2,
+            discountPercent: 14,
+            isOnSale: true
+          }
+        ])
+        setLoading(false)
+      }, 1000)
     }
-  ])
+
+    fetchCartItems()
+  }, [])
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -95,8 +113,17 @@ const CartPage = () => {
     return getSubtotal() + getShippingFee()
   }
 
+  if (loading) {
+    return (
+      <ProtectedRoute>
+        <CartSkeleton />
+      </ProtectedRoute>
+    )
+  }
+
   return (
-    <div className=" bg-gray-50">
+    <ProtectedRoute>
+      <div className=" bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         {/* <div className="mb-8">
@@ -266,6 +293,7 @@ const CartPage = () => {
         )}
       </div>
     </div>
+    </ProtectedRoute>
   )
 }
 
