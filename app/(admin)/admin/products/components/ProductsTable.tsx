@@ -104,6 +104,18 @@ export default function ProductsTable({
       render: (discount: string) => discount ? <Tag color="red">{discount}</Tag> : '-',
     },
     {
+      title: 'Số lượng',
+      dataIndex: 'quantity',
+      key: 'quantity',
+      width: 120,
+      align: 'right',
+      render: (quantity: number) => (
+        <span style={{ fontWeight: 500, color: quantity > 0 ? '#52c41a' : '#ff4d4f' }}>
+          {quantity.toLocaleString('vi-VN')}
+        </span>
+      ),
+    },
+    {
       title: 'Trạng thái',
       dataIndex: 'isPublished',
       key: 'isPublished',

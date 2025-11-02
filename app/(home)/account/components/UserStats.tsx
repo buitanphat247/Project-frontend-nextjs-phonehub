@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingOutlined, CreditCardOutlined, HistoryOutlined } from '@ant-design/icons';
+import { ShoppingOutlined, CreditCardOutlined, HistoryOutlined, CrownOutlined } from '@ant-design/icons';
 import { UserInfo } from '../interface/IAccount';
 
 interface UserStatsProps {
@@ -52,7 +52,7 @@ const UserStats: React.FC<UserStatsProps> = ({ userInfo }) => {
             <p className="text-2xl font-bold text-orange-600">VIP</p>
           </div>
           <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-            <span className="text-orange-600 text-xl">👑</span>
+            <CrownOutlined className="text-orange-600 text-xl" />
           </div>
         </div>
       </div>

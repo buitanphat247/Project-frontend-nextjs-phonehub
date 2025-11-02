@@ -41,8 +41,8 @@ export default function Navigation() {
           <Link
             key={item.name}
             href={item.href}
-            className={`font-medium transition-colors py-2 px-3 rounded-lg ${
-              isActive(item.href) ? "text-blue-600 bg-blue-50 border-b-2 border-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+            className={`font-medium transition-colors py-2 px-3 rounded-lg text-inherit! ${
+              isActive(item.href) ? "text-blue-600! bg-blue-50 border-b-2 border-blue-600" : "text-gray-700! hover:text-gray-900! hover:bg-gray-50"
             }`}
           >
             {item.name}
@@ -68,8 +68,8 @@ export default function Navigation() {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`block px-4 py-3 rounded-lg transition-colors font-medium ${
-                  isActive(item.href) ? "text-blue-600 bg-blue-100 border-l-4 border-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                className={`block px-4 py-3 rounded-lg transition-colors font-medium text-inherit! ${
+                  isActive(item.href) ? "text-blue-600! bg-blue-100 border-l-4 border-blue-600" : "text-gray-700! hover:text-gray-900! hover:bg-gray-100"
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >

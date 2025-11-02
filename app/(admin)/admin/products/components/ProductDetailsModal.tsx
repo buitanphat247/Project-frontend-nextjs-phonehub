@@ -76,6 +76,11 @@ export default function ProductDetailsModal({ product, visible, onClose }: Produ
               <Tag color="red">{product.discount}</Tag>
             </Descriptions.Item>
           ) : null}
+          <Descriptions.Item label="Số lượng">
+            <span style={{ fontWeight: 500, color: (product.quantity || 0) > 0 ? '#52c41a' : '#ff4d4f' }}>
+              {(product.quantity || 0).toLocaleString('vi-VN')}
+            </span>
+          </Descriptions.Item>
           <Descriptions.Item label="Trạng thái">
             <Tag color={product.isPublished ? 'green' : 'default'}>
               {product.isPublished ? 'Đã xuất bản' : 'Chưa xuất bản'}

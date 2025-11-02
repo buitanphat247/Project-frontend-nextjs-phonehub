@@ -57,6 +57,7 @@ export function useProductHandlers() {
       priceOld: product.priceOld,
       discount: product.discount,
       thumbnailImage: product.thumbnailImage,
+      quantity: product.quantity || 0,
       isPublished: product.isPublished,
       publishedAt: product.publishedAt,
       createdAt: product.createdAt,

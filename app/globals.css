@@ -3,7 +3,6 @@
   outline: none;
 }
 
-
 /* Hide scrollbar but keep functionality */
 .hide-scrollbar {
   -ms-overflow-style: none; /* Internet Explorer 10+ */
@@ -42,6 +41,28 @@ body {
 
 body::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
+}
+
+/* Override Ant Design link color for navigation */
+nav a,
+nav a:visited,
+nav a:link {
+  color: inherit !important;
+}
+
+nav a:hover {
+  color: inherit !important;
+}
+
+/* Override Ant Design link color for footer */
+footer a,
+footer a:visited,
+footer a:link {
+  color: inherit !important;
+}
+
+footer a:hover {
+  color: inherit !important;
 }
 
 /* Cart Sidebar Animations */

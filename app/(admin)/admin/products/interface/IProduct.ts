@@ -9,6 +9,7 @@ export interface Product {
   priceOld: number;
   discount: string;
   thumbnailImage: string;
+  quantity: number;
   isPublished: boolean;
   publishedAt: string;
   createdAt: string;

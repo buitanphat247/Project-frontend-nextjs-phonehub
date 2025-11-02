@@ -48,6 +48,7 @@ export interface ProductResponse {
   name: string;
   slug: string;
   brand: string;
+  quantity?: number;
   category: ProductCategoryResponse;
   price: number;
   priceOld: number;
