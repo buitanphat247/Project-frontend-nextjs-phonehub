@@ -3,6 +3,7 @@ export interface UserInfo {
   email: string;
   phone: string;
   avatar: string;
+  birthday?: string; // Format: YYYY-MM-DD from API
   joinDate: string;
   totalOrders: number;
   totalSpent: number;

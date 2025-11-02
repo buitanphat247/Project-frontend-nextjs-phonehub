@@ -1,4 +1,5 @@
 import { buildApiUrl, defaultFetchOptions, ApiResponse, PaginatedResponse } from './config';
+import { apiPut, apiGet } from '../utils/apiClient';
 
 // User interface matching API response
 export interface UserResponse {
@@ -8,6 +9,7 @@ export interface UserResponse {
   phone: string;
   address: string;
   avatar: string;
+  birthday?: string; // Format: YYYY-MM-DD
   role: {
     id: number;
     name: string;
@@ -65,18 +67,7 @@ export async function searchUsers(
 
 // Get user by ID
 export async function getUserById(id: number): Promise<ApiResponse<UserResponse>> {
-  const url = buildApiUrl(`/users/${id}`);
-  
-  const response = await fetch(url, {
-    ...defaultFetchOptions,
-    method: 'GET',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch user: ${response.statusText}`);
-  }
-
-  return response.json();
+  return apiGet<UserResponse>(`/users/${id}`);
 }
 
 // Create user
@@ -109,21 +100,11 @@ export async function updateUser(id: number, userData: {
   email?: string;
   phone?: string;
   address?: string;
+  avatar?: string;
+  birthday?: string;
   roleId?: number;
 }): Promise<ApiResponse<UserResponse>> {
-  const url = buildApiUrl(`/users/${id}`);
-  
-  const response = await fetch(url, {
-    ...defaultFetchOptions,
-    method: 'PUT',
-    body: JSON.stringify(userData),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to update user: ${response.statusText}`);
-  }
-
-  return response.json();
+  return apiPut<UserResponse>(`/users/${id}`, userData);
 }
 
 // Delete user

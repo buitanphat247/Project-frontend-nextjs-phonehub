@@ -58,6 +58,7 @@ export async function apiClient<T>(
 
 /**
  * Wrapper for GET requests
+ * Handles token refresh automatically on JWT expiration
  */
 export async function apiGet<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
   try {
@@ -65,6 +66,52 @@ export async function apiGet<T>(endpoint: string, options?: RequestInit): Promis
       ...options,
       method: 'GET',
     })
+
+    // Check for new token even if response is not ok (for JWT expiration)
+    // Must check headers before consuming response body
+    const newToken = 
+      response.headers.get('x-new-access-token') || 
+      response.headers.get('X-New-Access-Token') ||
+      response.headers.get('x-new-accestoken') ||
+      response.headers.get('X-New-Accestoken')
+    
+    // If we have a new token and got a 400/401 error (likely JWT expired), save token and retry
+    if (newToken && !response.ok && (response.status === 400 || response.status === 401)) {
+      const authData = getAuthData()
+      if (authData) {
+        authData.token = newToken
+        saveAuthData(authData)
+        
+        // Retry once with new token
+        const retryResponse = await apiClient(endpoint, {
+          ...options,
+          method: 'GET',
+        })
+        
+        if (!retryResponse.ok) {
+          let errorData
+          try {
+            errorData = await retryResponse.json()
+          } catch {
+            errorData = {
+              message: `Request failed with status ${retryResponse.status}: ${retryResponse.statusText}`,
+            }
+          }
+          throw new Error(errorData.message || `Request failed with status ${retryResponse.status}`)
+        }
+        
+        return retryResponse.json()
+      }
+    }
+
+    // If we have new token but response is ok, just save it (already saved in apiClient, but ensure it's saved)
+    if (newToken && response.ok) {
+      const authData = getAuthData()
+      if (authData && authData.token !== newToken) {
+        authData.token = newToken
+        saveAuthData(authData)
+      }
+    }
 
     if (!response.ok) {
       let errorData
@@ -75,7 +122,6 @@ export async function apiGet<T>(endpoint: string, options?: RequestInit): Promis
           message: `Request failed with status ${response.status}: ${response.statusText}`,
         }
       }
-      console.error(`API Error [${response.status}]:`, errorData)
       throw new Error(errorData.message || `Request failed with status ${response.status}`)
     }
 
@@ -88,6 +134,7 @@ export async function apiGet<T>(endpoint: string, options?: RequestInit): Promis
 
 /**
  * Wrapper for POST requests
+ * Handles token refresh automatically on JWT expiration
  */
 export async function apiPost<T>(
   endpoint: string,
@@ -99,6 +146,47 @@ export async function apiPost<T>(
     method: 'POST',
     body: data ? JSON.stringify(data) : undefined,
   })
+
+  // Check for new token even if response is not ok (for JWT expiration)
+  const newToken = 
+    response.headers.get('x-new-access-token') || 
+    response.headers.get('X-New-Access-Token') ||
+    response.headers.get('x-new-accestoken') ||
+    response.headers.get('X-New-Accestoken')
+  
+  // If we have a new token and got a 400/401 error (likely JWT expired), save token and retry
+  if (newToken && !response.ok && (response.status === 400 || response.status === 401)) {
+    const authData = getAuthData()
+    if (authData) {
+      authData.token = newToken
+      saveAuthData(authData)
+      
+      // Retry once with new token
+      const retryResponse = await apiClient(endpoint, {
+        ...options,
+        method: 'POST',
+        body: data ? JSON.stringify(data) : undefined,
+      })
+      
+      if (!retryResponse.ok) {
+        const errorData = await retryResponse.json().catch(() => ({
+          message: 'Request failed',
+        }))
+        throw new Error(errorData.message || 'Request failed')
+      }
+      
+      return retryResponse.json()
+    }
+  }
+
+  // If we have new token but response is ok, just save it (already saved in apiClient, but ensure it's saved)
+  if (newToken && response.ok) {
+    const authData = getAuthData()
+    if (authData && authData.token !== newToken) {
+      authData.token = newToken
+      saveAuthData(authData)
+    }
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({
@@ -136,12 +224,53 @@ export async function apiPut<T>(
 
 /**
  * Wrapper for DELETE requests
+ * Handles token refresh automatically on JWT expiration
  */
 export async function apiDelete<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
   const response = await apiClient(endpoint, {
     ...options,
     method: 'DELETE',
   })
+
+  // Check for new token even if response is not ok (for JWT expiration)
+  const newToken = 
+    response.headers.get('x-new-access-token') || 
+    response.headers.get('X-New-Access-Token') ||
+    response.headers.get('x-new-accestoken') ||
+    response.headers.get('X-New-Accestoken')
+  
+  // If we have a new token and got a 400/401 error (likely JWT expired), save token and retry
+  if (newToken && !response.ok && (response.status === 400 || response.status === 401)) {
+    const authData = getAuthData()
+    if (authData) {
+      authData.token = newToken
+      saveAuthData(authData)
+      
+      // Retry once with new token
+      const retryResponse = await apiClient(endpoint, {
+        ...options,
+        method: 'DELETE',
+      })
+      
+      if (!retryResponse.ok) {
+        const errorData = await retryResponse.json().catch(() => ({
+          message: 'Request failed',
+        }))
+        throw new Error(errorData.message || 'Request failed')
+      }
+      
+      return retryResponse.json()
+    }
+  }
+
+  // If we have new token but response is ok, just save it (already saved in apiClient, but ensure it's saved)
+  if (newToken && response.ok) {
+    const authData = getAuthData()
+    if (authData && authData.token !== newToken) {
+      authData.token = newToken
+      saveAuthData(authData)
+    }
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({

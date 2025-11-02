@@ -94,16 +94,7 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
       icon: <HeartOutlined />,
       label: 'Sản phẩm yêu thích',
     },
-    {
-      type: 'divider',
-    },
-    {
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: 'Đăng xuất',
-      danger: true,
-      onClick: handleLogout,
-    },
+   
   ]
 
   // Transform API response to Product
