@@ -9,6 +9,7 @@ import UserStats from "./components/UserStats";
 import ProfileTab from "./components/ProfileTab";
 import SettingsTab from "./components/SettingsTab";
 import ChangePasswordModal from "./components/ChangePasswordModal";
+import ChangeEmailModal from "./components/ChangeEmailModal";
 import AccountSkeleton from "./components/AccountSkeleton";
 import { getUserById } from "../../../lib/api/users";
 import { getAuthData, updateAuthData } from "../../../lib/utils/cookie";
@@ -17,6 +18,7 @@ const AccountPage = () => {
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isChangeEmailModalOpen, setIsChangeEmailModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -80,6 +82,16 @@ const AccountPage = () => {
   const handlePasswordSuccess = () => {
     setIsChangePasswordModalOpen(false);
   };
+
+  const handleOpenEmailModal = () => {
+    setIsChangeEmailModalOpen(true);
+  };
+
+  const handleCloseEmailModal = () => {
+    setIsChangeEmailModalOpen(false);
+  };
+
+  // Không cập nhật ngay; email sẽ cập nhật sau khi người dùng xác minh qua email
 
   const handleProfileUpdate = async (updatedUserInfo: UserInfo) => {
     // Update state immediately for UI
@@ -170,7 +182,7 @@ const AccountPage = () => {
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <SettingsTab 
               onOpenPasswordModal={handleOpenPasswordModal}
-              onOpenEmailModal={() => message.info('Mở modal cập nhật email (sẽ triển khai sau)')}
+              onOpenEmailModal={handleOpenEmailModal}
             />
           </div>
         </div>
@@ -179,6 +191,11 @@ const AccountPage = () => {
           isOpen={isChangePasswordModalOpen}
           onClose={handleClosePasswordModal}
           onSuccess={handlePasswordSuccess}
+        />
+        <ChangeEmailModal
+          isOpen={isChangeEmailModalOpen}
+          onClose={handleCloseEmailModal}
+          currentEmail={userInfo?.email}
         />
       </div>
     </ProtectedRoute>
