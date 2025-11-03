@@ -21,7 +21,7 @@ const UserHeader: React.FC<UserHeaderProps> = ({ userInfo }) => {
             <div className="mt-4">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-linear-to-r from-blue-100 to-purple-100 text-blue-800">
                 <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                VIP Member
+                {userInfo.rankName ? `${userInfo.rankName} Member` : 'Thành viên'}
               </span>
             </div>
           </div>

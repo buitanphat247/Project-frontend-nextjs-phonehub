@@ -45,13 +45,16 @@ const AccountPage = () => {
           setUserInfo({
             name: userData.username,
             email: userData.email,
+            address: userData.address || "",
             phone: userData.phone || "",
             avatar: userData.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
             birthday: userData.birthday || undefined,
             joinDate: formattedJoinDate,
-            totalOrders: 0, // TODO: Fetch từ API orders
-            totalSpent: 0, // TODO: Fetch từ API orders
-            loyaltyPoints: 0, // TODO: Fetch từ API loyalty
+            totalOrders: 0,
+            totalSpent: 0,
+            loyaltyPoints: userData.points ?? 0,
+            rankName: userData.rank?.name,
+            rankDiscount: (userData as any).rank?.discount,
           });
         } else {
           message.error(response.message || "Không thể tải thông tin người dùng");
@@ -106,13 +109,16 @@ const AccountPage = () => {
           setUserInfo({
             name: userData.username,
             email: userData.email,
+            address: userData.address || "",
             phone: userData.phone || "",
             avatar: userData.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
             birthday: userData.birthday || undefined,
             joinDate: formattedJoinDate,
             totalOrders: updatedUserInfo.totalOrders,
             totalSpent: updatedUserInfo.totalSpent,
-            loyaltyPoints: updatedUserInfo.loyaltyPoints,
+            loyaltyPoints: userData.points ?? updatedUserInfo.loyaltyPoints,
+            rankName: userData.rank?.name ?? updatedUserInfo.rankName,
+            rankDiscount: (userData as any).rank?.discount ?? updatedUserInfo.rankDiscount,
           });
 
           // Update cookie again with fresh data from API
@@ -162,7 +168,10 @@ const AccountPage = () => {
 
           {/* Cài đặt */}
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            <SettingsTab onOpenPasswordModal={handleOpenPasswordModal} />
+            <SettingsTab 
+              onOpenPasswordModal={handleOpenPasswordModal}
+              onOpenEmailModal={() => message.info('Mở modal cập nhật email (sẽ triển khai sau)')}
+            />
           </div>
         </div>
 

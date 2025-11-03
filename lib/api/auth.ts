@@ -1,4 +1,5 @@
 import { buildApiUrl, ApiResponse } from './config'
+import { apiPost } from '../utils/apiClient'
 
 export interface SignInRequest {
   username: string
@@ -35,6 +36,14 @@ export async function signIn(credentials: SignInRequest): Promise<ApiResponse<Si
   }
 
   return response.json()
+}
+
+/**
+ * Sign in with Google id_token (body expects a JSON string)
+ */
+export async function signInWithGoogle(idToken: string): Promise<ApiResponse<SignInResponse>> {
+  // Use shared api client (handles token refresh, headers, proxy, errors)
+  return apiPost<SignInResponse>('/auth/signin/google', idToken)
 }
 
 /**

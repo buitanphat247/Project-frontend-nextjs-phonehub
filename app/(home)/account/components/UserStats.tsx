@@ -49,7 +49,7 @@ const UserStats: React.FC<UserStatsProps> = ({ userInfo }) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-600 mb-1">Cấp độ</p>
-            <p className="text-2xl font-bold text-orange-600">VIP</p>
+            <p className="text-2xl font-bold text-orange-600">{userInfo.rankName || '—'}</p>
           </div>
           <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
             <CrownOutlined className="text-orange-600 text-xl" />

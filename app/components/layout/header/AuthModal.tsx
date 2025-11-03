@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Modal, Tabs, Form, Input, Button, Checkbox, Divider, Space, message } from 'antd'
+import { Modal, Tabs, Form, Input, Button, Checkbox, Divider, Space, message, Spin } from 'antd'
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
-import { signIn } from '../../../../lib/api/auth'
+import { signIn, signInWithGoogle } from '../../../../lib/api/auth'
 import { saveAuthData } from '../../../../lib/utils/cookie'
+import { buildApiUrl } from '../../../../lib/api/config'
+import GoogleLoginButton from './GoogleLoginButton'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -18,6 +20,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [signInForm] = Form.useForm()
   const [signUpForm] = Form.useForm()
   const [loading, setLoading] = useState(false)
+  const [authProcessing, setAuthProcessing] = useState(false)
 
   // Control body scroll when modal is open
   useEffect(() => {
@@ -55,6 +58,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const handleSignIn = async (values: { username: string; password: string }) => {
     try {
       setLoading(true)
+      setAuthProcessing(true)
       const response = await signIn({
         username: values.username,
         password: values.password,
@@ -83,6 +87,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       message.error(error.message || 'Đăng nhập thất bại!')
     } finally {
       setLoading(false)
+      setAuthProcessing(false)
     }
   }
 
@@ -98,7 +103,24 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   }
 
   const handleGoogleLogin = () => {
-    message.info('Đăng nhập Google (Demo)')
+    // Deprecated: replaced by GoogleLoginButton component
+  }
+
+  const handleGoogleToken = async (idToken: string) => {
+    try {
+      setAuthProcessing(true)
+      const data = await signInWithGoogle(idToken)
+      if (data?.data) saveAuthData(data.data)
+      message.success(data?.message || 'Đăng nhập thành công')
+      onClose()
+      // reload để đồng bộ UI đăng nhập
+      setTimeout(() => window.location.reload(), 300)
+    } catch (e: any) {
+      message.error(e?.message || 'Đăng nhập Google thất bại')
+    }
+    finally {
+      setAuthProcessing(false)
+    }
   }
 
   const handleFacebookLogin = () => {
@@ -332,33 +354,31 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           body: { padding: '0 24px 24px 24px' }
         }}
         mask={false}
+        closable={!authProcessing}
+        maskClosable={!authProcessing}
         zIndex={50}
       >
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        items={items}
-        className="auth-tabs"
-      />
-      
-      <Divider>Hoặc đăng nhập bằng</Divider>
-      
-      <Space direction="vertical" className="w-full">
-        <Button
-          icon={<span className="text-blue-500 font-bold">f</span>}
-          onClick={handleFacebookLogin}
-          className="w-full h-12 flex items-center justify-center"
-        >
-          Facebook
-        </Button>
-        <Button
-          icon={<span className="text-red-500 font-bold">G</span>}
-          onClick={handleGoogleLogin}
-          className="w-full h-12 flex items-center justify-center"
-        >
-          Google
-        </Button>
-      </Space>
+      <div className={`relative ${authProcessing ? 'pointer-events-none' : ''}`} aria-busy={authProcessing}>
+        {authProcessing && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 rounded">
+            <Spin tip="Đang xử lý..." size="large" />
+          </div>
+        )}
+        <Tabs
+          activeKey={activeTab}
+          onChange={authProcessing ? () => {} : setActiveTab}
+          items={items}
+          className="auth-tabs"
+        />
+        
+        <Divider>Hoặc đăng nhập bằng</Divider>
+        
+        <Space direction="vertical" className="w-full">
+          <div className={authProcessing ? 'opacity-60' : ''}>
+            <GoogleLoginButton onReceivedToken={handleGoogleToken} />
+          </div>
+        </Space>
+      </div>
       </Modal>
     </>
   )

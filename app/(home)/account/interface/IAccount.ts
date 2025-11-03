@@ -1,6 +1,7 @@
 export interface UserInfo {
   name: string;
   email: string;
+  address: string;
   phone: string;
   avatar: string;
   birthday?: string; // Format: YYYY-MM-DD from API
@@ -8,6 +9,8 @@ export interface UserInfo {
   totalOrders: number;
   totalSpent: number;
   loyaltyPoints: number;
+  rankName?: string;
+  rankDiscount?: number;
 }
 
 export interface Order {

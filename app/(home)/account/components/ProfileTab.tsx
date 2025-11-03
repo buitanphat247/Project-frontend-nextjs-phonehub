@@ -37,7 +37,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userInfo, onUpdateSuccess }) =>
 
   const [formData, setFormData] = useState({
     name: userInfo.name,
-    email: userInfo.email,
+    address: userInfo.address || '',
     phone: userInfo.phone || '',
     birthday: parseDateFromAPI(userInfo.birthday),
   });
@@ -50,7 +50,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userInfo, onUpdateSuccess }) =>
     setFormData(prev => {
       // If form data matches userInfo exactly, it means initial load or after API update
       const isInitialLoad = prev.name === userInfo.name && 
-                           prev.email === userInfo.email && 
+                           prev.address === (userInfo.address || '') && 
                            prev.phone === (userInfo.phone || '');
       
       // Compare dayjs objects
@@ -64,13 +64,13 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userInfo, onUpdateSuccess }) =>
         // Update all fields including birthday
         return {
           name: userInfo.name,
-          email: userInfo.email,
+          address: userInfo.address || '',
           phone: userInfo.phone || '',
           birthday: parsedBirthday,
         };
       }
       
-      // If name, email, phone match, update birthday from API
+      // If name, address, phone match, update birthday from API
       if (isInitialLoad) {
         return {
           ...prev,
@@ -115,8 +115,8 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userInfo, onUpdateSuccess }) =>
       if (formData.name !== userInfo.name) {
         updateData.username = formData.name;
       }
-      if (formData.email !== userInfo.email) {
-        updateData.email = formData.email;
+      if (formData.address !== (userInfo.address || '')) {
+        updateData.address = formData.address || null;
       }
       if (formData.phone !== (userInfo.phone || '')) {
         updateData.phone = formData.phone || null;
@@ -154,7 +154,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userInfo, onUpdateSuccess }) =>
         setFormData(prev => ({
           ...prev,
           name: response.data.username,
-          email: response.data.email,
+          address: response.data.address || '',
           phone: response.data.phone || '',
           birthday: parseDateFromAPI(response.data.birthday),
         }));
@@ -164,7 +164,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userInfo, onUpdateSuccess }) =>
           const updatedInfo: UserInfo = {
             ...userInfo,
             name: response.data.username,
-            email: response.data.email,
+            address: response.data.address || '',
             phone: response.data.phone || '',
             avatar: response.data.avatar || userInfo.avatar,
             birthday: response.data.birthday || undefined,
@@ -195,11 +195,10 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userInfo, onUpdateSuccess }) =>
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
             <Input 
-              type="email"
-              value={formData.email} 
-              onChange={(e) => handleInputChange('email', e.target.value)}
+              value={formData.address} 
+              onChange={(e) => handleInputChange('address', e.target.value)}
               className="rounded-lg" 
             />
           </div>

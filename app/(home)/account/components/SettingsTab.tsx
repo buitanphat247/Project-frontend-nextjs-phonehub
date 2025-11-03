@@ -1,12 +1,13 @@
 import React from 'react';
 import { Button, Switch } from 'antd';
-import { BellOutlined, LockOutlined, CreditCardOutlined } from '@ant-design/icons';
+import { BellOutlined, LockOutlined, CreditCardOutlined, MailOutlined } from '@ant-design/icons';
 
 interface SettingsTabProps {
   onOpenPasswordModal: () => void;
+  onOpenEmailModal?: () => void;
 }
 
-const SettingsTab: React.FC<SettingsTabProps> = ({ onOpenPasswordModal }) => {
+const SettingsTab: React.FC<SettingsTabProps> = ({ onOpenPasswordModal, onOpenEmailModal }) => {
   return (
     <div className="p-6">
       <div className="space-y-6">
@@ -46,6 +47,13 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ onOpenPasswordModal }) => {
             Bảo mật
           </h3>
           <div className="space-y-3">
+            <Button 
+              icon={<MailOutlined />} 
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 rounded-lg"
+              onClick={onOpenEmailModal}
+            >
+              Cập nhật email
+            </Button>
             <Button 
               icon={<LockOutlined />} 
               className="w-full h-12 bg-green-600 hover:bg-green-700 rounded-lg focus:outline-none focus:ring-0"
