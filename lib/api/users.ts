@@ -10,12 +10,23 @@ export interface UserResponse {
   address: string;
   avatar: string;
   birthday?: string; // Format: YYYY-MM-DD
+  points?: number;
+  roleId?: number; // Direct roleId from API (when role object is not present)
+  rankId?: number; // Direct rankId from API (when rank object is not present)
   role: {
     id: number;
     name: string;
     createdAt: string;
     updatedAt: string;
-  };
+  } | null;
+  rank: {
+    id: number;
+    name: string;
+    minPoints: number;
+    maxPoints?: number;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
   createdAt: string;
   updatedAt: string;
 }

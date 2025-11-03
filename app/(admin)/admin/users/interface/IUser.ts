@@ -5,8 +5,12 @@ export interface User {
   phone: string;
   address: string;
   avatar: string;
-  roleId: number;
+  birthday?: string;
+  points?: number;
+  roleId?: number;
   roleName?: string;
+  rankId?: number;
+  rankName?: string;
   createdAt: string;
   updatedAt: string;
 }

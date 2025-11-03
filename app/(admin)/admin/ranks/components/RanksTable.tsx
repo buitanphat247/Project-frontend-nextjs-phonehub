@@ -1,24 +1,29 @@
-import { Table, Button, Space, Popconfirm } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import type { ColumnsType } from 'antd/es/table';
-import { User } from '../interface/IUser';
+'use client';
 
-interface UsersTableProps {
-  users: User[];
+import React from 'react';
+import { Table, Button, Space, Tag, Popconfirm } from 'antd';
+import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { toast } from 'react-toastify';
+import type { ColumnsType } from 'antd/es/table';
+import { Rank } from '../interface/IRank';
+import { capitalizeFirst } from '../../../../../lib/utils/string';
+
+interface RanksTableProps {
+  ranks: Rank[];
   searchText: string;
   loading?: boolean;
   currentPage?: number;
   pageSize?: number;
   total?: number;
-  onView: (user: User) => void;
-  onEdit: (user: User) => void;
+  onView: (rank: Rank) => void;
+  onEdit: (rank: Rank) => void;
   onDelete: (id: number) => void;
   onPageChange?: (page: number, size: number) => void;
 }
 
-export default function UsersTable({ 
-  users, 
-  searchText,
+export default function RanksTable({ 
+  ranks, 
+  searchText, 
   loading = false,
   currentPage = 1,
   pageSize = 10,
@@ -27,8 +32,8 @@ export default function UsersTable({
   onEdit, 
   onDelete,
   onPageChange,
-}: UsersTableProps) {
-  const columns: ColumnsType<User> = [
+}: RanksTableProps) {
+  const columns: ColumnsType<Rank> = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -36,30 +41,31 @@ export default function UsersTable({
       width: 80,
     },
     {
-      title: 'Username',
-      dataIndex: 'username',
-      key: 'username',
+      title: 'Tên xếp hạng',
+      dataIndex: 'name',
+      key: 'name',
+      filteredValue: searchText ? [searchText] : null,
+      onFilter: (value, record) =>
+        record.name.toLowerCase().includes((value as string).toLowerCase()),
+      render: (name: string) => capitalizeFirst(name),
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
+      title: 'Điểm tối thiểu',
+      dataIndex: 'minPoints',
+      key: 'minPoints',
+      render: (points: number) => points.toLocaleString('vi-VN'),
     },
     {
-      title: 'Số điện thoại',
-      dataIndex: 'phone',
-      key: 'phone',
+      title: 'Điểm tối đa',
+      dataIndex: 'maxPoints',
+      key: 'maxPoints',
+      render: (points: number | undefined) => points ? points.toLocaleString('vi-VN') : '∞',
     },
     {
-      title: 'Địa chỉ',
-      dataIndex: 'address',
-      key: 'address',
-    },
-    {
-      title: 'Điểm',
-      dataIndex: 'points',
-      key: 'points',
-      render: (points: number | undefined) => (points || 0).toLocaleString('vi-VN'),
+      title: 'Giảm giá (%)',
+      dataIndex: 'discountPercent',
+      key: 'discountPercent',
+      render: (percent: number | undefined) => percent ? `${percent}%` : '-',
     },
     {
       title: 'Ngày tạo',
@@ -90,8 +96,8 @@ export default function UsersTable({
             Sửa
           </Button>
           <Popconfirm
-            title="Xóa người dùng"
-            description="Bạn có chắc chắn muốn xóa người dùng này?"
+            title="Xóa xếp hạng"
+            description="Bạn có chắc chắn muốn xóa xếp hạng này?"
             onConfirm={() => onDelete(record.id)}
             okText="Xóa"
             cancelText="Hủy"
@@ -113,7 +119,7 @@ export default function UsersTable({
   return (
     <Table
       columns={columns}
-      dataSource={users}
+      dataSource={ranks}
       rowKey="id"
       loading={loading}
       pagination={{
@@ -124,7 +130,7 @@ export default function UsersTable({
         showTotal: (total, range) => {
           if (loading) return 'Đang tải...';
           if (total === 0) return 'Không có dữ liệu';
-          return `${range[0]}-${range[1]} của ${total} người dùng`;
+          return `${range[0]}-${range[1]} của ${total} xếp hạng`;
         },
         onChange: onPageChange ? (page) => onPageChange(page, pageSize) : undefined,
       }}

@@ -13,6 +13,9 @@ import {
   SecurityScanOutlined,
   PictureOutlined,
   ApiOutlined,
+  TrophyOutlined,
+  SafetyCertificateOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 
 const { Sider } = Layout;
@@ -55,15 +58,28 @@ export default function AdminSidebar({ collapsed, setCollapsed, headerHeight = 6
       label: <Link href="/admin/orders">Quản lý đơn hàng</Link>,
     },
     {
-      key: "/admin/users",
+      key: "users",
       icon: <UserOutlined />,
-      label: <Link href="/admin/users">Quản lý người dùng</Link>,
+      label: "Người dùng",
+      children: [
+        {
+          key: "/admin/users",
+          icon: <TeamOutlined />,
+          label: <Link href="/admin/users">Quản lý người dùng</Link>,
+        },
+        {
+          key: "/admin/roles",
+          icon: <SafetyCertificateOutlined />,
+          label: <Link href="/admin/roles">Quản lý vai trò</Link>,
+        },
+        {
+          key: "/admin/ranks",
+          icon: <TrophyOutlined />,
+          label: <Link href="/admin/ranks">Quản lý xếp hạng</Link>,
+        },
+      ],
     },
-    {
-      key: "/admin/roles",
-      icon: <SecurityScanOutlined />,
-      label: <Link href="/admin/roles">Quản lý vai trò</Link>,
-    },
+
     {
       key: "/admin/settings",
       icon: <SettingOutlined />,

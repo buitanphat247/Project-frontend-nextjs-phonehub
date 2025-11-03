@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { message } from 'antd';
 import { User } from '../interface/IUser';
-import { getUsers, searchUsers, createUser, updateUser, deleteUser } from '../../../../../lib/api/users';
+import { getUsers, searchUsers, createUser, updateUser, deleteUser, getUserById } from '../../../../../lib/api/users';
 import type { UserResponse } from '../../../../../lib/api/users';
 
 // Helper to get URL params
@@ -55,8 +55,12 @@ export function useUserHandlers() {
       phone: user.phone || '',
       address: user.address || '',
       avatar: user.avatar || '',
-      roleId: user.role?.id || 0,
-      roleName: user.role?.name || '',
+      birthday: user.birthday,
+      points: user.points || 0,
+      roleId: user.roleId ?? user.role?.id,
+      roleName: user.role?.name,
+      rankId: user.rankId ?? user.rank?.id,
+      rankName: user.rank?.name,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     }));
@@ -194,9 +198,37 @@ export function useUserHandlers() {
     }
   };
 
-  const handleView = (user: User) => {
-    setSelectedUser(user);
-    setModalVisible(true);
+  const handleView = async (user: User) => {
+    try {
+      // Fetch full user details from API
+      const response = await getUserById(user.id);
+      if (response.success && response.data) {
+        const userData = response.data;
+        const fullUser: User = {
+          id: userData.id,
+          username: userData.username,
+          email: userData.email,
+          phone: userData.phone || '',
+          address: userData.address || '',
+          avatar: userData.avatar || '',
+          birthday: userData.birthday,
+          points: userData.points || 0,
+          roleId: userData.roleId ?? userData.role?.id,
+          roleName: userData.role?.name,
+          rankId: userData.rankId ?? userData.rank?.id,
+          rankName: userData.rank?.name,
+          createdAt: userData.createdAt,
+          updatedAt: userData.updatedAt,
+        };
+        setSelectedUser(fullUser);
+        setModalVisible(true);
+      } else {
+        message.error(response.message || 'Không thể tải thông tin người dùng');
+      }
+    } catch (error: any) {
+      console.error('Error fetching user details:', error);
+      message.error('Không thể tải thông tin người dùng: ' + (error.message || 'Lỗi không xác định'));
+    }
   };
 
   const handleCloseViewModal = () => {
@@ -212,9 +244,41 @@ export function useUserHandlers() {
     setCreateModalVisible(false);
   };
 
-  const handleEditClick = (user: User) => {
-    setSelectedUser(user);
-    setEditModalVisible(true);
+  const handleEditClick = async (user: User) => {
+    try {
+      // Fetch full user details from API to ensure we have roleId
+      const response = await getUserById(user.id);
+      if (response.success && response.data) {
+        const userData = response.data;
+        const fullUser: User = {
+          id: userData.id,
+          username: userData.username,
+          email: userData.email,
+          phone: userData.phone || '',
+          address: userData.address || '',
+          avatar: userData.avatar || '',
+          birthday: userData.birthday,
+          points: userData.points || 0,
+          roleId: userData.roleId ?? userData.role?.id,
+          roleName: userData.role?.name,
+          rankId: userData.rankId ?? userData.rank?.id,
+          rankName: userData.rank?.name,
+          createdAt: userData.createdAt,
+          updatedAt: userData.updatedAt,
+        };
+        setSelectedUser(fullUser);
+        setEditModalVisible(true);
+      } else {
+        // Fallback to using user from table if API call fails
+        setSelectedUser(user);
+        setEditModalVisible(true);
+      }
+    } catch (error: any) {
+      console.error('Error fetching user details for edit:', error);
+      // Fallback to using user from table if API call fails
+      setSelectedUser(user);
+      setEditModalVisible(true);
+    }
   };
 
   const handleCloseEditModal = () => {

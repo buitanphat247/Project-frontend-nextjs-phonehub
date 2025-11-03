@@ -141,9 +141,91 @@ export async function apiPost<T>(
   data?: any,
   options?: RequestInit
 ): Promise<ApiResponse<T>> {
+  try {
+    const response = await apiClient(endpoint, {
+      ...options,
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined,
+    })
+
+    // Check for new token even if response is not ok (for JWT expiration)
+    // Must check headers before consuming response body
+    const newToken = 
+      response.headers.get('x-new-access-token') || 
+      response.headers.get('X-New-Access-Token') ||
+      response.headers.get('x-new-accestoken') ||
+      response.headers.get('X-New-Accestoken')
+    
+    // If we have a new token and got a 400/401 error (likely JWT expired), save token and retry
+    if (newToken && !response.ok && (response.status === 400 || response.status === 401)) {
+      const authData = getAuthData()
+      if (authData) {
+        authData.token = newToken
+        saveAuthData(authData)
+        
+        // Retry once with new token
+        const retryResponse = await apiClient(endpoint, {
+          ...options,
+          method: 'POST',
+          body: data ? JSON.stringify(data) : undefined,
+        })
+        
+        if (!retryResponse.ok) {
+          let errorData
+          try {
+            errorData = await retryResponse.json()
+          } catch {
+            errorData = {
+              message: `Request failed with status ${retryResponse.status}: ${retryResponse.statusText}`,
+            }
+          }
+          throw new Error(errorData.message || `Request failed with status ${retryResponse.status}`)
+        }
+        
+        return retryResponse.json()
+      }
+    }
+
+    // If we have new token but response is ok, just save it (already saved in apiClient, but ensure it's saved)
+    if (newToken && response.ok) {
+      const authData = getAuthData()
+      if (authData && authData.token !== newToken) {
+        authData.token = newToken
+        saveAuthData(authData)
+      }
+    }
+
+    if (!response.ok) {
+      let errorData
+      try {
+        errorData = await response.json()
+      } catch {
+        errorData = {
+          message: `Request failed with status ${response.status}: ${response.statusText}`,
+        }
+      }
+      throw new Error(errorData.message || `Request failed with status ${response.status}`)
+    }
+
+    return response.json()
+  } catch (error: any) {
+    console.error(`Error in apiPost for ${endpoint}:`, error)
+    throw error
+  }
+}
+
+/**
+ * Wrapper for PUT requests
+ * Handles token refresh automatically on JWT expiration
+ */
+export async function apiPut<T>(
+  endpoint: string,
+  data?: any,
+  options?: RequestInit
+): Promise<ApiResponse<T>> {
   const response = await apiClient(endpoint, {
     ...options,
-    method: 'POST',
+    method: 'PUT',
     body: data ? JSON.stringify(data) : undefined,
   })
 
@@ -164,7 +246,7 @@ export async function apiPost<T>(
       // Retry once with new token
       const retryResponse = await apiClient(endpoint, {
         ...options,
-        method: 'POST',
+        method: 'PUT',
         body: data ? JSON.stringify(data) : undefined,
       })
       
@@ -187,30 +269,6 @@ export async function apiPost<T>(
       saveAuthData(authData)
     }
   }
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({
-      message: 'Request failed',
-    }))
-    throw new Error(errorData.message || 'Request failed')
-  }
-
-  return response.json()
-}
-
-/**
- * Wrapper for PUT requests
- */
-export async function apiPut<T>(
-  endpoint: string,
-  data?: any,
-  options?: RequestInit
-): Promise<ApiResponse<T>> {
-  const response = await apiClient(endpoint, {
-    ...options,
-    method: 'PUT',
-    body: data ? JSON.stringify(data) : undefined,
-  })
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({
