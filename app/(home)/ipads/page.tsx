@@ -32,7 +32,7 @@ const IPadsPage = () => {
             Máy tính bảng
           </h1>
           <p className="text-gray-600">
-            {totalElements} sản phẩm
+            {isLoading ? 'Đang tải...' : `${totalElements} sản phẩm`}
           </p>
         </div>
 
@@ -63,11 +63,13 @@ const IPadsPage = () => {
                   ))}
                 </div>
 
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                {totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
               </>
             ) : (
               <div className="text-center py-16">

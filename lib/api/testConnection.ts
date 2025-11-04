@@ -10,6 +10,9 @@ export async function testConnection({ apiUrl, endpoint }: TestConnectionParams)
   const cleanApiUrl = apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl;
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   const fullUrl = `${cleanApiUrl}${cleanEndpoint}`;
+  
+  // Measure API call duration (client-side only)
+  const start = typeof window !== 'undefined' ? performance.now() : 0;
   const startTime = Date.now();
 
   try {
@@ -21,6 +24,20 @@ export async function testConnection({ apiUrl, endpoint }: TestConnectionParams)
     const response = await fetch(fullUrl, options);
     const endTime = Date.now();
     const responseTime = endTime - startTime;
+    
+    // Calculate duration using performance.now() for logging
+    const duration = typeof window !== 'undefined' 
+      ? (performance.now() - start).toFixed(2) 
+      : responseTime.toString();
+    
+    // Log timing (always log in client-side)
+    if (typeof window !== 'undefined') {
+      if (response.ok) {
+        console.log(`✅ Test Connection [${response.status}] ${fullUrl} (${duration} ms)`);
+      } else {
+        console.error(`❌ Test Connection [${response.status}] ${fullUrl} (${duration} ms)`);
+      }
+    }
 
     let data;
     const contentType = response.headers.get('content-type');
@@ -42,6 +59,16 @@ export async function testConnection({ apiUrl, endpoint }: TestConnectionParams)
   } catch (error: any) {
     const endTime = Date.now();
     const responseTime = endTime - startTime;
+    
+    // Calculate duration using performance.now() for logging
+    const duration = typeof window !== 'undefined' 
+      ? (performance.now() - start).toFixed(2) 
+      : responseTime.toString();
+    
+    // Log error timing (always log in client-side)
+    if (typeof window !== 'undefined') {
+      console.error(`❌ Test Connection failed ${fullUrl} (${duration} ms):`, error);
+    }
 
     // Kiểm tra nếu là lỗi CORS
     const isCorsError =

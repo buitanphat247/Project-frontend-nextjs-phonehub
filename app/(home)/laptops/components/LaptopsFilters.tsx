@@ -92,14 +92,15 @@ export default function LaptopsFilters({ onFilterChange, currentFilters, brands,
       </div>
 
       {/* Price Range Filter */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Mức giá
+      <div className="mb-6 opacity-50">
+        <label className="block text-sm font-medium text-gray-500 mb-2">
+          Mức giá (Tạm khóa)
         </label>
         <select
           value={localFilters.priceRange || ''}
           onChange={(e) => handleFilterChange('priceRange', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+          disabled
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
         >
           {priceRanges.map((range) => (
             <option key={range.value} value={range.value}>

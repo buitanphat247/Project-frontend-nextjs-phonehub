@@ -32,7 +32,7 @@ const LaptopsPage = () => {
             Laptop
           </h1>
           <p className="text-gray-600">
-            {totalElements} sản phẩm
+            {isLoading ? 'Đang tải...' : `${totalElements} sản phẩm`}
           </p>
         </div>
 
@@ -63,11 +63,13 @@ const LaptopsPage = () => {
                   ))}
                 </div>
 
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                {totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
               </>
             ) : (
               <div className="text-center py-16">

@@ -30,7 +30,7 @@ const PhonesPage = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Điện Thoại</h1>
           <p className="text-gray-600">
-            {totalElements} sản phẩm
+            {isLoading ? 'Đang tải...' : `${totalElements} sản phẩm`}
           </p>
         </div>
 
@@ -56,7 +56,9 @@ const PhonesPage = () => {
                   ))}
                 </div>
 
-                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+                {totalPages > 1 && (
+                  <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+                )}
               </>
             ) : (
               <div className="text-center py-16">

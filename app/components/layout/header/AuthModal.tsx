@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Modal, Tabs, Form, Input, Button, Checkbox, Divider, Space, message, Spin } from 'antd'
-import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
-import { signIn, signInWithGoogle } from '../../../../lib/api/auth'
+import { Modal, Tabs, Form, Input, Button, Checkbox, Divider, Space, message, Spin, DatePicker, Row, Col } from 'antd'
+import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, CalendarOutlined, HomeOutlined } from '@ant-design/icons'
+import dayjs from 'dayjs'
+import { signIn, signInWithGoogle, signUp } from '../../../../lib/api/auth'
 import { saveAuthData } from '../../../../lib/utils/cookie'
-import { buildApiUrl } from '../../../../lib/api/config'
 import GoogleLoginButton from './GoogleLoginButton'
 
 interface AuthModalProps {
@@ -93,12 +93,70 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   const handleSignUp = async (values: any) => {
     try {
-      console.log('Sign up:', values)
-      message.success('Đăng ký thành công!')
-      onClose()
-      signUpForm.resetFields()
-    } catch (error) {
-      message.error('Đăng ký thất bại!')
+      setLoading(true)
+      setAuthProcessing(true)
+      
+      // Format birthday to YYYY-MM-DD
+      const birthday = values.birthday ? dayjs(values.birthday).format('YYYY-MM-DD') : undefined
+      
+      // Step 1: Đăng ký tài khoản
+      const signUpResponse = await signUp({
+        username: values.username,
+        email: values.email,
+        phone: values.phone,
+        address: values.address,
+        birthday: birthday,
+        password: values.password,
+      })
+
+      if (!signUpResponse.success) {
+        message.error(signUpResponse.message || 'Đăng ký thất bại!')
+        return
+      }
+
+      message.success(signUpResponse.message || 'Đăng ký thành công!')
+
+      // Step 2: Sau khi đăng ký thành công, tự động đăng nhập
+      try {
+        const signInResponse = await signIn({
+          username: values.username,
+          password: values.password,
+        })
+
+        if (signInResponse.success && signInResponse.data) {
+          // Lưu auth data vào cookie sau khi đăng nhập thành công
+          saveAuthData(signInResponse.data)
+          message.success('Đăng nhập thành công!')
+          onClose()
+          signUpForm.resetFields()
+          
+          // Redirect to protected route if exists, otherwise reload
+          const urlParams = new URLSearchParams(window.location.search)
+          const redirect = urlParams.get('redirect')
+          if (redirect) {
+            router.push(redirect)
+          } else {
+            window.location.reload()
+          }
+        } else {
+          message.warning('Đăng ký thành công nhưng đăng nhập thất bại. Vui lòng đăng nhập lại!')
+          // Chuyển sang tab đăng nhập
+          setActiveTab('signin')
+          signUpForm.resetFields()
+        }
+      } catch (signInError: any) {
+        console.error('Auto sign in error:', signInError)
+        message.warning('Đăng ký thành công nhưng đăng nhập thất bại. Vui lòng đăng nhập lại!')
+        // Chuyển sang tab đăng nhập
+        setActiveTab('signin')
+        signUpForm.resetFields()
+      }
+    } catch (error: any) {
+      console.error('Sign up error:', error)
+      message.error(error.message || 'Đăng ký thất bại!')
+    } finally {
+      setLoading(false)
+      setAuthProcessing(false)
     }
   }
 
@@ -201,75 +259,105 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           layout="vertical"
           size="large"
         >
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item
-              name="firstName"
-              rules={[{ required: true, message: 'Vui lòng nhập họ!' }]}
-            >
-              <Input
-                prefix={<UserOutlined />}
-                placeholder="Họ"
-                className="h-12"
-                autoComplete="off"
-              />
-            </Form.Item>
-            <Form.Item
-              name="lastName"
-              rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
-            >
-              <Input
-                prefix={<UserOutlined />}
-                placeholder="Tên"
-                className="h-12"
-                autoComplete="off"
-              />
-            </Form.Item>
-          </div>
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="username"
+                rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}
+              >
+                <Input
+                  prefix={<UserOutlined />}
+                  placeholder="Tên đăng nhập"
+                  className="h-12"
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </Col>
 
-          <Form.Item
-            name="email"
-            rules={[
-              { required: true, message: 'Vui lòng nhập email!' },
-              { type: 'email', message: 'Email không hợp lệ!' }
-            ]}
-          >
-            <Input
-              prefix={<MailOutlined />}
-              placeholder="Email"
-              className="h-12"
-              autoComplete="off"
-            />
-          </Form.Item>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="email"
+                rules={[
+                  { required: true, message: 'Vui lòng nhập email!' },
+                  { type: 'email', message: 'Email không hợp lệ!' }
+                ]}
+              >
+                <Input
+                  prefix={<MailOutlined />}
+                  placeholder="Email"
+                  className="h-12"
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
-          <Form.Item
-            name="phone"
-            rules={[
-              { required: true, message: 'Vui lòng nhập số điện thoại!' },
-              { pattern: /^[0-9]+$/, message: 'Số điện thoại không hợp lệ!' }
-            ]}
-          >
-            <Input
-              prefix={<PhoneOutlined />}
-              placeholder="Số điện thoại"
-              className="h-12"
-              autoComplete="off"
-            />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="phone"
+                rules={[
+                  { required: true, message: 'Vui lòng nhập số điện thoại!' },
+                  { pattern: /^[0-9]+$/, message: 'Số điện thoại không hợp lệ!' }
+                ]}
+              >
+                <Input
+                  prefix={<PhoneOutlined />}
+                  placeholder="Số điện thoại"
+                  className="h-12"
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </Col>
 
-          <Form.Item
-            name="password"
-            rules={[
-              { required: true, message: 'Vui lòng nhập mật khẩu!' },
-              { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
-            ]}
-          >
-            <Input.Password
-              prefix={<LockOutlined />}
-              placeholder="Mật khẩu"
-              className="h-12"
-              autoComplete="new-password"
-            />
-          </Form.Item>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="address"
+                rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}
+              >
+                <Input
+                  prefix={<HomeOutlined />}
+                  placeholder="Địa chỉ"
+                  className="h-12"
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="birthday"
+                rules={[{ required: true, message: 'Vui lòng chọn ngày sinh!' }]}
+              >
+                <DatePicker
+                  placeholder="Ngày sinh"
+                  className="w-full h-12"
+                  format="DD/MM/YYYY"
+                  suffixIcon={<CalendarOutlined />}
+                  disabledDate={(current) => current && current > dayjs().endOf('day')}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="password"
+                rules={[
+                  { required: true, message: 'Vui lòng nhập mật khẩu!' },
+                  { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
+                ]}
+              >
+                <Input.Password
+                  prefix={<LockOutlined />}
+                  placeholder="Mật khẩu"
+                  className="h-12"
+                  autoComplete="new-password"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Form.Item
             name="confirmPassword"
@@ -311,6 +399,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               type="primary"
               htmlType="submit"
               className="w-full h-12 bg-blue-600 hover:bg-blue-700"
+              loading={loading}
+              disabled={loading}
             >
               Đăng ký
             </Button>
@@ -347,7 +437,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         open={isOpen}
         onCancel={onClose}
         footer={null}
-        width={500}
+        width={700}
         centered
         className="auth-modal"
         styles={{

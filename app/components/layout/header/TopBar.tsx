@@ -46,12 +46,32 @@ export default function TopBar({ initialAuth }: TopBarProps) {
       checkAuth();
     };
     
+    // Listen for openAuthModal event
+    const handleOpenAuthModal = () => {
+      setIsAuthModalOpen(true);
+    };
+    
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('openAuthModal', handleOpenAuthModal);
+    
+    // Check URL params for auth=login
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('auth') === 'login') {
+        setIsAuthModalOpen(true);
+        // Remove param from URL
+        urlParams.delete('auth');
+        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
+    
     // Also check periodically in case cookie changes without storage event
     const interval = setInterval(checkAuth, 1000);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('openAuthModal', handleOpenAuthModal);
       clearInterval(interval);
     };
   }, []);

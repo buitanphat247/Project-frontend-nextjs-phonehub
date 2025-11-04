@@ -24,12 +24,29 @@ export async function apiClient<T>(
     headers['Authorization'] = `Bearer ${token}`
   }
 
+  // Measure API call duration (client-side only)
+  const start = typeof window !== 'undefined' ? performance.now() : 0
+
   try {
+    
     // Make the request (proxy handles CORS, so no special mode needed)
     const response = await fetch(url, {
       ...options,
       headers,
     })
+    
+    const duration = typeof window !== 'undefined' 
+      ? (performance.now() - start).toFixed(2) 
+      : '0'
+    
+    // Log timing (always log in client-side)
+    if (typeof window !== 'undefined') {
+      if (response.ok) {
+        console.log(`✅ API [${response.status}] ${endpoint} (${duration} ms)`)
+      } else {
+        console.error(`❌ API [${response.status}] ${endpoint} (${duration} ms)`)
+      }
+    }
 
     // Check if we got a new token in the response header
     // Backend returns X-New-Access-Token header
@@ -51,7 +68,11 @@ export async function apiClient<T>(
 
     return response
   } catch (error: any) {
-    console.error(`Error when calling ${url}:`, error)
+    // Measure duration even on error (client-side only)
+    if (typeof window !== 'undefined') {
+      const duration = (performance.now() - start).toFixed(2)
+      console.error(`❌ API failed ${endpoint} (${duration} ms):`, error)
+    }
     throw error
   }
 }

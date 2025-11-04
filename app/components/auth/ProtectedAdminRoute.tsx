@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Spin } from "antd";
 import { getAuthData } from "../../../lib/utils/cookie";
-import { toast } from "react-toastify";
+import { showLoginRequired, showAccessDenied } from "../../../lib/utils/loginAlert";
 
 interface ProtectedAdminRouteProps {
   children: React.ReactNode;
@@ -31,14 +31,18 @@ export default function ProtectedAdminRoute({ children }: ProtectedAdminRoutePro
       const authData = getAuthData();
       
       if (!authData || !authData.token) {
-        toast.warn("Vui lòng đăng nhập để truy cập trang này");
-        router.push(`/?redirect=${encodeURIComponent(pathname)}`);
+        showLoginRequired("Bạn không có quyền truy cập trang này").then(() => {
+          // Bắt buộc phải về trang chủ
+          router.push(`/?redirect=${encodeURIComponent(pathname)}`);
+        });
         return;
       }
 
       if (!isAdmin(authData)) {
-        toast.error("Bạn không có quyền truy cập trang này");
-        router.push('/');
+        showAccessDenied("Bạn không có quyền truy cập trang này").then(() => {
+          // Bắt buộc phải về trang chủ
+          router.push('/');
+        });
         return;
       }
 

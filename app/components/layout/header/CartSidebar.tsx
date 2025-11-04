@@ -2,17 +2,28 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { ShoppingCartOutlined, CloseOutlined, MinusOutlined, PlusOutlined, DeleteOutlined, CreditCardOutlined, CarOutlined, ShoppingOutlined } from '@ant-design/icons'
+import { ShoppingCartOutlined, CloseOutlined, MinusOutlined, PlusOutlined, DeleteOutlined, CreditCardOutlined, CarOutlined, ShoppingOutlined, PictureOutlined } from '@ant-design/icons'
+import { useEffect } from 'react'
+import toast from 'react-hot-toast'
+import { getMyCart, updateCartItemQuantity, deleteCartItem } from '../../../../lib/api/cart'
+import { getAuthData } from '../../../../lib/utils/cookie'
 
 interface CartItem {
   id: number
-  name: string
-  price: number
-  originalPrice?: number
+  productId: number
+  product: {
+    id: number
+    name: string
+    slug: string
+    brand?: string
+    price: number
+    priceOld?: number
+    thumbnailImage?: string
+  }
   quantity: number
-  image: string
-  color: string
-  brand: string
+  priceAtAdd: number
+  createdAt: string
+  updatedAt: string
 }
 
 interface CartSidebarProps {
@@ -33,18 +44,100 @@ export default function CartSidebar({
   onClose
 }: CartSidebarProps) {
   const [quantities, setQuantities] = useState<Record<number, number>>({})
+  const [fetchedItems, setFetchedItems] = useState<CartItem[]>([])
+  const [fetchedTotal, setFetchedTotal] = useState<number>(0)
+  const [useLocalData, setUseLocalData] = useState<boolean>(false)
 
-  const updateQuantity = (itemId: number, newQuantity: number) => {
+  // Fetch cart when sidebar opens (defensive, in case parent chưa truyền items)
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const auth = getAuthData()
+        const userId = auth?.userId ? parseInt(auth.userId, 10) : NaN
+        if (!userId) return
+        const res = await getMyCart(userId)
+        if (res.success && Array.isArray(res.data)) {
+          setFetchedItems(res.data as unknown as CartItem[])
+          const total = res.data.reduce((sum: number, ci: any) => sum + ((ci.priceAtAdd || ci.product.price) * ci.quantity), 0)
+          setFetchedTotal(total)
+          setUseLocalData(true)
+        }
+      } catch {
+        // ignore
+      }
+    }
+    if (isOpen) fetchCart()
+  }, [isOpen])
+
+  // Ưu tiên dùng dữ liệu fetch nội bộ để có thể cập nhật số lượng tức thời
+  const itemsToRender = useLocalData ? fetchedItems : (cartItems || [])
+  const totalToRender = useLocalData ? fetchedTotal : (totalPrice || 0)
+
+  const updateQuantity = async (itemId: number, newQuantity: number) => {
     if (newQuantity < 1) return
-    setQuantities(prev => ({
-      ...prev,
-      [itemId]: newQuantity
-    }))
+
+    // Tìm item trong danh sách hiện tại (fetchedItems)
+    const currentItems = itemsToRender.length ? [...itemsToRender] : []
+    const idx = currentItems.findIndex(i => i.id === itemId)
+    if (idx === -1) return
+    const prevQty = currentItems[idx].quantity
+
+    // Optimistic update
+    currentItems[idx] = { ...currentItems[idx], quantity: newQuantity }
+    setFetchedItems(currentItems)
+    setUseLocalData(true)
+    setQuantities(prev => ({ ...prev, [itemId]: newQuantity }))
+    setFetchedTotal(currentItems.reduce((sum, ci) => sum + ((ci.priceAtAdd || ci.product.price) * ci.quantity), 0))
+
+    try {
+      const res = await updateCartItemQuantity(itemId, newQuantity)
+      if (!res.success) throw new Error(res.message || 'Cập nhật thất bại')
+      // đồng bộ badge
+      const count = currentItems.reduce((s, i) => s + i.quantity, 0)
+      localStorage.setItem('cart_count', String(count))
+      window.dispatchEvent(new Event('storage'))
+    } catch (e: any) {
+      // rollback
+      const rollback = itemsToRender.length ? [...itemsToRender] : []
+      const rIdx = rollback.findIndex(i => i.id === itemId)
+      if (rIdx !== -1) rollback[rIdx] = { ...rollback[rIdx], quantity: prevQty }
+      setFetchedItems(rollback)
+      setFetchedTotal(rollback.reduce((sum, ci) => sum + ((ci.priceAtAdd || ci.product.price) * ci.quantity), 0))
+    }
   }
 
-  const removeItem = (itemId: number) => {
-    // Logic to remove item from cart
-    console.log('Remove item:', itemId)
+  const removeItem = async (itemId: number) => {
+    const currentItems = itemsToRender.length ? [...itemsToRender] : []
+    const idx = currentItems.findIndex(i => i.id === itemId)
+    if (idx === -1) return
+
+    // Optimistic remove
+    const removed = currentItems.splice(idx, 1)[0]
+    const prevItems = itemsToRender
+    setFetchedItems(currentItems)
+    setUseLocalData(true)
+    setFetchedTotal(currentItems.reduce((s, i) => s + ((i.priceAtAdd || i.product.price) * i.quantity), 0))
+    setQuantities(prev => {
+      const n = { ...prev }
+      delete n[itemId]
+      return n
+    })
+    try {
+      const res = await deleteCartItem(itemId)
+      if (!res.success) throw new Error(res.message || 'Xóa thất bại')
+      toast.success('Đã xóa khỏi giỏ hàng')
+      const count = currentItems.reduce((s, i) => s + i.quantity, 0)
+      localStorage.setItem('cart_count', String(count))
+      window.dispatchEvent(new Event('storage'))
+    } catch (e: any) {
+      // rollback
+      const rollback = [...prevItems]
+      // chèn lại item đã xóa tại vị trí cũ
+      rollback.splice(idx, 0, removed)
+      setFetchedItems(rollback)
+      setFetchedTotal(rollback.reduce((s, i) => s + ((i.priceAtAdd || i.product.price) * i.quantity), 0))
+      toast.error(e?.message || 'Không thể xóa khỏi giỏ hàng')
+    }
   }
 
   const formatPrice = (price: number) => {
@@ -144,7 +237,7 @@ export default function CartSidebar({
               </div>
               <div>
                 <h2 className="text-xl font-bold">Giỏ hàng</h2>
-                <p className="text-blue-100 text-sm">{totalItems} sản phẩm</p>
+                <p className="text-blue-100 text-sm">{itemsToRender.reduce((s, i) => s + i.quantity, 0)} sản phẩm</p>
               </div>
             </div>
             <button
@@ -159,12 +252,12 @@ export default function CartSidebar({
 
         {/* Content */}
         <div className="flex flex-col h-full">
-          {cartItems.length > 0 ? (
+          {itemsToRender.length > 0 ? (
             <>
               {/* Items List */}
               <div className="flex-1 overflow-y-auto p-6">
                 <div className="space-y-4">
-                  {cartItems.map((item, index) => (
+                  {itemsToRender.map((item, index) => (
                     <div 
                       key={item.id} 
                       className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all duration-300"
@@ -172,23 +265,28 @@ export default function CartSidebar({
                       <div className="flex items-start space-x-4">
                         {/* Product Image */}
                         <div className="w-16 h-16 bg-linear-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center text-2xl">
-                          {item.image}
+                          {item.product.thumbnailImage ? (
+                            <img src={item.product.thumbnailImage} alt={item.product.name} className="w-full h-full object-cover rounded-lg" />
+                          ) : (
+                            <PictureOutlined className="text-xl text-gray-400" />
+                          )}
                         </div>
                         
                         {/* Product Info */}
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-sm leading-tight">{item.name}</h3>
-                          <p className="text-xs text-gray-500 mb-1">{item.brand}</p>
-                          <p className="text-xs text-gray-500 mb-2">{item.color}</p>
+                          <h3 className="font-semibold text-gray-900 text-sm leading-tight">{item.product.name}</h3>
+                          {item.product.brand && (
+                            <p className="text-xs text-gray-500 mb-1">{item.product.brand}</p>
+                          )}
                           
                           {/* Price */}
                           <div className="flex items-center space-x-2">
                             <span className="text-sm font-bold text-blue-600">
-                              {formatPrice(item.price)}
+                              {formatPrice(item.priceAtAdd || item.product.price)}
                             </span>
-                            {item.originalPrice && item.originalPrice > item.price && (
+                            {typeof item.product.priceOld === 'number' && item.product.priceOld > (item.priceAtAdd || item.product.price) && (
                               <span className="text-xs text-gray-400 line-through">
-                                {formatPrice(item.originalPrice)}
+                                {formatPrice(item.product.priceOld)}
                               </span>
                             )}
                           </div>
@@ -233,7 +331,7 @@ export default function CartSidebar({
                 <div className="flex justify-between items-center mb-4 p-4 bg-white rounded-lg">
                   <span className="text-lg font-bold text-gray-900">Tổng cộng:</span>
                   <span className="text-2xl font-bold text-blue-600">
-                    {formatPrice(totalPrice)}
+                    {formatPrice(totalToRender)}
                   </span>
                 </div>
                 

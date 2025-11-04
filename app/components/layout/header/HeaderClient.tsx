@@ -5,6 +5,8 @@ import TopBar from './TopBar'
 import MainHeader from './MainHeader'
 import Navigation from './Navigation'
 import CartSidebar from './CartSidebar'
+import { getMyCart, CartItemApi } from '../../../../lib/api/cart'
+import { getAuthData } from '../../../../lib/utils/cookie'
 
 interface AuthState {
   authenticated: boolean
@@ -22,31 +24,12 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isCartClosing, setIsCartClosing] = useState(false)
   const cartButtonRef = useRef<HTMLButtonElement>(null)
-
-  // Sample cart data
-  const cartItems = [
-    {
-      id: 1,
-      name: 'iPhone 15 Pro Max',
-      price: 29990000,
-      quantity: 1,
-      image: '📱',
-      color: 'Titanium Natural',
-      brand: 'Apple'
-    },
-    {
-      id: 2,
-      name: 'Samsung Galaxy S24 Ultra',
-      price: 24990000,
-      quantity: 1,
-      image: '📱',
-      color: 'Titanium Black',
-      brand: 'Samsung'
-    }
-  ]
-
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
-  const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  // Cart count is driven by localStorage 'cart_count' (updated when adding cart)
+  const [totalItems, setTotalItems] = useState<number>(
+    typeof window !== 'undefined' ? parseInt(localStorage.getItem('cart_count') || '0', 10) || 0 : 0
+  )
+  const [cartItems, setCartItems] = useState<CartItemApi[]>([])
+  const [totalPrice, setTotalPrice] = useState<number>(0)
 
   // Handle ESC key and focus management
   useEffect(() => {
@@ -68,6 +51,40 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
       document.body.style.overflow = "unset"
     }
   }, [isCartOpen, isCartClosing])
+
+  // Listen to storage changes to update cart badge in real-time
+  useEffect(() => {
+    const syncCartCount = () => {
+      const next = parseInt(localStorage.getItem('cart_count') || '0', 10) || 0
+      setTotalItems(next)
+    }
+    window.addEventListener('storage', syncCartCount)
+    const interval = setInterval(syncCartCount, 1000)
+    return () => {
+      window.removeEventListener('storage', syncCartCount)
+      clearInterval(interval)
+    }
+  }, [])
+
+  // Fetch cart items when sidebar opens
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const auth = getAuthData()
+        const userId = auth?.userId ? parseInt(auth.userId, 10) : NaN
+        if (!userId) return
+        const res = await getMyCart(userId)
+        if (res.success && Array.isArray(res.data)) {
+          setCartItems(res.data)
+          const count = res.data.reduce((sum, ci) => sum + ci.quantity, 0)
+          setTotalItems(count)
+          const price = res.data.reduce((sum, ci) => sum + ((ci.priceAtAdd || ci.product.price) * ci.quantity), 0)
+          setTotalPrice(price)
+        }
+      } catch {}
+    }
+    if (isCartOpen) fetchCart()
+  }, [isCartOpen])
 
   const openCart = () => {
     setIsCartOpen(true)

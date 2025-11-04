@@ -98,30 +98,26 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4 text-white">Danh mục</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/products/iphone" className="text-gray-300! hover:text-white! transition-colors block py-1">
-                  iPhone
+                <Link href="/phones" className="text-gray-300! hover:text-white! transition-colors block py-1">
+                  Điện thoại
                 </Link>
               </li>
               <li>
-                <Link href="/products/samsung" className="text-gray-300! hover:text-white! transition-colors block py-1">
-                  Samsung
+                <Link href="/laptops" className="text-gray-300! hover:text-white! transition-colors block py-1">
+                  Laptop
                 </Link>
               </li>
               <li>
-                <Link href="/products/xiaomi" className="text-gray-300! hover:text-white! transition-colors block py-1">
-                  Xiaomi
+                <Link href="/ipads" className="text-gray-300! hover:text-white! transition-colors block py-1">
+                  Máy tính bảng
                 </Link>
               </li>
               <li>
-                <Link href="/products/oppo" className="text-gray-300! hover:text-white! transition-colors block py-1">
-                  OPPO
+                <Link href="/smartwatches" className="text-gray-300! hover:text-white! transition-colors block py-1">
+                  Đồng hồ thông minh
                 </Link>
               </li>
-              <li>
-                <Link href="/products/vivo" className="text-gray-300! hover:text-white! transition-colors block py-1">
-                  Vivo
-                </Link>
-              </li>
+              
             </ul>
           </div>
 

@@ -1,5 +1,5 @@
-import { buildApiUrl, defaultFetchOptions, ApiResponse, PaginatedResponse } from './config';
-import { apiPut, apiGet } from '../utils/apiClient';
+import { ApiResponse, PaginatedResponse } from "./config";
+import { apiPut, apiGet, apiPost, apiDelete } from "../utils/apiClient";
 
 // User interface matching API response
 export interface UserResponse {
@@ -33,47 +33,12 @@ export interface UserResponse {
 
 // Get users with pagination
 export async function getUsers(page: number = 0, size: number = 10): Promise<ApiResponse<PaginatedResponse<UserResponse>>> {
-  const url = buildApiUrl('/users');
-  const queryParams = new URLSearchParams({
-    page: page.toString(),
-    size: size.toString(),
-  });
-
-  const response = await fetch(`${url}?${queryParams}`, {
-    ...defaultFetchOptions,
-    method: 'GET',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch users: ${response.statusText}`);
-  }
-
-  return response.json();
+  return apiGet<PaginatedResponse<UserResponse>>(`/users?page=${page}&size=${size}`);
 }
 
 // Search users by keyword (username or email) with pagination
-export async function searchUsers(
-  keyword: string,
-  page: number = 0,
-  size: number = 10
-): Promise<ApiResponse<PaginatedResponse<UserResponse>>> {
-  const url = buildApiUrl('/users/search');
-  const queryParams = new URLSearchParams({
-    keyword: keyword,
-    page: page.toString(),
-    size: size.toString(),
-  });
-
-  const response = await fetch(`${url}?${queryParams}`, {
-    ...defaultFetchOptions,
-    method: 'GET',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to search users: ${response.statusText}`);
-  }
-
-  return response.json();
+export async function searchUsers(keyword: string, page: number = 0, size: number = 10): Promise<ApiResponse<PaginatedResponse<UserResponse>>> {
+  return apiGet<PaginatedResponse<UserResponse>>(`/users/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}`);
 }
 
 // Get user by ID
@@ -90,47 +55,26 @@ export async function createUser(userData: {
   address?: string;
   roleId: number;
 }): Promise<ApiResponse<UserResponse>> {
-  const url = buildApiUrl('/users');
-  
-  const response = await fetch(url, {
-    ...defaultFetchOptions,
-    method: 'POST',
-    body: JSON.stringify(userData),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to create user: ${response.statusText}`);
-  }
-
-  return response.json();
+  return apiPost<UserResponse>("/users", userData);
 }
 
 // Update user
-export async function updateUser(id: number, userData: {
-  username?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  avatar?: string;
-  birthday?: string;
-  roleId?: number;
-}): Promise<ApiResponse<UserResponse>> {
+export async function updateUser(
+  id: number,
+  userData: {
+    username?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    avatar?: string;
+    birthday?: string;
+    roleId?: number;
+  }
+): Promise<ApiResponse<UserResponse>> {
   return apiPut<UserResponse>(`/users/${id}`, userData);
 }
 
 // Delete user
 export async function deleteUser(id: number): Promise<ApiResponse<void>> {
-  const url = buildApiUrl(`/users/${id}`);
-  
-  const response = await fetch(url, {
-    ...defaultFetchOptions,
-    method: 'DELETE',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to delete user: ${response.statusText}`);
-  }
-
-  return response.json();
+  return apiDelete<void>(`/users/${id}`);
 }
-

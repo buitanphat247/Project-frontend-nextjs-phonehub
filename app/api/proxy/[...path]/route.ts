@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api/v1'
+// For server-side proxy, use NEXT_PUBLIC_API_BASE_URL or fallback to localhost
+// In Docker, this should be set to backend URL (e.g., host.docker.internal:8080)
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 
+                     process.env.API_BASE_URL || 
+                     'http://localhost:8080/api/v1'
 
 export async function GET(
   request: NextRequest,
@@ -80,8 +84,6 @@ async function handleRequest(
         signal: AbortSignal.timeout(10000), // 10 seconds timeout
       })
     } catch (fetchError: any) {
-      console.error('Backend connection error:', fetchError)
-      
       // Check if it's a connection error
       if (
         fetchError.code === 'ECONNREFUSED' || 
@@ -152,7 +154,6 @@ async function handleRequest(
       headers: responseHeaders,
     })
   } catch (error: any) {
-    console.error('Proxy error:', error)
     return NextResponse.json(
       { 
         success: false, 

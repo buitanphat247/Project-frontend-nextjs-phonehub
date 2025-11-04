@@ -1,7 +1,9 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import ProductCard from './components/ProductCard'
+import ProductCardSkeleton from './components/ProductCardSkeleton'
 import Filters from './components/Filters'
 import Pagination from './components/Pagination'
 import { useProducts } from './hooks/useProducts'
@@ -9,34 +11,53 @@ import { categoryConfig, CategoryKey } from './constants/categoryConfig'
 
 const ProductsPage = () => {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const categorySlug = pathname.split('/').pop() || 'all'
   const category = (categorySlug === 'products' ? 'all' : categorySlug) as CategoryKey
   
+  // Get initial page from URL query params
+  const initialPage = parseInt(searchParams.get('page') || '1', 10)
+  
   const {
-    filteredProducts,
     currentProducts,
     currentPage,
     totalPages,
+    totalElements,
     filters,
     handleFilterChange,
-    handlePageChange,
+    handlePageChange: internalHandlePageChange,
     isLoading,
-  } = useProducts({ category })
+  } = useProducts({ category, initialPage })
 
-  const config = categoryConfig[category as CategoryKey] || categoryConfig.all
-
-  if (isLoading) {
-    return (
-      <div className="bg-gray-50 min-h-screen">
-        <div className="container mx-auto px-4 py-16">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Đang tải sản phẩm...</p>
-          </div>
-        </div>
-      </div>
-    )
+  // Update URL when page changes
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (page === 1) {
+      params.delete('page')
+    } else {
+      params.set('page', page.toString())
+    }
+    router.push(`${pathname}${params.toString() ? `?${params.toString()}` : ''}`, { scroll: false })
+    internalHandlePageChange(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+
+  // Sync URL with current page on mount (only once)
+  useEffect(() => {
+    if (currentPage !== initialPage && currentPage > 0) {
+      const params = new URLSearchParams(searchParams.toString())
+      if (currentPage === 1) {
+        params.delete('page')
+      } else {
+        params.set('page', currentPage.toString())
+      }
+      router.replace(`${pathname}${params.toString() ? `?${params.toString()}` : ''}`, { scroll: false })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  
+  const config = categoryConfig[category as CategoryKey] || categoryConfig.all
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -47,7 +68,7 @@ const ProductsPage = () => {
             {config.title}
           </h1>
           <p className="text-gray-600">
-            {filteredProducts.length} sản phẩm
+            {isLoading ? 'Đang tải...' : `${totalElements} sản phẩm`}
           </p>
         </div>
 
@@ -63,19 +84,27 @@ const ProductsPage = () => {
 
           {/* Products Grid */}
           <div className="lg:col-span-3">
-            {currentProducts.length > 0 ? (
+            {isLoading ? (
+              <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+                {[...Array(9)].map((_, index) => (
+                  <ProductCardSkeleton key={index} />
+                ))}
+              </div>
+            ) : currentProducts.length > 0 ? (
               <>
                 <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-          {currentProducts.map((product) => (
+                  {currentProducts.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
 
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                {totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
               </>
             ) : (
               <div className="text-center py-16">

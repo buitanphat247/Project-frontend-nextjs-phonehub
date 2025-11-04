@@ -22,7 +22,7 @@ import ProductCard from "./products/components/ProductCard";
 import ProductCardSkeleton from "./products/components/ProductCardSkeleton";
 import { useHomeProducts } from "./hooks/useHomeProducts";
 import { isAuthenticated } from "../../lib/utils/cookie";
-
+import { showLoginAlert } from "../../lib/utils/loginAlert";
 const HomePage = () => {
   const router = useRouter();
   const { phonesProducts, laptopsProducts, ipadsProducts, smartwatchesProducts, loading } = useHomeProducts();
@@ -31,7 +31,7 @@ const HomePage = () => {
     if (isAuthenticated()) {
       router.push("/favourite");
     } else {
-      toast.warn("Vui lòng đăng nhập!");
+      showLoginAlert("Bạn cần đăng nhập để xem danh sách yêu thích");
     }
   };
 
@@ -116,6 +116,9 @@ const HomePage = () => {
                 type="primary"
                 size="large"
                 className="bg-yellow-500 hover:bg-yellow-600 border-yellow-500 text-black font-semibold px-8 py-4 h-auto"
+                onClick={() => {
+                  router.push("/products");
+                }}
               >
                 <ShoppingCartOutlined className="mr-2" />
                 Mua sắm ngay

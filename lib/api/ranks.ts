@@ -1,5 +1,5 @@
-import { ApiResponse, PaginatedResponse } from './config';
-import { apiGet, apiPost, apiPut, apiDelete } from '../utils/apiClient';
+import { ApiResponse, PaginatedResponse } from "./config";
+import { apiGet, apiPost, apiPut, apiDelete } from "../utils/apiClient";
 
 export interface RankResponse {
   id: number;
@@ -31,16 +31,13 @@ export interface UpdateRankRequest {
  * Get all user ranks (returns array, not paginated)
  */
 export async function getUserRanks(): Promise<ApiResponse<RankResponse[]>> {
-  return apiGet<RankResponse[]>('/user-ranks');
+  return apiGet<RankResponse[]>("/user-ranks");
 }
 
 /**
  * Get all ranks with pagination
  */
-export async function getRanks(
-  page: number = 0,
-  size: number = 10
-): Promise<ApiResponse<PaginatedResponse<RankResponse>>> {
+export async function getRanks(page: number = 0, size: number = 10): Promise<ApiResponse<PaginatedResponse<RankResponse>>> {
   return apiGet<PaginatedResponse<RankResponse>>(`/ranks?page=${page}&size=${size}`);
 }
 
@@ -55,7 +52,7 @@ export async function getRankById(id: number): Promise<ApiResponse<RankResponse>
  * Create a new rank
  */
 export async function createRank(data: CreateRankRequest): Promise<ApiResponse<RankResponse>> {
-  return apiPost<RankResponse>('/user-ranks', data);
+  return apiPost<RankResponse>("/user-ranks", data);
 }
 
 /**
@@ -71,4 +68,3 @@ export async function updateRank(id: number, data: UpdateRankRequest): Promise<A
 export async function deleteRank(id: number): Promise<ApiResponse<void>> {
   return apiDelete<void>(`/ranks/${id}`);
 }
-

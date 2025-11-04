@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { HeartFilled, HeartOutlined, ShoppingCartOutlined, ThunderboltOutlined, SwapOutlined } from "@ant-design/icons";
 import { Product } from "../interface/IProduct";
-import { isAuthenticated } from "../../../../lib/utils/cookie";
+import { isAuthenticated, getAuthData } from "../../../../lib/utils/cookie";
 import { addToFavorites, removeFromFavorites, checkFavorite } from "../../../../lib/api/favorites";
+import { addToCart } from "../../../../lib/api/cart";
+import { showLoginAlert } from "../../../../lib/utils/loginAlert";
 
 interface ProductInfoProps {
   product: Product;
@@ -55,7 +57,7 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
     const authenticated = isAuthenticated();
     
     if (!authenticated) {
-      toast.warn("Vui lòng đăng nhập để thêm sản phẩm vào yêu thích!");
+      showLoginAlert("Bạn cần đăng nhập để thêm các sản phẩm yêu thích");
       return;
     }
 
@@ -88,14 +90,40 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
     }
   };
 
-  const handleActionClick = (actionName: string) => {
+  const handleActionClick = async (actionName: string) => {
     const authenticated = isAuthenticated();
     
     if (!authenticated) {
-      toast.warn("Vui lòng đăng nhập!");
+      showLoginAlert("Bạn cần đăng nhập để thực hiện hành động này");
       return;
     }
-    // TODO: Implement action logic here
+    if (actionName === "Thêm vào giỏ hàng") {
+      try {
+        const auth = getAuthData();
+        const userId = auth?.userId ? parseInt(auth.userId, 10) : NaN;
+        if (!userId) {
+          toast.error("Không xác định được người dùng");
+          return;
+        }
+
+        const res = await addToCart({ userId, productId: product.id, quantity: 1 });
+        if (res.success) {
+          toast.success("Đã thêm vào giỏ hàng");
+          // Cập nhật badge giỏ hàng (dựa trên localStorage)
+          const current = parseInt(localStorage.getItem('cart_count') || '0', 10) || 0;
+          const next = current + 1;
+          localStorage.setItem('cart_count', String(next));
+          // Phát sự kiện để header cập nhật ngay
+          window.dispatchEvent(new Event('storage'));
+        } else {
+          toast.error(res.message || "Không thể thêm vào giỏ hàng");
+        }
+      } catch (e: any) {
+        toast.error(e?.message || "Lỗi khi thêm vào giỏ hàng");
+      }
+      return;
+    }
+    // Các hành động khác
     console.log(`${actionName} clicked for product ${product.id}`);
   };
 
