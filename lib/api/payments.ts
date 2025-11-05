@@ -8,7 +8,7 @@
 export async function submitVnpayOrder(amount: number, orderInfo: string): Promise<{ raw: string; redirectUrl?: string }> {
   // Gọi trực tiếp endpoint tuyệt đối: http://localhost:8080/api/v1/vnpay/submitOrder?amount=...&orderInfo=...
   const qs = new URLSearchParams({ amount: String(Math.floor(amount)), orderInfo });
-  const url = `http://163.61.182.56:8080/api/v1/vnpay/submitOrder?${qs.toString()}`;
+  const url = `https://phonehub.io.vn/api/proxy/vnpay/submitOrder?${qs.toString()}`;
 
   const response = await fetch(url, {
     method: "POST",
