@@ -1,21 +1,27 @@
-// Standalone request (không dùng apiClient) để gọi trực tiếp backend VNPAY
-
 /**
  * Submit VNPAY order to backend
  * Backend expects @RequestParam amount (int) and orderInfo (string)
- * We will send as application/x-www-form-urlencoded
+ * 
+ * Sử dụng Next.js API route riêng để:
+ * - Tránh CORS khi deploy
+ * - Không ảnh hưởng đến chữ ký VNPAY (không thêm headers không cần thiết)
  */
 export async function submitVnpayOrder(amount: number, orderInfo: string): Promise<{ raw: string; redirectUrl?: string }> {
-  // Gọi trực tiếp endpoint tuyệt đối: http://localhost:8080/api/v1/vnpay/submitOrder?amount=...&orderInfo=...
-  const qs = new URLSearchParams({ amount: String(Math.floor(amount)), orderInfo });
-  const url = `http://163.61.182.56:8080/api/v1/vnpay/submitOrder?${qs.toString()}`;
+  // Gọi Next.js API route riêng (không qua proxy chung)
+  // Route này sẽ forward đến backend mà không thêm headers
+  const qs = new URLSearchParams({ 
+    amount: String(Math.floor(amount)), 
+    orderInfo: orderInfo 
+  });
+  const url = `/api/vnpay/submitOrder?${qs.toString()}`;
 
   const response = await fetch(url, {
     method: "POST",
     // Không gửi body, chỉ dùng query params theo yêu cầu
+    // Không thêm headers để tránh ảnh hưởng đến chữ ký VNPAY
   });
-  console.log("response", response);
-  // Proxy may return JSON-wrapped string; try text first
+
+  // Response là text string (không phải JSON)
   const rawText = await response.text();
 
   // If proxy wrapped it as JSON string, it'll look like "redirect:URL" (quoted)
