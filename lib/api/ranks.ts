@@ -49,6 +49,14 @@ export async function getRankById(id: number): Promise<ApiResponse<RankResponse>
 }
 
 /**
+ * Get current rank of a user by userId
+ * Backend endpoint returns rank info with discount percent
+ */
+export async function getUserRank(userId: number): Promise<ApiResponse<RankResponse>> {
+  return apiGet<RankResponse>(`/user-ranks/${userId}`);
+}
+
+/**
  * Create a new rank
  */
 export async function createRank(data: CreateRankRequest): Promise<ApiResponse<RankResponse>> {

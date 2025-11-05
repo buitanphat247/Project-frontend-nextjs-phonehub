@@ -9,7 +9,7 @@ import { Product } from '../../../(home)/products/interface/IProduct'
 import { getCategoryRoute } from '../../../(home)/products/utils/categoryUtils'
 import { Spin, Dropdown, Button, App } from 'antd'
 import type { MenuProps } from 'antd'
-import { UserOutlined, LogoutOutlined, SettingOutlined, HeartOutlined, ExclamationCircleOutlined, ShoppingCartOutlined, SearchOutlined, MobileOutlined } from '@ant-design/icons'
+import { UserOutlined, LogoutOutlined, SettingOutlined, HeartOutlined, ExclamationCircleOutlined, ShoppingCartOutlined, SearchOutlined, MobileOutlined, OrderedListOutlined } from '@ant-design/icons'
 import { isAuthenticated, getAuthData, clearAuthData } from '../../../../lib/utils/cookie'
 
 interface AuthState {
@@ -67,6 +67,8 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
     }
   }, [])
 
+  // No cart animation
+
   const handleLogout = () => {
     modal.confirm({
       title: 'Xác nhận đăng xuất',
@@ -89,6 +91,8 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     if (e.key === 'account') {
       router.push('/account?tab=account')
+    } else if (e.key === 'orders') {
+      router.push('/account?tab=orders')
     } else if (e.key === 'favorites') {
       router.push('/favourite')
     } else if (e.key === 'settings') {
@@ -105,6 +109,12 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
       label: 'Tài khoản của tôi',
       className: 'cursor-pointer',
     },
+    // {
+    //   key: 'orders',
+    //   icon: <OrderedListOutlined />,
+    //   label: 'Đơn hàng của tôi',
+    //   className: 'cursor-pointer',
+    // },
     {
       key: 'favorites',
       icon: <HeartOutlined />,
@@ -399,11 +409,7 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
             aria-label={authenticated ? `Giỏ hàng có ${totalItems} sản phẩm` : "Giỏ hàng"}
           >
             <span className="text-xl"><ShoppingCartOutlined /></span>
-            {authenticated && totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                {totalItems}
-              </span>
-            )}
+            {/* Không hiển thị badge/hiệu ứng */}
           </button>
         </div>
       </div>

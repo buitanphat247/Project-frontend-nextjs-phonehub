@@ -134,3 +134,7 @@ footer a:hover {
 .cart-overlay-exit {
   animation: fadeOut 0.2s ease-out forwards;
 }
+.ant-image {
+  height: -webkit-fill-available !important;
+  
+}

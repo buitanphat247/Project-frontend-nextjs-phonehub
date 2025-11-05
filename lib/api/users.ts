@@ -78,3 +78,8 @@ export async function updateUser(
 export async function deleteUser(id: number): Promise<ApiResponse<void>> {
   return apiDelete<void>(`/users/${id}`);
 }
+
+// Get total spent by user
+export async function getUserTotalSpent(userId: number): Promise<ApiResponse<number>> {
+  return apiGet<number>(`/users/${userId}/order-items/total-spent`);
+}

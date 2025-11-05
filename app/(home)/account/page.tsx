@@ -11,7 +11,9 @@ import SettingsTab from "./components/SettingsTab";
 import ChangePasswordModal from "./components/ChangePasswordModal";
 import ChangeEmailModal from "./components/ChangeEmailModal";
 import AccountSkeleton from "./components/AccountSkeleton";
-import { getUserById } from "../../../lib/api/users";
+import { getUserById, getUserTotalSpent } from "../../../lib/api/users";
+import { getOrders, OrderDetailResponse } from "../../../lib/api/orders";
+import { useSearchParams } from "next/navigation";
 import { getAuthData, updateAuthData } from "../../../lib/utils/cookie";
 
 const AccountPage = () => {
@@ -19,6 +21,13 @@ const AccountPage = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [isChangeEmailModalOpen, setIsChangeEmailModalOpen] = useState(false);
+  const [orders, setOrders] = useState<OrderDetailResponse[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersTotal, setOrdersTotal] = useState(0);
+  const [ordersPage, setOrdersPage] = useState(0);
+  const [ordersSize] = useState(5);
+  const params = useSearchParams();
+  const ordersRef = React.useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -70,6 +79,54 @@ const AccountPage = () => {
 
     fetchUserData();
   }, []);
+
+  // Fetch orders and stats
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setOrdersLoading(true);
+        const auth = getAuthData();
+        const uid = auth?.userId ? parseInt(auth.userId, 10) : NaN;
+        if (!uid) return;
+        const res = await getOrders({ page: ordersPage, size: ordersSize, userId: uid });
+        if (res.success && res.data) {
+          setOrders(res.data.content || []);
+          const total = res.data.totalElements || 0;
+          setOrdersTotal(total);
+          // Update userInfo with total orders
+          setUserInfo(prev => prev ? { ...prev, totalOrders: total } : null);
+        }
+      } catch (e) {
+        // silent fail
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+    fetchOrders();
+  }, [ordersPage, ordersSize]);
+
+  // Fetch total spent once when userInfo is loaded
+  useEffect(() => {
+    if (!userInfo) return;
+    const fetchTotalSpent = async () => {
+      try {
+        const auth = getAuthData();
+        const uid = auth?.userId ? parseInt(auth.userId, 10) : NaN;
+        if (!uid) return;
+        const spentRes = await getUserTotalSpent(uid);
+        if (spentRes.success && typeof spentRes.data === 'number') {
+          setUserInfo(prev => prev ? { ...prev, totalSpent: spentRes.data } : null);
+        }
+      } catch {}
+    };
+    fetchTotalSpent();
+  }, [userInfo?.name]); // Only fetch when userInfo is first loaded
+
+  useEffect(() => {
+    if (params?.get('tab') === 'orders' && ordersRef.current) {
+      ordersRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [params, ordersRef]);
 
   const handleOpenPasswordModal = () => {
     setIsChangePasswordModalOpen(true);
@@ -184,6 +241,58 @@ const AccountPage = () => {
               onOpenPasswordModal={handleOpenPasswordModal}
               onOpenEmailModal={handleOpenEmailModal}
             />
+          </div>
+
+          {/* Đơn hàng của tôi */}
+          <div ref={ordersRef} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Đơn hàng của tôi</h2>
+              {ordersLoading ? (
+                <div className="text-gray-500">Đang tải đơn hàng...</div>
+              ) : orders.length === 0 ? (
+                <div className="text-gray-600">Bạn chưa có đơn hàng nào.</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full table-auto border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Mã đơn</th>
+                        <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Trạng thái</th>
+                        <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Ngày tạo</th>
+                        <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Sản phẩm</th>
+                        <th className="px-4 py-2 text-right text-sm font-semibold text-gray-700">Tổng tiền</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {orders.map((o) => (
+                        <tr key={o.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm text-gray-900 font-medium">{o.id}</td>
+                          <td className="px-4 py-3 text-sm capitalize">
+                            <span className={`${o.status === 'success' ? 'text-green-600' : o.status === 'failed' ? 'text-red-600' : 'text-gray-700'}`}>{o.status}</span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-700">{new Date(o.createdAt).toLocaleString('vi-VN')}</td>
+                          <td className="px-4 py-3 text-sm text-gray-700">
+                            <div className="space-y-1">
+                              {o.items?.map((it) => (
+                                <div key={it.id}>{`${it.productName} x ${it.quantity}`}</div>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-right font-semibold text-blue-600">
+                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(o.totalPrice)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="pt-4 flex justify-end gap-2 text-sm">
+                    <button disabled={ordersPage===0} onClick={()=>setOrdersPage(p=>Math.max(0,p-1))} className={`px-3 py-1 rounded border ${ordersPage===0? 'text-gray-400 border-gray-200':'text-gray-700 hover:bg-gray-50 border-gray-300'}`}>Trước</button>
+                    <div className="self-center text-gray-600">Trang {ordersPage+1} / {Math.max(1, Math.ceil(ordersTotal/ordersSize))}</div>
+                    <button disabled={(ordersPage+1)>=Math.ceil(ordersTotal/ordersSize)} onClick={()=>setOrdersPage(p=>p+1)} className={`px-3 py-1 rounded border ${ (ordersPage+1)>=Math.ceil(ordersTotal/ordersSize) ? 'text-gray-400 border-gray-200':'text-gray-700 hover:bg-gray-50 border-gray-300'}`}>Sau</button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

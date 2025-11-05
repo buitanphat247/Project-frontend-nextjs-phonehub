@@ -3,12 +3,26 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { HeartFilled, HeartOutlined, ShoppingCartOutlined, ThunderboltOutlined, SwapOutlined } from "@ant-design/icons";
+import { Modal, Form, Input, Select, Button, message, InputNumber } from "antd";
+import {
+  HeartFilled,
+  HeartOutlined,
+  ShoppingCartOutlined,
+  ThunderboltOutlined,
+  SwapOutlined,
+  UserOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  HomeOutlined,
+  CreditCardOutlined,
+} from "@ant-design/icons";
 import { Product } from "../interface/IProduct";
 import { isAuthenticated, getAuthData } from "../../../../lib/utils/cookie";
 import { addToFavorites, removeFromFavorites, checkFavorite } from "../../../../lib/api/favorites";
 import { addToCart } from "../../../../lib/api/cart";
 import { showLoginAlert } from "../../../../lib/utils/loginAlert";
+import { submitVnpayOrder } from "../../../../lib/api/payments";
+import { createOrder, addOrderItem } from "../../../../lib/api/orders";
 
 interface ProductInfoProps {
   product: Product;
@@ -20,6 +34,9 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
   const [isAddingFavorite, setIsAddingFavorite] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isCheckingFavorite, setIsCheckingFavorite] = useState(true);
+  const [buyNowModalVisible, setBuyNowModalVisible] = useState(false);
+  const [buyNowForm] = Form.useForm();
+  const [submittingOrder, setSubmittingOrder] = useState(false);
 
   // Check if product is in favorites when component mounts
   useEffect(() => {
@@ -55,7 +72,7 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
 
   const handleFavoriteClick = async () => {
     const authenticated = isAuthenticated();
-    
+
     if (!authenticated) {
       showLoginAlert("Bạn cần đăng nhập để thêm các sản phẩm yêu thích");
       return;
@@ -92,7 +109,7 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
 
   const handleActionClick = async (actionName: string) => {
     const authenticated = isAuthenticated();
-    
+
     if (!authenticated) {
       showLoginAlert("Bạn cần đăng nhập để thực hiện hành động này");
       return;
@@ -110,11 +127,11 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
         if (res.success) {
           toast.success("Đã thêm vào giỏ hàng");
           // Cập nhật badge giỏ hàng (dựa trên localStorage)
-          const current = parseInt(localStorage.getItem('cart_count') || '0', 10) || 0;
+          const current = parseInt(localStorage.getItem("cart_count") || "0", 10) || 0;
           const next = current + 1;
-          localStorage.setItem('cart_count', String(next));
+          localStorage.setItem("cart_count", String(next));
           // Phát sự kiện để header cập nhật ngay
-          window.dispatchEvent(new Event('storage'));
+          window.dispatchEvent(new Event("storage"));
         } else {
           toast.error(res.message || "Không thể thêm vào giỏ hàng");
         }
@@ -123,8 +140,88 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
       }
       return;
     }
+    if (actionName === "Mua ngay") {
+      // Mở modal mua ngay - không pre-fill giá trị
+      buyNowForm.resetFields();
+      setBuyNowModalVisible(true);
+      return;
+    }
     // Các hành động khác
     console.log(`${actionName} clicked for product ${product.id}`);
+  };
+
+  const handleBuyNowSubmit = async (values: any) => {
+    try {
+      setSubmittingOrder(true);
+
+      // Chỉ hỗ trợ VNPAY
+      if (values.paymentMethod !== "bank_transfer") {
+        message.error("Hiện tại chúng tôi chỉ hỗ trợ thanh toán qua VNPAY");
+        setSubmittingOrder(false);
+        return;
+      }
+
+      const auth = getAuthData();
+      const uid = auth?.userId ? parseInt(auth.userId, 10) : NaN;
+      if (!uid) {
+        throw new Error("Không xác định được userId");
+      }
+
+      const orderCustomer = {
+        buyerName: values.username,
+        buyerPhone: values.phone,
+        buyerEmail: values.email,
+        buyerAddress: values.address,
+      };
+
+      const quantity = Number(values.quantity) || 1;
+      const orderItemsPayload = [
+        { productId: product.id, quantity, unitPrice: product.price },
+      ];
+      const orderTotal = orderItemsPayload.reduce((sum, it) => sum + it.unitPrice * it.quantity, 0);
+      
+      // Bước 1: tạo đơn hàng pending (định dạng chuẩn backend yêu cầu)
+      const created = await createOrder({
+        userId: uid,
+        buyerName: orderCustomer.buyerName,
+        buyerEmail: orderCustomer.buyerEmail,
+        buyerPhone: orderCustomer.buyerPhone,
+        buyerAddress: orderCustomer.buyerAddress,
+        paymentMethod: "VNPAY",
+        amount: Math.floor(orderTotal),
+        status: "PENDING",
+      });
+      if (!created.success || !created.data?.id) {
+        throw new Error(created.message || "Tạo đơn hàng thất bại");
+      }
+      const orderId = created.data.id;
+
+      // Bước 2: thêm chi tiết đơn hàng - gửi TỪNG ITEM một
+      for (const it of orderItemsPayload) {
+        const resAdd = await addOrderItem(orderId, it);
+        if (!resAdd.success) {
+          throw new Error(resAdd.message || "Thêm sản phẩm vào đơn hàng thất bại");
+        }
+      }
+
+      // Gửi sang VNPAY: chỉ cần truyền orderId để backend tra cứu lại
+      const orderInfoStr = String(orderId);
+      const amount = Math.floor(orderTotal);
+      const submitResp = await submitVnpayOrder(amount, orderInfoStr);
+      const prefix = "redirect:";
+      let url = submitResp.redirectUrl;
+      if (!url && typeof submitResp.raw === "string") {
+        url = submitResp.raw.startsWith(prefix) ? submitResp.raw.slice(prefix.length) : undefined;
+      }
+      if (url) {
+        window.location.href = url;
+        return;
+      }
+    } catch (error: any) {
+      message.error(error.message || "Có lỗi xảy ra khi đặt hàng");
+    } finally {
+      setSubmittingOrder(false);
+    }
   };
 
   return (
@@ -134,10 +231,8 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-500 uppercase tracking-wide">{product.brand}</span>
           {product.quantity !== undefined && (
-            <span className={`text-sm font-medium ${
-              product.quantity > 0 ? 'text-green-600' : 'text-red-600'
-            }`}>
-              (Còn {product.quantity.toLocaleString('vi-VN')} sản phẩm)
+            <span className={`text-sm font-medium ${product.quantity > 0 ? "text-green-600" : "text-red-600"}`}>
+              (Còn {product.quantity.toLocaleString("vi-VN")} sản phẩm)
             </span>
           )}
           {/* Rating - chỉ hiển thị nếu có */}
@@ -183,10 +278,7 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
                 className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-blue-500 transition-colors cursor-pointer"
                 style={{ borderColor: color.hexColor }}
               >
-                <div
-                  className="w-6 h-6 rounded-full border border-gray-300"
-                  style={{ backgroundColor: color.hexColor }}
-                />
+                <div className="w-6 h-6 rounded-full border border-gray-300" style={{ backgroundColor: color.hexColor }} />
                 <span className="text-gray-700">{color.name}</span>
               </div>
             ))}
@@ -229,30 +321,31 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
       {/* Actions */}
       <div className="space-y-4">
         <div className="flex space-x-4">
-          <button 
+          <button
             onClick={() => handleActionClick("Thêm vào giỏ hàng")}
             className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors cursor-pointer flex items-center justify-center space-x-2"
           >
             <ShoppingCartOutlined />
             <span>Thêm vào giỏ hàng</span>
           </button>
-          <button 
-            onClick={() => handleActionClick("Mua ngay")}
-            className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors cursor-pointer flex items-center justify-center space-x-2"
-          >
-            <ThunderboltOutlined />
-            <span>Mua ngay</span>
-          </button>
+          {/* Ẩn nút Mua ngay */}
+          {false && (
+            <button
+              onClick={() => handleActionClick("Mua ngay")}
+              className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors cursor-pointer flex items-center justify-center space-x-2"
+            >
+              <ThunderboltOutlined />
+              <span>Mua ngay</span>
+            </button>
+          )}
         </div>
 
         <div className="flex space-x-4">
-          <button 
+          <button
             onClick={handleFavoriteClick}
             disabled={isAddingFavorite || isCheckingFavorite}
             className={`flex-1 border py-3 px-6 rounded-lg font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 ${
-              isFavorite 
-                ? "border-red-300 bg-red-50 text-red-600 hover:bg-red-100" 
-                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+              isFavorite ? "border-red-300 bg-red-50 text-red-600 hover:bg-red-100" : "border-gray-300 text-gray-700 hover:bg-gray-50"
             }`}
           >
             {isAddingFavorite ? (
@@ -273,7 +366,7 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
               </>
             )}
           </button>
-          <button 
+          <button
             onClick={() => handleActionClick("So sánh")}
             className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-center space-x-2"
           >
@@ -282,6 +375,35 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
           </button>
         </div>
       </div>
+
+      {/* Ẩn modal Mua ngay */}
+      {false && (
+        <Modal
+          title="Thông tin đặt hàng"
+          open={buyNowModalVisible}
+          onCancel={() => {
+            setBuyNowModalVisible(false);
+            buyNowForm.resetFields();
+          }}
+          footer={null}
+          width={600}
+          centered
+        >
+          <Form
+            form={buyNowForm}
+            layout="vertical"
+            onFinish={handleBuyNowSubmit}
+            className="mt-4"
+            autoComplete="off"
+            disabled={submittingOrder}
+            initialValues={{ quantity: 1, paymentMethod: "bank_transfer" }}
+          >
+            <Form.Item label="Tên người dùng" name="username" rules={[{ required: true, message: "Vui lòng nhập tên người dùng" }]}>
+              <Input prefix={<UserOutlined />} placeholder="Nhập tên người dùng" autoComplete="off" />
+            </Form.Item>
+          </Form>
+        </Modal>
+      )}
     </div>
   );
 };

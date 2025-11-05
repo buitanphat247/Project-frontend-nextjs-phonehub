@@ -28,9 +28,7 @@ const SmartwatchesPage = () => {
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Đồng hồ thông minh</h1>
-          <p className="text-gray-600">
-            {totalElements} sản phẩm
-          </p>
+          <p className="text-gray-600">{loading ? "Đang tải..." : `${totalElements} sản phẩm`}</p>
         </div>
 
         <div className="grid lg:grid-cols-4 gap-8">
@@ -72,4 +70,3 @@ const SmartwatchesPage = () => {
 };
 
 export default SmartwatchesPage;
-

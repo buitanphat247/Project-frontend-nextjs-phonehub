@@ -25,7 +25,9 @@ const UserStats: React.FC<UserStatsProps> = ({ userInfo }) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-600 mb-1">Đã chi tiêu</p>
-            <p className="text-2xl font-bold text-green-600">{userInfo.totalSpent.toLocaleString("vi-VN")}đ</p>
+            <p className="text-2xl font-bold text-green-600">
+              {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(userInfo.totalSpent)}
+            </p>
           </div>
           <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
             <CreditCardOutlined className="text-green-600 text-xl" />

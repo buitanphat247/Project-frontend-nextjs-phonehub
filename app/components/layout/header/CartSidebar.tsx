@@ -274,7 +274,7 @@ export default function CartSidebar({
                         
                         {/* Product Info */}
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-sm leading-tight">{item.product.name}</h3>
+                          <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">{item.product.name}</h3>
                           {item.product.brand && (
                             <p className="text-xs text-gray-500 mb-1">{item.product.brand}</p>
                           )}
@@ -326,9 +326,9 @@ export default function CartSidebar({
               </div>
 
               {/* Footer */}
-              <div className="border-t border-gray-200 p-6 bg-gray-50">
+              <div className="border-t border-gray-200 p-6 bg-gray-50 space-y-3">
                 {/* Total */}
-                <div className="flex justify-between items-center mb-4 p-4 bg-white rounded-lg">
+                <div className="flex justify-between items-center  bg-white rounded-lg">
                   <span className="text-lg font-bold text-gray-900">Tổng cộng:</span>
                   <span className="text-2xl font-bold text-blue-600">
                     {formatPrice(totalToRender)}
@@ -336,7 +336,7 @@ export default function CartSidebar({
                 </div>
                 
                 {/* Action Buttons */}
-                <div className="space-y-3">
+                <div >
                   <Link
                     href="/cart"
                     className="flex w-full items-center justify-center bg-linear-to-r from-blue-600 to-blue-700  py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 hover:shadow-lg text-white!"
@@ -345,14 +345,14 @@ export default function CartSidebar({
                     <ShoppingCartOutlined className="mr-2 text-white!" />
                     Xem giỏ hàng
                   </Link>
-                  <Link
+                  {/* <Link
                     href="/checkout"
                     className="flex w-full items-center justify-center bg-white border-2 border-blue-600 py-3 px-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300"
                     onClick={onClose}
                   >
                     <CreditCardOutlined className="mr-2 " />
                     Thanh toán
-                  </Link>
+                  </Link> */}
                 </div>
                 
                 {/* Free shipping notice */}

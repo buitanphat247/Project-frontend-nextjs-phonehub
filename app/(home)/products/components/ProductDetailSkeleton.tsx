@@ -44,10 +44,9 @@ const ProductDetailSkeleton = () => {
             {/* Description - 2 dòng */}
             <Skeleton active paragraph={{ rows: 5, width: ["100%", "100%", "100%", "100%", "80%"] }} title={false} />
 
-            {/* 4 Action Buttons */}
+            {/* Action Buttons Skeleton (match UI: 1 primary row, then 2 secondary) */}
             <div className="space-y-4">
               <div className="flex gap-4">
-                <div className="flex-1 h-12 bg-gray-200 rounded-lg animate-pulse" />
                 <div className="flex-1 h-12 bg-gray-200 rounded-lg animate-pulse" />
               </div>
               <div className="flex gap-4">

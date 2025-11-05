@@ -249,9 +249,10 @@ export function useSmartwatches({ productsPerPage = 12 }: UseSmartwatchesOptions
     }
 
     const performFetch = async () => {
+      // Set loading state before fetching
+      setLoading(true)
       setSearching(false)
       setPaging(false)
-      setLoading(true)
 
       try {
         let response
@@ -301,12 +302,15 @@ export function useSmartwatches({ productsPerPage = 12 }: UseSmartwatchesOptions
         setTotalPages(0)
       } finally {
         setLoading(false)
+        setSearching(false)
+        setPaging(false)
       }
     }
 
     if (isInitialMount.current) {
       isInitialMount.current = false
-      performFetch()
+      // Add small delay to ensure loading skeleton is visible
+      fetchTimeoutRef.current = setTimeout(performFetch, 100)
     } else {
       const delay = (isSearchChange || isBrandChange || isPriceRangeChange) ? 500 : 200
       fetchTimeoutRef.current = setTimeout(performFetch, delay)

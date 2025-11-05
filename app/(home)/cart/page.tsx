@@ -1,17 +1,21 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button } from "antd";
+import { Button, Modal, Form, Input, Select, message } from "antd";
 import { MinusOutlined, PlusOutlined, DeleteOutlined, ShoppingOutlined, ShoppingCartOutlined, PictureOutlined } from "@ant-design/icons";
 import ProtectedRoute from "../../components/auth/ProtectedRoute";
 import CartSkeleton from "./components/CartSkeleton";
 import toast from "react-hot-toast";
 import { getMyCart, updateCartItemQuantity, deleteCartItem, CartItemApi } from "../../../lib/api/cart";
+import { getUserRank } from "../../../lib/api/ranks";
+import { createOrder, addOrderItem } from "../../../lib/api/orders";
+import { submitVnpayOrder } from "../../../lib/api/payments";
 import { getAuthData } from "../../../lib/utils/cookie";
 import { useRouter } from "next/navigation";
 
 interface CartItem {
   id: number;
+  productId?: number;
   name: string;
   price: number;
   originalPrice: number;
@@ -26,6 +30,10 @@ interface CartItem {
 const CartPage = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [rankPercent, setRankPercent] = useState<number>(0);
+  const [checkoutVisible, setCheckoutVisible] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [checkoutForm] = Form.useForm();
   const router = useRouter();
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -46,6 +54,7 @@ const CartPage = () => {
             const discountPercent = originalPrice > 0 ? Math.max(0, Math.floor(((originalPrice - price) / originalPrice) * 100)) : 0;
             return {
               id: ci.id,
+              productId: (ci as any).product?.id,
               name: ci.product.name,
               price,
               originalPrice,
@@ -68,6 +77,26 @@ const CartPage = () => {
       }
     };
     fetchCartItems();
+  }, []);
+
+  // Fetch current user rank (for member discount)
+  useEffect(() => {
+    const fetchRank = async () => {
+      try {
+        const auth = getAuthData();
+        const userId = auth?.userId ? parseInt(auth.userId, 10) : NaN;
+        if (!userId) return;
+        const res = await getUserRank(userId);
+        if (res.success && res.data) {
+          const percent = (res.data.discountPercent ?? res.data.discount ?? 0) as number;
+          setRankPercent(Math.max(0, Math.min(100, percent)));
+          console.debug("[Cart] User rank fetched", { userId, rank: res.data.name, percent });
+        }
+      } catch (e) {
+        // ignore rank errors
+      }
+    };
+    fetchRank();
   }, []);
 
   const formatPrice = (price: number) => {
@@ -127,16 +156,82 @@ const CartPage = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
+  // Không còn dùng giảm giá theo giá gốc vì giá hiện tại đã là giá sau khuyến mãi.
+  // Hàm giữ lại để tránh lỗi gọi, luôn trả 0 và log để debug.
   const getTotalDiscount = () => {
-    return cartItems.reduce((total, item) => total + (item.originalPrice - item.price) * item.quantity, 0);
+    console.debug("[Cart] Product-level discount disabled (using current price only)");
+    return 0;
   };
 
   const getShippingFee = () => {
     return getSubtotal() >= 500000 ? 0 : 30000;
   };
 
+  const getMemberDiscount = () => {
+    const subtotal = getSubtotal();
+    const member = Math.floor((subtotal * rankPercent) / 100);
+    console.debug("[Cart] Member discount (rank applied on current prices)", { subtotal, rankPercent, member });
+    return Math.max(0, member);
+  };
+
   const getTotal = () => {
-    return getSubtotal() + getShippingFee();
+    const net = getSubtotal() - getMemberDiscount();
+    return Math.max(0, net) + getShippingFee();
+  };
+
+  const handleCheckoutSubmit = async (values: any) => {
+    try {
+      setSubmitting(true);
+      const auth = getAuthData();
+      const userId = auth?.userId ? parseInt(auth.userId, 10) : NaN;
+      if (!userId) throw new Error("Không xác định được người dùng");
+
+      const buyerName = values.username;
+      const buyerPhone = values.phone;
+      const buyerEmail = values.email;
+      const buyerAddress = values.address;
+
+      // Tính tổng giá theo giỏ hàng (không tính phí ship)
+      const orderTotal = cartItems.reduce((s, it) => s + it.price * it.quantity, 0);
+
+      // Tạo order pending
+      const created = await createOrder({
+        userId,
+        buyerName,
+        buyerEmail,
+        buyerPhone,
+        buyerAddress,
+        paymentMethod: "VNPAY",
+        amount: Math.floor(orderTotal),
+        status: "PENDING",
+      });
+      if (!created.success || !created.data?.id) throw new Error(created.message || "Tạo đơn hàng thất bại");
+      const orderId = created.data.id;
+
+      // Thêm từng item
+      for (const it of cartItems) {
+        if (!it.productId) continue;
+        const resAdd = await addOrderItem(orderId, { productId: it.productId, quantity: it.quantity, unitPrice: it.price });
+        if (!resAdd.success) throw new Error(resAdd.message || "Thêm sản phẩm vào đơn hàng thất bại");
+      }
+
+      // Sang VNPay
+      const orderInfoStr = String(orderId);
+      const submitResp = await submitVnpayOrder(Math.floor(orderTotal), orderInfoStr);
+      const prefix = "redirect:";
+      let url = submitResp.redirectUrl;
+      if (!url && typeof submitResp.raw === "string") {
+        url = submitResp.raw.startsWith(prefix) ? submitResp.raw.slice(prefix.length) : undefined;
+      }
+      if (url) {
+        window.location.href = url;
+        return;
+      }
+    } catch (e: any) {
+      message.error(e?.message || "Không thể xử lý thanh toán");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -266,8 +361,8 @@ const CartPage = () => {
                     </div>
 
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Giảm giá:</span>
-                      <span className="text-green-600 font-medium">-{formatPrice(getTotalDiscount())}</span>
+                      <span className="text-gray-600">Giảm theo hạng ( {rankPercent}% ):</span>
+                      <span className="text-green-600 font-medium">-{formatPrice(getMemberDiscount())}</span>
                     </div>
 
                     <div className="flex justify-between">
@@ -286,7 +381,7 @@ const CartPage = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <Button type="primary" size="large" block className="bg-blue-600 hover:bg-blue-700">
+                    <Button type="primary" size="large" block className="bg-blue-600 hover:bg-blue-700" onClick={() => setCheckoutVisible(true)}>
                       Thanh toán
                     </Button>
 
@@ -314,6 +409,49 @@ const CartPage = () => {
           )}
         </div>
       </div>
+      {/* Checkout Modal */}
+      <Modal
+        title="Thông tin thanh toán"
+        open={checkoutVisible}
+        onCancel={() => { setCheckoutVisible(false); checkoutForm.resetFields(); }}
+        footer={null}
+        width={600}
+        centered
+      >
+        <Form
+          form={checkoutForm}
+          layout="vertical"
+          onFinish={handleCheckoutSubmit}
+          autoComplete="off"
+          disabled={submitting}
+          initialValues={{ paymentMethod: "bank_transfer" }}
+        >
+          <Form.Item label="Tên người dùng" name="username" rules={[{ required: true, message: "Vui lòng nhập tên" }]}>
+            <Input placeholder="Nhập tên người dùng" autoComplete="off" />
+          </Form.Item>
+          <Form.Item label="Số điện thoại" name="phone" rules={[{ required: true, message: "Vui lòng nhập số điện thoại" }, { pattern: /^[0-9]{10,11}$/, message: "Số điện thoại không hợp lệ" }]}>
+            <Input placeholder="Nhập số điện thoại" autoComplete="off" />
+          </Form.Item>
+          <Form.Item label="Email" name="email" rules={[{ required: true, message: "Vui lòng nhập email" }, { type: 'email', message: 'Email không hợp lệ' }]}>
+            <Input placeholder="Nhập email" autoComplete="off" />
+          </Form.Item>
+          <Form.Item label="Địa chỉ" name="address" rules={[{ required: true, message: "Vui lòng nhập địa chỉ" }]}>
+            <Input.TextArea rows={3} placeholder="Nhập địa chỉ giao hàng" autoComplete="off" />
+          </Form.Item>
+          <Form.Item label="Phương thức thanh toán" name="paymentMethod" rules={[{ required: true, message: "Vui lòng chọn phương thức thanh toán" }]}>
+            <Select placeholder="Chọn phương thức thanh toán">
+              <Select.Option value="bank_transfer">VNPAY</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item className="mb-0">
+            <div className="flex justify-end space-x-3">
+              <Button onClick={() => { setCheckoutVisible(false); checkoutForm.resetFields(); }} disabled={submitting}>Hủy</Button>
+              <Button type="primary" htmlType="submit" loading={submitting} className="bg-blue-600 hover:bg-blue-700">Thanh toán</Button>
+            </div>
+          </Form.Item>
+        </Form>
+      </Modal>
     </ProtectedRoute>
   );
 };

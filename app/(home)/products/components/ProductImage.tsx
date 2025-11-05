@@ -20,11 +20,8 @@ const ProductImage = ({ product }: ProductImageProps) => {
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
 
   // Lấy images từ product, nếu không có thì dùng thumbnailImage
-  const images = product.images && product.images.length > 0
-    ? product.images.map(img => img.url)
-    : product.thumbnailImage
-      ? [product.thumbnailImage]
-      : [];
+  const images =
+    product.images && product.images.length > 0 ? product.images.map((img) => img.url) : product.thumbnailImage ? [product.thumbnailImage] : [];
 
   if (images.length === 0) {
     return (
@@ -43,6 +40,16 @@ const ProductImage = ({ product }: ProductImageProps) => {
           border-color: #3b82f6 !important;
           box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
+        .ant-image {
+          height: inherit !important;
+          width: 100% !important;
+        }
+        /* Ảnh bên trong antd Image */
+        :global(.ant-image-img) {
+          height: inherit !important;
+          width: 100% !important;
+          object-fit: contain !important;
+        }
       `}</style>
       <div className="relative">
         <Swiper
@@ -56,13 +63,12 @@ const ProductImage = ({ product }: ProductImageProps) => {
           grabCursor={true}
           allowTouchMove={true}
           simulateTouch={true}
-          autoplay={images.length > 1 ? {
-            delay: 1500,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true
-          } : false}
+          // autoplay={images.length > 1 ? {
+          //   delay: 1500,
+          //   disableOnInteraction: false,
+          //   pauseOnMouseEnter: true
+          // } : false}
           loop={images.length > 1}
-          
         >
           {images.map((image, index) => (
             <SwiperSlide key={index}>
@@ -93,11 +99,7 @@ const ProductImage = ({ product }: ProductImageProps) => {
               {images.map((image, index) => (
                 <SwiperSlide key={index}>
                   <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded border border-gray-200 overflow-hidden">
-                    <img
-                      src={image}
-                      alt={`Thumbnail ${index + 1}`}
-                      className="w-full h-full object-contain"
-                    />
+                    <img src={image} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-contain" />
                   </div>
                 </SwiperSlide>
               ))}
