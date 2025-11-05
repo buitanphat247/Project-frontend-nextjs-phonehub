@@ -44,16 +44,45 @@ async function handleRequest(
   method: string
 ) {
   try {
-    const path = params.path?.join('/') || ''
-    const url = `${API_BASE_URL}/${path}`
+    // Validate and clean path
+    const pathArray = Array.isArray(params.path) ? params.path : []
+    
+    // Filter out any invalid values (null, undefined, empty strings)
+    const validPathParts = pathArray.filter((p): p is string => 
+      typeof p === 'string' && p.length > 0 && !p.includes('undefined') && !p.includes('[object')
+    )
+    
+    if (validPathParts.length === 0) {
+      console.error('⚠️ Proxy: Invalid or empty path array:', params.path)
+      return NextResponse.json(
+        { success: false, message: 'Invalid proxy path' },
+        { status: 400 }
+      )
+    }
+    
+    const path = validPathParts.join('/')
+    
+    // Ensure API_BASE_URL doesn't end with slash and path doesn't start with slash
+    const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path
+    const url = `${baseUrl}/${cleanPath}`
     
     // Get query params from request
     const searchParams = request.nextUrl.searchParams
     const queryString = searchParams.toString()
     const fullUrl = queryString ? `${url}?${queryString}` : url
+    
+    // Log the actual URL being called (critical for debugging)
+    console.log(`➡️ Fetching URL: ${fullUrl}`)
+    console.log(`   Method: ${method}`)
+    console.log(`   Path parts:`, validPathParts)
+    console.log(`   API_BASE_URL: ${API_BASE_URL}`)
 
     // Get headers from request
-    const headers: Record<string, string> = {}
+    const headers: Record<string, string> = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    }
     
     // Forward Authorization header if present
     const authHeader = request.headers.get('authorization')
@@ -61,11 +90,20 @@ async function handleRequest(
       headers['Authorization'] = authHeader
     }
     
-    // Forward Content-Type
+    // Override Content-Type if provided
     const contentType = request.headers.get('content-type')
     if (contentType) {
       headers['Content-Type'] = contentType
     }
+    
+    // Forward Accept header if provided (overrides default)
+    const acceptHeader = request.headers.get('accept')
+    if (acceptHeader) {
+      headers['Accept'] = acceptHeader
+    }
+
+    // Log headers being sent (for debugging)
+    console.log(`📤 Request headers:`, JSON.stringify(headers, null, 2))
 
     // Get body for POST/PUT requests
     let body: string | undefined
@@ -83,7 +121,13 @@ async function handleRequest(
         // Add timeout for connection
         signal: AbortSignal.timeout(10000), // 10 seconds timeout
       })
+      
+      // Log response status
+      console.log(`✅ Response status: ${response.status} ${response.statusText}`)
     } catch (fetchError: any) {
+      console.error(`❌ Fetch error for ${fullUrl}:`, fetchError.message)
+      console.error(`   Error code: ${fetchError.code}`)
+      console.error(`   Error name: ${fetchError.name}`)
       // Check if it's a connection error
       if (
         fetchError.code === 'ECONNREFUSED' || 
@@ -118,7 +162,31 @@ async function handleRequest(
     let jsonData
     try {
       jsonData = JSON.parse(data)
-    } catch {
+      
+      // Log raw response structure for debugging (first 500 chars)
+      const responsePreview = JSON.stringify(jsonData).substring(0, 500)
+      console.log(`📦 Raw response preview: ${responsePreview}...`)
+      
+      // Log response summary for debugging
+      if (jsonData?.data) {
+        const contentLength = Array.isArray(jsonData.data?.content) 
+          ? jsonData.data.content.length 
+          : 'N/A'
+        const totalElements = jsonData.data?.totalElements ?? 'N/A'
+        console.log(`📦 Response data: success=${jsonData.success}, content.length=${contentLength}, totalElements=${totalElements}`)
+        
+        // Log full data structure if empty
+        if (contentLength === 0 || totalElements === 0) {
+          console.log(`⚠️ Empty response detected. Full data structure:`, JSON.stringify(jsonData, null, 2))
+        }
+      } else {
+        // Response doesn't have expected structure
+        console.warn(`⚠️ Response doesn't have 'data' field. Full response:`, JSON.stringify(jsonData, null, 2))
+      }
+    } catch (parseError) {
+      console.error(`❌ Failed to parse JSON response`)
+      console.error(`   Raw response (first 500 chars): ${data.substring(0, 500)}`)
+      console.error(`   Parse error:`, parseError)
       jsonData = data
     }
 
