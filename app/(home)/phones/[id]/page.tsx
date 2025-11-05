@@ -13,6 +13,7 @@ import { getCategoryRoute } from "../../products/utils/categoryUtils";
 import { getAuthData, isAuthenticated } from "../../../../lib/utils/cookie";
 import { getUserById } from "../../../../lib/api/users";
 import { getReviewsByProductId, createReview, type ReviewResponse } from "../../../../lib/api/reviews";
+import { showLoginAlert } from "../../../../lib/utils/loginAlert";
 import { Input, Button, Avatar, Modal, Rate, Steps, message } from "antd";
 import { UserOutlined, StarFilled } from "@ant-design/icons";
 
@@ -177,7 +178,7 @@ const PhoneDetailPage = ({ params }: PageProps) => {
 
   const handleOpenReviewModal = () => {
     if (!isAuthenticated()) {
-      message.info("Vui lòng đăng nhập để đánh giá sản phẩm!");
+      showLoginAlert("Bạn cần đăng nhập để đánh giá sản phẩm");
       return;
     }
     if (hasUserReviewed()) {
