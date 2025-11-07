@@ -1,25 +1,28 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { createReview, ReviewResponse } from "../../../../lib/api/reviews";
+import { updateOrderItemReviewState } from "../../../../lib/api/orders";
 import { getAuthData } from "../../../../lib/utils/cookie";
 import { showLoginAlert } from "../../../../lib/utils/loginAlert";
+import { OrderItemReviewInfo } from "./useAccountData";
 
 interface UseReviewModalProps {
-  productReviews: Map<number, ReviewResponse[]>;
-  setProductReviews: React.Dispatch<React.SetStateAction<Map<number, ReviewResponse[]>>>;
-  productReviewsRef: React.MutableRefObject<Map<number, ReviewResponse[]>>;
+  productReviews: Map<number, OrderItemReviewInfo[]>;
+  productReviewsRef: React.MutableRefObject<Map<number, OrderItemReviewInfo[]>>;
+  markOrderItemReviewed: (params: { orderId: number; orderItemId: number; review: ReviewResponse }) => void;
 }
 
-export function useReviewModal({ productReviews, setProductReviews, productReviewsRef }: UseReviewModalProps) {
+export function useReviewModal({ productReviews, productReviewsRef, markOrderItemReviewed }: UseReviewModalProps) {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [rating, setRating] = useState<number>(0);
   const [commentContent, setCommentContent] = useState<string>("");
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+  const [selectedOrderItemId, setSelectedOrderItemId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleOpenReviewModal = (orderId: number, productId: number) => {
+  const handleOpenReviewModal = (orderId: number, orderItemId: number, productId: number) => {
     const authData = getAuthData();
     if (!authData?.userId) {
       showLoginAlert("Bạn cần đăng nhập để đánh giá sản phẩm");
@@ -27,15 +30,15 @@ export function useReviewModal({ productReviews, setProductReviews, productRevie
     }
 
     // Check if user has reviewed
-    const reviews = productReviews.get(productId) || [];
-    const userId = parseInt(authData.userId, 10);
-    const hasReviewed = reviews.some((review) => review.userId === userId && review.orderId === orderId);
+    const reviews = productReviewsRef.current.get(productId) ?? productReviews.get(productId) ?? [];
+    const hasReviewed = reviews.some((review) => review.orderItemId === orderItemId);
     if (hasReviewed) {
-      toast("Bạn đã đánh giá sản phẩm này rồi!", { icon: 'ℹ️' });
+      toast("Bạn đã đánh giá sản phẩm này rồi!", { icon: "ℹ️" });
       return;
     }
-    
+
     setSelectedOrderId(orderId);
+    setSelectedOrderItemId(orderItemId);
     setSelectedProductId(productId);
     setIsReviewModalOpen(true);
     setCurrentStep(0);
@@ -50,6 +53,7 @@ export function useReviewModal({ productReviews, setProductReviews, productRevie
     setCommentContent("");
     setSelectedProductId(null);
     setSelectedOrderId(null);
+    setSelectedOrderItemId(null);
   };
 
   const handleNextStep = () => {
@@ -69,7 +73,7 @@ export function useReviewModal({ productReviews, setProductReviews, productRevie
   };
 
   const handleSubmitReview = async () => {
-    if (!rating || !commentContent.trim() || !selectedProductId || !selectedOrderId) {
+    if (!rating || !commentContent.trim() || !selectedProductId || !selectedOrderId || !selectedOrderItemId) {
       toast.error("Vui lòng chọn đánh giá và viết bình luận!");
       return;
     }
@@ -86,24 +90,37 @@ export function useReviewModal({ productReviews, setProductReviews, productRevie
       if (response.success && response.data) {
         toast.success("Đánh giá của bạn đã được gửi thành công!");
 
-        // Update productReviews
-        const newReview = { ...response.data!, orderId: selectedOrderId } as ReviewResponse;
+        // Update order item review state
+        const reviewId = response.data.id;
+        let updateSucceeded = true;
+        try {
+          const updateState = await updateOrderItemReviewState(selectedOrderItemId, {
+            reviewed: true,
+            reviewId,
+          });
 
-        setProductReviews(prev => {
-          const currentReviews = prev.get(selectedProductId) || [];
-          const newMap = new Map(prev);
-          newMap.set(selectedProductId, [...currentReviews, newReview]);
-          productReviewsRef.current = newMap; // Update ref
-          return newMap;
+          if (!updateState.success) {
+            updateSucceeded = false;
+            toast.error(updateState.message || "Không thể cập nhật trạng thái đánh giá!");
+          }
+        } catch (error: any) {
+          updateSucceeded = false;
+          console.error("Error updating order item review state:", error);
+          toast.error(error.message || "Không thể cập nhật trạng thái đánh giá!");
+        }
+
+        if (!updateSucceeded) {
+          return;
+        }
+
+        // Update local state
+        markOrderItemReviewed({
+          orderId: selectedOrderId,
+          orderItemId: selectedOrderItemId,
+          review: response.data,
         });
 
-        // Reset form
-        setRating(0);
-        setCommentContent("");
-        setCurrentStep(0);
-        setIsReviewModalOpen(false);
-        setSelectedProductId(null);
-        setSelectedOrderId(null);
+        handleCloseReviewModal();
       } else {
         toast.error(response.message || "Có lỗi xảy ra khi gửi đánh giá!");
       }
@@ -129,4 +146,3 @@ export function useReviewModal({ productReviews, setProductReviews, productRevie
     setCommentContent,
   };
 }
-

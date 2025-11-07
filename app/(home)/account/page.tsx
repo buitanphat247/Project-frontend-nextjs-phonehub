@@ -35,9 +35,9 @@ const AccountPage = () => {
     setOrdersPage,
     ordersSize,
     productReviews,
-    setProductReviews,
     productReviewsRef,
     dataReady,
+    markOrderItemReviewed,
   } = useAccountData();
 
   const {
@@ -53,7 +53,7 @@ const AccountPage = () => {
     handleSubmitReview,
     setRating,
     setCommentContent,
-  } = useReviewModal({ productReviews, setProductReviews, productReviewsRef });
+  } = useReviewModal({ productReviews, productReviewsRef, markOrderItemReviewed });
 
   // Get tab param from URL safely
   useEffect(() => {

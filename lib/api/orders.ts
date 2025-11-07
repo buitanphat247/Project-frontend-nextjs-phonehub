@@ -25,6 +25,11 @@ export interface OrderDetailItem {
   productName: string
   quantity: number
   unitPrice: number
+  isReviewed?: boolean
+  reviewId?: number | null
+  reviewRating?: number | null
+  reviewComment?: string | null
+  reviewCreatedAt?: string | null
   createdAt?: string
 }
 
@@ -74,6 +79,23 @@ export async function addOrderItem(orderId: number | string, item: OrderItemRequ
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(item),
+  })
+  return res.json()
+}
+
+export interface UpdateOrderItemReviewStateRequest {
+  reviewed: boolean
+  reviewId: number | null
+}
+
+export async function updateOrderItemReviewState(
+  orderItemId: number | string,
+  payload: UpdateOrderItemReviewStateRequest
+): Promise<ApiResponse<boolean>> {
+  const res = await apiClient(`/order-items/${orderItemId}/review-state`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   })
   return res.json()
 }

@@ -2,9 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { getUserById, getUserTotalSpent } from "../../../../lib/api/users";
 import { getOrders, OrderDetailResponse } from "../../../../lib/api/orders";
-import { getReviewsByProductId, ReviewResponse } from "../../../../lib/api/reviews";
+import { ReviewResponse } from "../../../../lib/api/reviews";
 import { getAuthData } from "../../../../lib/utils/cookie";
 import { UserInfo } from "../interface/IAccount";
+
+export interface OrderItemReviewInfo extends ReviewResponse {
+  orderId: number;
+  orderItemId: number;
+}
 
 export function useAccountData() {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
@@ -14,10 +19,65 @@ export function useAccountData() {
   const [ordersTotal, setOrdersTotal] = useState(0);
   const [ordersPage, setOrdersPage] = useState(0);
   const [ordersSize] = useState(5);
-  const [productReviews, setProductReviews] = useState<Map<number, ReviewResponse[]>>(new Map());
-  const productReviewsRef = useRef<Map<number, ReviewResponse[]>>(new Map());
+  const [productReviews, setProductReviews] = useState<Map<number, OrderItemReviewInfo[]>>(new Map());
+  const productReviewsRef = useRef<Map<number, OrderItemReviewInfo[]>>(new Map());
   const [dataReady, setDataReady] = useState(false);
   const [isFetchingOrders, setIsFetchingOrders] = useState(false);
+
+  const rebuildProductReviews = (ordersData: OrderDetailResponse[]) => {
+    const map = new Map<number, OrderItemReviewInfo[]>();
+    ordersData.forEach((order) => {
+      order.items?.forEach((item) => {
+        if (item.reviewId) {
+          const reviewInfo: OrderItemReviewInfo = {
+            id: item.reviewId,
+            productId: item.productId,
+            userId: order.userId,
+            rating: item.reviewRating ?? 0,
+            comment: item.reviewComment ?? "",
+            createdAt: item.reviewCreatedAt ?? "",
+            updatedAt: item.reviewCreatedAt ?? "",
+            orderId: order.id,
+            orderItemId: item.id,
+          };
+          const existing = map.get(item.productId) ?? [];
+          map.set(item.productId, [...existing, reviewInfo]);
+        }
+      });
+    });
+    setProductReviews(map);
+    productReviewsRef.current = map;
+  };
+
+  const markOrderItemReviewed = ({
+    orderId,
+    orderItemId,
+    review,
+  }: {
+    orderId: number;
+    orderItemId: number;
+    review: ReviewResponse;
+  }) => {
+    setOrders((prev) => {
+      const updatedOrders = prev.map((order) => {
+        if (order.id !== orderId) return order;
+        const updatedItems = order.items?.map((item) => {
+          if (item.id !== orderItemId) return item;
+          return {
+            ...item,
+            isReviewed: true,
+            reviewId: review.id,
+            reviewRating: review.rating,
+            reviewComment: review.comment,
+            reviewCreatedAt: review.createdAt,
+          };
+        }) ?? order.items;
+        return { ...order, items: updatedItems };
+      });
+      rebuildProductReviews(updatedOrders);
+      return updatedOrders;
+    });
+  };
 
   // Fetch tất cả data một lần duy nhất khi component mount
   useEffect(() => {
@@ -82,43 +142,10 @@ export function useAccountData() {
 
         // Set orders
         if (ordersResponse.success && ordersResponse.data) {
-          setOrders(ordersResponse.data.content || []);
+          const ordersData = ordersResponse.data.content || [];
+          setOrders(ordersData);
           setOrdersTotal(ordersResponse.data.totalElements || 0);
-          
-          // Fetch reviews for all products in orders (chỉ fetch một lần)
-          const productIds = new Set<number>();
-          ordersResponse.data.content?.forEach(order => {
-            order.items?.forEach(item => {
-              if (item.productId) {
-                productIds.add(item.productId);
-              }
-            });
-          });
-          
-          // Fetch reviews for each product (parallel) - chỉ một lần
-          if (productIds.size > 0) {
-            const reviewPromises = Array.from(productIds).map(async (productId) => {
-              try {
-                const reviewsRes = await getReviewsByProductId(productId, 0, 100);
-                if (reviewsRes.success && reviewsRes.data?.content) {
-                  return { productId, reviews: reviewsRes.data.content };
-                }
-              } catch (error) {
-                console.error(`Error fetching reviews for product ${productId}:`, error);
-              }
-              return null;
-            });
-            
-            const reviewResults = await Promise.all(reviewPromises);
-            const reviewsMap = new Map<number, ReviewResponse[]>();
-            reviewResults.forEach(result => {
-              if (result) {
-                reviewsMap.set(result.productId, result.reviews);
-              }
-            });
-            setProductReviews(reviewsMap);
-            productReviewsRef.current = reviewsMap;
-          }
+          rebuildProductReviews(ordersData);
         }
 
         setDataReady(true);
@@ -152,7 +179,8 @@ export function useAccountData() {
         
         const res = await getOrders({ page: ordersPage, size: ordersSize, userId: uid });
         if (res.success && res.data) {
-          setOrders(res.data.content || []);
+          const ordersData = res.data.content || [];
+          setOrders(ordersData);
           const total = res.data.totalElements || 0;
           setOrdersTotal(total);
           
@@ -163,45 +191,7 @@ export function useAccountData() {
             return { ...prev, totalOrders: total };
           });
           
-          // Fetch reviews chỉ cho products chưa có reviews (sử dụng ref để tránh stale closure)
-          const currentProductIds = new Set<number>();
-          res.data.content?.forEach(order => {
-            order.items?.forEach(item => {
-              if (item.productId) {
-                currentProductIds.add(item.productId);
-              }
-            });
-          });
-          
-          // Chỉ fetch reviews cho products chưa có trong ref
-          const productIdsToFetch = Array.from(currentProductIds).filter(id => !productReviewsRef.current.has(id));
-          
-          if (productIdsToFetch.length > 0) {
-            // Fetch reviews cho products mới (parallel)
-            const reviewPromises = productIdsToFetch.map(async (productId) => {
-              try {
-                const reviewsRes = await getReviewsByProductId(productId, 0, 100);
-                if (reviewsRes.success && reviewsRes.data?.content) {
-                  return { productId, reviews: reviewsRes.data.content };
-                }
-              } catch (error) {
-                console.error(`Error fetching reviews for product ${productId}:`, error);
-              }
-              return null;
-            });
-            
-            const reviewResults = await Promise.all(reviewPromises);
-            setProductReviews(prev => {
-              const newMap = new Map(prev);
-              reviewResults.forEach(result => {
-                if (result) {
-                  newMap.set(result.productId, result.reviews);
-                }
-              });
-              productReviewsRef.current = newMap; // Update ref
-              return newMap;
-            });
-          }
+          rebuildProductReviews(ordersData);
         }
       } catch (e) {
         console.error("Error fetching orders:", e);
@@ -225,9 +215,9 @@ export function useAccountData() {
     setOrdersPage,
     ordersSize,
     productReviews,
-    setProductReviews,
     productReviewsRef,
     dataReady,
+    markOrderItemReviewed,
   };
 }
 

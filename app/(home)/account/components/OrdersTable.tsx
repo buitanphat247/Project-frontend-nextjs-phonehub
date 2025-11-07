@@ -3,8 +3,7 @@
 import React from "react";
 import { Button } from "antd";
 import { OrderDetailResponse } from "../../../../lib/api/orders";
-import { ReviewResponse } from "../../../../lib/api/reviews";
-import { getAuthData } from "../../../../lib/utils/cookie";
+import { OrderItemReviewInfo } from "../hooks/useAccountData";
 
 interface OrdersTableProps {
   orders: OrderDetailResponse[];
@@ -13,8 +12,8 @@ interface OrdersTableProps {
   ordersPage: number;
   ordersSize: number;
   onPageChange: (page: number) => void;
-  productReviews: Map<number, ReviewResponse[]>;
-  onReviewClick: (orderId: number, productId: number) => void;
+  productReviews: Map<number, OrderItemReviewInfo[]>;
+  onReviewClick: (orderId: number, orderItemId: number, productId: number) => void;
 }
 
 const OrdersTable: React.FC<OrdersTableProps> = ({
@@ -27,14 +26,13 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
   productReviews,
   onReviewClick,
 }) => {
-  const authData = getAuthData();
-  const userId = authData?.userId ? parseInt(authData.userId, 10) : null;
-
   // Check if user has reviewed a product
-  const hasUserReviewed = (orderId: number, productId: number): boolean => {
-    if (!userId) return false;
-    const reviews = productReviews.get(productId) || [];
-    return reviews.some((review) => review.userId === userId && review.orderId === orderId);
+  const hasUserReviewed = (orderItem: OrderDetailResponse["items"][number] | undefined): boolean => {
+    if (!orderItem) return false;
+    const directFlag = orderItem.isReviewed || Boolean(orderItem.reviewId);
+    if (directFlag) return true;
+    const reviews = productReviews.get(orderItem.productId) || [];
+    return reviews.some((review) => (review as any).orderItemId === orderItem.id);
   };
 
   if (ordersLoading) {
@@ -109,13 +107,13 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
                 <div className="space-y-2">
                   {o.items?.map((it) => {
                     const isOrderSuccess = o.status?.toLowerCase() === 'success';
-                    const hasReviewed = hasUserReviewed(o.id, it.productId);
+                    const hasReviewed = hasUserReviewed(it);
                     return (
                       <div key={it.id}>
                         <Button
                           type="primary"
                           size="small"
-                          onClick={() => onReviewClick(o.id, it.productId)}
+                          onClick={() => onReviewClick(o.id, it.id, it.productId)}
                           disabled={!isOrderSuccess || hasReviewed}
                           className="text-xs"
                         >
