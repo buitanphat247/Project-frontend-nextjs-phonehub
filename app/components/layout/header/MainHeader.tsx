@@ -401,16 +401,18 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
             </Dropdown>
           )}
 
-          {/* Shopping Cart */}
-          <button
-            onClick={onCartClick}
-            className="relative cursor-pointer p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Giỏ hàng"
-            aria-label={authenticated ? `Giỏ hàng có ${totalItems} sản phẩm` : "Giỏ hàng"}
-          >
-            <span className="text-xl"><ShoppingCartOutlined /></span>
-            {/* Không hiển thị badge/hiệu ứng */}
-          </button>
+          {/* Shopping Cart - hide when not authenticated */}
+          {authenticated && (
+            <button
+              onClick={onCartClick}
+              className="relative cursor-pointer p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Giỏ hàng"
+              aria-label={`Giỏ hàng có ${totalItems} sản phẩm`}
+            >
+              <span className="text-xl"><ShoppingCartOutlined /></span>
+              {/* Không hiển thị badge/hiệu ứng */}
+            </button>
+          )}
         </div>
       </div>
 

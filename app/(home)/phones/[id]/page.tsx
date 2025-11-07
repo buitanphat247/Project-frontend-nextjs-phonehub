@@ -14,6 +14,8 @@ import { getAuthData, isAuthenticated } from "../../../../lib/utils/cookie";
 import { getUserById } from "../../../../lib/api/users";
 import { getReviewsByProductId, createReview, type ReviewResponse } from "../../../../lib/api/reviews";
 import { showLoginAlert } from "../../../../lib/utils/loginAlert";
+import { checkUserPurchasedProduct } from "../../../../lib/api/orders";
+import { formatFullDateTime } from "../../../../lib/utils/dateFormat";
 import { Input, Button, Avatar, Modal, Rate, Steps, message } from "antd";
 import { UserOutlined, StarFilled } from "@ant-design/icons";
 
@@ -38,6 +40,8 @@ const PhoneDetailPage = ({ params }: PageProps) => {
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
+  const [hasPurchased, setHasPurchased] = useState<boolean>(false);
+  const [checkingPurchased, setCheckingPurchased] = useState<boolean>(false);
 
   useEffect(() => {
     const getParams = async () => {
@@ -139,6 +143,35 @@ const PhoneDetailPage = ({ params }: PageProps) => {
     fetchUserInfo();
   }, []);
 
+  // Check if user has purchased the product
+  useEffect(() => {
+    const checkPurchased = async () => {
+      if (!isAuthenticated() || id === 0) {
+        setHasPurchased(false);
+        return;
+      }
+
+      try {
+        setCheckingPurchased(true);
+        const authData = getAuthData();
+        if (authData?.userId) {
+          const userId = parseInt(authData.userId, 10);
+          const purchased = await checkUserPurchasedProduct(userId, id);
+          setHasPurchased(purchased);
+        } else {
+          setHasPurchased(false);
+        }
+      } catch (error) {
+        console.error("Error checking purchased:", error);
+        setHasPurchased(false);
+      } finally {
+        setCheckingPurchased(false);
+      }
+    };
+
+    checkPurchased();
+  }, [id]);
+
   // Fetch reviews when product ID changes
   useEffect(() => {
     if (id === 0) return;
@@ -173,12 +206,16 @@ const PhoneDetailPage = ({ params }: PageProps) => {
     const authData = getAuthData();
     if (!authData?.userId) return false;
     const userId = parseInt(authData.userId, 10);
-    return reviews.some(review => review.userId === userId);
+    return reviews.some((review) => review.userId === userId);
   };
 
   const handleOpenReviewModal = () => {
     if (!isAuthenticated()) {
       showLoginAlert("Bạn cần đăng nhập để đánh giá sản phẩm");
+      return;
+    }
+    if (!hasPurchased) {
+      message.warning("Bạn cần mua sản phẩm này trước khi đánh giá!");
       return;
     }
     if (hasUserReviewed()) {
@@ -230,18 +267,18 @@ const PhoneDetailPage = ({ params }: PageProps) => {
 
       if (response.success && response.data) {
         message.success("Đánh giá của bạn đã được gửi thành công!");
-        
+
         // Reset form
         setRating(0);
         setCommentContent("");
         setCurrentStep(0);
-        
+
         // Close modal first
         setIsReviewModalOpen(false);
-        
+
         // Small delay to ensure backend has processed
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         // Reload reviews
         const reviewsResponse = await getReviewsByProductId(id, 0, 10);
         if (reviewsResponse.success && reviewsResponse.data) {
@@ -268,14 +305,6 @@ const PhoneDetailPage = ({ params }: PageProps) => {
     return (total / reviews.length).toFixed(1);
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
-  };
 
   if (loading) {
     return <ProductDetailSkeleton />;
@@ -342,177 +371,73 @@ const PhoneDetailPage = ({ params }: PageProps) => {
             </div>
           )}
 
-           {/* Comment Section */}
-           <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 pb-4 border-b border-gray-200">
-               <div>
-                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Đánh giá sản phẩm</h2>
-                 <div className="flex items-center space-x-2">
-                   <div className="flex items-center bg-yellow-50 px-3 py-1 rounded-full border border-yellow-200">
-                     <StarFilled className="text-yellow-400 text-lg" />
-                     <span className="ml-1.5 text-base font-bold text-gray-900">{calculateAverageRating()}</span>
-                   </div>
-                   <span className="text-gray-600 text-sm">({totalReviews} đánh giá)</span>
-                 </div>
-               </div>
-               <Button
-                 type="primary"
-                 size="middle"
-                 onClick={handleOpenReviewModal}
-                 disabled={hasUserReviewed()}
-                 className="rounded-lg px-6 font-medium"
-               >
-                 {hasUserReviewed() ? "Đã đánh giá" : "Đánh giá sản phẩm"}
-               </Button>
-             </div>
+          {/* Comment Section */}
+          <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 pb-4 border-b border-gray-200">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Đánh giá sản phẩm</h2>
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center bg-yellow-50 px-3 py-1 rounded-full border border-yellow-200">
+                    <StarFilled className="text-yellow-400 text-lg" />
+                    <span className="ml-1.5 text-base font-bold text-gray-900">{calculateAverageRating()}</span>
+                  </div>
+                  <span className="text-gray-600 text-sm">({totalReviews} đánh giá)</span>
+                </div>
+              </div>
+            </div>
 
-             {/* Comments List */}
-             {reviewsLoading ? (
-               <div className="text-center py-8">
-                 <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mb-3"></div>
-                 <p className="text-gray-500 text-sm">Đang tải đánh giá...</p>
-               </div>
-             ) : reviews.length === 0 ? (
-               <div className="text-center py-8">
-                 <div className="mb-3">
-                   <StarFilled className="text-gray-300 text-3xl mx-auto" />
-                 </div>
-                 <p className="text-gray-500">Chưa có đánh giá nào cho sản phẩm này.</p>
-                 <p className="text-gray-400 text-sm mt-1">Hãy là người đầu tiên đánh giá sản phẩm này!</p>
-               </div>
-             ) : (
-               <div >
-                 {reviews.map((review) => (
-                   <div
-                     key={review.id}
-                     className="bg-linear-to-br from-white to-gray-50 rounded-lg p-4 transition-all duration-300"
-                   >
-                     <div className="flex items-start space-x-3">
-                       <div className="shrink-0">
-                         <Avatar
-                           size={48}
-                           src={review.user?.avatar || undefined}
-                           icon={<UserOutlined />}
-                           className="ring-2 ring-blue-100"
-                         />
-                       </div>
-                       <div className="flex-1 min-w-0">
-                         <div className="flex items-start justify-between mb-2">
-                           <div className="flex-1">
-                             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                               <span className="font-semibold text-gray-900">{review.user?.username || "Người dùng"}</span>
-                               <Rate
-                                 disabled
-                                 value={review.rating}
-                                 className="text-sm [&_.ant-rate-star-full]:text-yellow-400"
-                               />
-                             </div>
-                             <span className="text-xs text-gray-500 flex items-center gap-1">
-                               <svg
-                                 className="w-3.5 h-3.5"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 viewBox="0 0 24 24"
-                               >
-                                 <path
-                                   strokeLinecap="round"
-                                   strokeLinejoin="round"
-                                   strokeWidth={2}
-                                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                 />
-                               </svg>
-                               {formatDate(review.createdAt)}
-                             </span>
-                           </div>
-                         </div>
-                         <div className="bg-white rounded-md p-3 border border-gray-200">
-                           <p className="text-gray-700 leading-relaxed text-sm">{review.comment}</p>
-                         </div>
-                       </div>
-                     </div>
-                   </div>
-                 ))}
-               </div>
-             )}
-           </div>
-
-           {/* Review Modal */}
-           <Modal
-             title="Đánh giá sản phẩm"
-             open={isReviewModalOpen}
-             onCancel={handleCloseReviewModal}
-             footer={null}
-             width={600}
-             className="review-modal"
-           >
-             <Steps
-               current={currentStep}
-               items={[
-                 { title: "Chọn đánh giá" },
-                 { title: "Viết bình luận" },
-               ]}
-               className="mb-6"
-             />
-
-             {currentStep === 0 && (
-               <div className="py-6">
-                 <div className="text-center">
-                   <p className="text-lg font-medium text-gray-900 mb-4">Bạn đánh giá sản phẩm này như thế nào?</p>
-                   <Rate
-                     value={rating}
-                     onChange={setRating}
-                     className="text-3xl"
-                     allowClear
-                   />
-                   {rating > 0 && (
-                     <p className="mt-4 text-gray-600">
-                       {rating === 5 && "Tuyệt vời!"}
-                       {rating === 4 && "Rất tốt!"}
-                       {rating === 3 && "Tốt"}
-                       {rating === 2 && "Tạm được"}
-                       {rating === 1 && "Không hài lòng"}
-                     </p>
-                   )}
-                 </div>
-                 <div className="flex justify-end mt-8">
-                   <Button onClick={handleCloseReviewModal} className="mr-2">
-                     Hủy
-                   </Button>
-                   <Button type="primary" onClick={handleNextStep} disabled={rating === 0}>
-                     Tiếp theo
-                   </Button>
-                 </div>
-               </div>
-             )}
-
-             {currentStep === 1 && (
-               <div className="py-6">
-                 <div className="mb-4">
-                   <p className="text-sm text-gray-600 mb-2">Đánh giá của bạn:</p>
-                   <Rate disabled value={rating} className="text-lg" />
-                 </div>
-                 <div className="mb-6">
-                   <p className="text-sm font-medium text-gray-900 mb-2">Viết bình luận của bạn</p>
-                   <Input.TextArea
-                     placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."
-                     value={commentContent}
-                     onChange={(e) => setCommentContent(e.target.value)}
-                     rows={6}
-                     className="rounded-lg"
-                   />
-                 </div>
-                 <div className="flex justify-end space-x-2">
-                   <Button onClick={handlePrevStep}>Quay lại</Button>
-                   <Button onClick={handleCloseReviewModal} className="mr-2">
-                     Hủy
-                   </Button>
-                   <Button type="primary" onClick={handleSubmitReview} loading={isSubmitting} disabled={!commentContent.trim()}>
-                     Gửi đánh giá
-                   </Button>
-                 </div>
-               </div>
-             )}
-           </Modal>
+            {/* Comments List */}
+            {reviewsLoading ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mb-3"></div>
+                <p className="text-gray-500 text-sm">Đang tải đánh giá...</p>
+              </div>
+            ) : reviews.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="mb-3">
+                  <StarFilled className="text-gray-300 text-3xl mx-auto" />
+                </div>
+                <p className="text-gray-500">Chưa có đánh giá nào cho sản phẩm này.</p>
+                <p className="text-gray-400 text-sm mt-1">Hãy là người đầu tiên đánh giá sản phẩm này!</p>
+              </div>
+            ) : (
+              <div>
+                {reviews.map((review) => (
+                  <div key={review.id} className="bg-linear-to-br from-white to-gray-50 rounded-lg p-4 transition-all duration-300">
+                    <div className="flex items-start space-x-3">
+                      <div className="shrink-0">
+                        <Avatar size={48} src={review.user?.avatar || undefined} icon={<UserOutlined />} className="ring-2 ring-blue-100" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                              <span className="font-semibold text-gray-900">{review.user?.username || "Người dùng"}</span>
+                              <Rate disabled value={review.rating} className="text-sm [&_.ant-rate-star-full]:text-yellow-400" />
+                            </div>
+                            <span className="text-xs text-gray-500 flex items-start gap-1 whitespace-pre-line">
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                              {formatFullDateTime(review.createdAt)}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="bg-white rounded-md p-3 border border-gray-200">
+                          <p className="text-gray-700 leading-relaxed text-sm">{review.comment}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Related Products */}
           <RelatedProducts product={product} />

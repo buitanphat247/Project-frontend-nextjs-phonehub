@@ -50,6 +50,7 @@ export interface ReviewResponse {
   id: number;
   productId: number;
   userId: number;
+  orderId?: number;
   product?: ReviewProductResponse;
   user?: ReviewUserResponse;
   rating: number;
@@ -62,6 +63,7 @@ export interface ReviewResponse {
 export interface CreateReviewRequest {
   productId: number;
   userId: number;
+  orderId?: number;
   rating: number;
   comment: string;
 }

@@ -119,4 +119,58 @@ export async function getOrders(params: { page?: number; size?: number; userId?:
   return res.json()
 }
 
+/**
+ * Check if user has purchased a product (by productId)
+ * This function will:
+ * 1. Get all orders of the user (with status = "success" or "SUCCESS")
+ * 2. Find order items with the given productId
+ * 3. Check purchased for each order item found
+ */
+export async function checkUserPurchasedProduct(userId: number, productId: number): Promise<boolean> {
+  try {
+    // Get all orders of the user (we need to get all pages to check all orders)
+    let page = 0
+    const pageSize = 50
+    let hasMore = true
+    
+    while (hasMore) {
+      const ordersResponse = await getOrders({ page, size: pageSize, userId })
+      
+      if (!ordersResponse.success || !ordersResponse.data) {
+        return false
+      }
+      
+      const orders = ordersResponse.data.content || []
+      
+      // Check each order for the product
+      for (const order of orders) {
+        // Only check orders with status "success" or "SUCCESS"
+        const orderStatus = order.status?.toLowerCase()
+        if (orderStatus !== 'success') {
+          continue
+        }
+        
+        // Find order items with the given productId
+        const matchingItems = order.items?.filter(item => item.productId === productId) || []
+        
+        // Check purchased for each matching order item
+        // If we found matching items, user has purchased the product
+        if (matchingItems.length > 0) {
+          return true
+        }
+      }
+      
+      // Check if there are more pages
+      const totalPages = ordersResponse.data.totalPages || 0
+      hasMore = page + 1 < totalPages && orders.length > 0
+      page++
+    }
+    
+    return false
+  } catch (error) {
+    console.error('Error checking user purchased product:', error)
+    return false
+  }
+}
+
 

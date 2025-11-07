@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Modal, Form, Input, Button, message, Result } from 'antd'
+import { Modal, Form, Input, Button, Result } from 'antd'
 import { MailOutlined } from '@ant-design/icons'
+import toast from 'react-hot-toast'
 import { getAuthData } from '../../../../lib/utils/cookie'
 import { requestEmailChange } from '../../../../lib/api/auth'
 
@@ -33,7 +34,7 @@ export default function ChangeEmailModal({ isOpen, onClose, currentEmail }: Chan
       const values = await form.validateFields()
       const authData = getAuthData()
       if (!authData?.userId) {
-        message.error('Không tìm thấy người dùng')
+        toast.error('Không tìm thấy người dùng')
         return
       }
       setSubmitting(true)
@@ -46,12 +47,12 @@ export default function ChangeEmailModal({ isOpen, onClose, currentEmail }: Chan
       if (res.success) {
         setTargetEmail(values.email)
         setStep('sent')
-        message.success('Đã gửi yêu cầu, vui lòng kiểm tra email để xác nhận')
+        toast.success('Đã gửi yêu cầu, vui lòng kiểm tra email để xác nhận')
       } else {
         // Backend đã kiểm tra và trả lỗi (ví dụ: email đã tồn tại)
         const err = res.message || 'Cập nhật email thất bại'
         form.setFields([{ name: 'email', errors: [err] }])
-        message.error(err)
+        toast.error(err)
       }
     } catch (e: any) {
       if (e?.errorFields) return
@@ -62,7 +63,7 @@ export default function ChangeEmailModal({ isOpen, onClose, currentEmail }: Chan
         errorMsg = 'Email mới đã được sử dụng. Vui lòng thử email khác.'
       }
       form.setFields([{ name: 'email', errors: [errorMsg] }])
-      message.error(errorMsg)
+      toast.error(errorMsg)
     } finally {
       setSubmitting(false)
     }

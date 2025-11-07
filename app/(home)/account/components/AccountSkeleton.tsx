@@ -88,6 +88,44 @@ const AccountSkeleton = () => {
             </div>
           </div>
         </div>
+
+        {/* Đơn hàng của tôi Skeleton */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="p-6">
+            <div className="h-6 bg-gray-200 rounded animate-pulse w-40 mb-4" />
+            <div className="overflow-x-auto">
+              {/* Table skeleton */}
+              <table className="min-w-full table-auto border-collapse border-0">
+                <thead>
+                  <tr className="bg-gray-50">
+                    {[...Array(6)].map((_, index) => (
+                      <th key={index} className="px-4 py-2 border-0">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-20" />
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...Array(3)].map((_, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {[...Array(6)].map((_, colIndex) => (
+                        <td key={colIndex} className="px-4 py-3 border-0">
+                          <div className="h-4 bg-gray-200 rounded animate-pulse w-24" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {/* Pagination skeleton */}
+              <div className="pt-4 flex justify-end gap-2">
+                <div className="h-8 bg-gray-200 rounded animate-pulse w-16" />
+                <div className="h-8 bg-gray-200 rounded animate-pulse w-32" />
+                <div className="h-8 bg-gray-200 rounded animate-pulse w-16" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

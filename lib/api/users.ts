@@ -83,3 +83,8 @@ export async function deleteUser(id: number): Promise<ApiResponse<void>> {
 export async function getUserTotalSpent(userId: number): Promise<ApiResponse<number>> {
   return apiGet<number>(`/users/${userId}/order-items/total-spent`);
 }
+
+// Check if user has purchased a specific order item
+export async function checkPurchased(userId: number, orderItemId: number): Promise<ApiResponse<boolean>> {
+  return apiGet<boolean>(`/users/${userId}/order-items/${orderItemId}/check-purchased`);
+}

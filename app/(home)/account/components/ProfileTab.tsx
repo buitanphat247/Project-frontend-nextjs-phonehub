@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button, Input, DatePicker, ConfigProvider } from 'antd';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/vi';
 import locale from 'antd/locale/vi_VN';
@@ -141,7 +141,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userInfo, onUpdateSuccess }) =>
 
       // Check if there are any changes
       if (Object.keys(updateData).length === 0) {
-        toast.info("Không có thay đổi nào để cập nhật");
+        toast("Không có thay đổi nào để cập nhật", { icon: 'ℹ️' });
         return;
       }
 

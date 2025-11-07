@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, Button, message } from 'antd';
+import { Modal, Form, Input, Button } from 'antd';
 import { LockOutlined } from '@ant-design/icons';
+import toast from 'react-hot-toast';
 import { ChangePasswordForm } from '../interface/IAccount';
 
 interface ChangePasswordModalProps {
@@ -16,11 +17,11 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, onClo
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      message.success('Mật khẩu đã được cập nhật thành công!');
+      toast.success('Mật khẩu đã được cập nhật thành công!');
       onSuccess();
       form.resetFields();
     } catch (error) {
-      message.error('Có lỗi xảy ra, vui lòng thử lại!');
+      toast.error('Có lỗi xảy ra, vui lòng thử lại!');
     }
   };
 
