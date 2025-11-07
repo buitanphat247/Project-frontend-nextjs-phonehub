@@ -10,7 +10,7 @@ const getApiBaseUrl = (): string => {
   // Check if we're on client-side
   if (typeof window !== 'undefined') {
     // Use Next.js proxy to avoid CORS in development
-    return '/api/proxy';
+    return '/api/v1';
   }
   // Server-side can use direct URL
   const baseUrl = API_CONFIG.BASE_URL.endsWith('/') 
