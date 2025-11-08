@@ -5,12 +5,12 @@ import { NextRequest, NextResponse } from "next/server";
 // In production: set NEXT_PUBLIC_API_BASE_URL or API_BASE_URL environment variable
 const getApiBaseUrl = (): string => {
   // Ưu tiên API_BASE_URL (server-side only), sau đó NEXT_PUBLIC_API_BASE_URL
-  // if (process.env.API_BASE_URL) {
-  //   return process.env.API_BASE_URL;
-  // }
-  // if (process.env.NEXT_PUBLIC_API_BASE_URL) {
-  //   return process.env.NEXT_PUBLIC_API_BASE_URL;
-  // }
+  if (process.env.API_BASE_URL) {
+    return process.env.API_BASE_URL;
+  }
+  if (process.env.NEXT_PUBLIC_API_BASE_URL) {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  }
   // Development: sử dụng localhost:8080
   return "http://localhost:8080/api/v1";
 };
