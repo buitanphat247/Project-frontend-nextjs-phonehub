@@ -1,0 +1,27 @@
+{
+  "name": "PhoneHub - Mua sắm điện thoại trực tuyến",
+  "short_name": "PhoneHub",
+  "description": "Nền tảng mua sắm điện thoại thông minh, laptop, tablet và phụ kiện công nghệ chính hãng",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1890ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["shopping", "technology", "ecommerce"],
+  "lang": "vi-VN",
+  "dir": "ltr"
+}
+
