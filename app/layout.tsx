@@ -5,6 +5,21 @@ import { ConfigProvider, App } from 'antd';
 import { Toaster } from 'react-hot-toast';
 import { metadata } from "./metadata";
 
+// Helper function để lấy base URL (giống như trong metadata.ts)
+function getBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  // Trong production/deployment, luôn sử dụng phonehub.vn
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://phonehub.vn';
+  }
+  const port = process.env.PORT || '3000';
+  return `http://localhost:${port}`;
+}
+
+const baseUrl = getBaseUrl();
+
 // Cấu hình font - tắt preload để tránh lỗi download trong Docker
 const inter = Inter({ 
   subsets: ["latin"],
@@ -22,9 +37,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="vi">
       <head>
         <meta name="theme-color" content="#ffffff" />
-        <link rel="icon" href="/favicon.ico" />
-        {/* Logo cho SEO */}
-        <link rel="logo" href="/logo.png" type="image/png" />
+        {/* Explicit favicon links - ưu tiên /icon từ app/icon.tsx */}
+        {/* Thêm query string để bypass browser cache */}
+        <link rel="icon" href="/icon?v=2" type="image/png" sizes="512x512" />
+        <link rel="shortcut icon" href="/icon?v=2" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-icon?v=2" sizes="180x180" />
+        {/* Explicit Open Graph meta tags để đảm bảo ảnh được nhận diện */}
+        <meta property="og:image" content={`${baseUrl}/icon`} />
+        <meta property="og:image:width" content="512" />
+        <meta property="og:image:height" content="512" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:alt" content="Logo PhoneHub - Mua sắm điện thoại trực tuyến" />
+        {/* Twitter Card */}
+        <meta name="twitter:image" content={`${baseUrl}/icon`} />
         {/* Font Awesome CDN */}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
         {/* Structured Data cho SEO */}
@@ -36,9 +61,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@type": "Store",
               name: "PhoneHub",
               description: "Nền tảng mua sắm điện thoại thông minh, laptop, tablet và phụ kiện công nghệ chính hãng",
-              url: "https://phonehub.vn",
-              logo: "https://phonehub.vn/logo.png",
-              image: "https://phonehub.vn/banner.jpg",
+              url: baseUrl,
+              logo: `${baseUrl}/icon`,
+              image: `${baseUrl}/icon`,
               priceRange: "$$",
               address: {
                 "@type": "PostalAddress",
@@ -49,7 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               ],
               potentialAction: {
                 "@type": "SearchAction",
-                target: "https://phonehub.vn/search?q={search_term_string}",
+                target: `${baseUrl}/search?q={search_term_string}`,
                 "query-input": "required name=search_term_string",
               },
             }),

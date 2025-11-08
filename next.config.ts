@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/webp'],
     minimumCacheTTL: 31536000, // cache ảnh 1 năm
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'phonehub.vn',
+        pathname: '/**',
+      },
+    ],
+    unoptimized: false,
   },
 
   // Experimental features đã được loại bỏ để tránh lỗi serialize

@@ -41,7 +41,7 @@ export function SEOImage({
 export function Logo({ className, priority = true }: { className?: string; priority?: boolean }) {
   return (
     <SEOImage
-      src="/logo.png"
+      src="/icon.png"
       alt="Logo PhoneHub - Mua sắm điện thoại, laptop, tablet và phụ kiện công nghệ trực tuyến"
       width={512}
       height={512}
