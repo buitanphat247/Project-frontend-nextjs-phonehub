@@ -23,18 +23,8 @@ const nextConfig: NextConfig = {
     optimizeCss: true,
   },
 
-  // Webpack config để tăng tốc rebuild trong dev mode
-  webpack: (config, { dev, isServer }) => {
-    if (dev) {
-      // Tối ưu watch options cho rebuild nhanh hơn
-      config.watchOptions = {
-        poll: 1000,
-        aggregateTimeout: 300,
-        ignored: ['**/node_modules', '**/.git', '**/.next'],
-      };
-    }
-    return config;
-  },
+  // Webpack config đã được loại bỏ để tránh lỗi serialize trong production build
+  // Next.js tự động tối ưu webpack config trong production
 
   // Cache headers cho static assets và API routes
   async headers() {
