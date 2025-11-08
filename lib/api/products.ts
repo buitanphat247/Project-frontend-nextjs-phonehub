@@ -1,6 +1,5 @@
 import { ApiResponse, PaginatedResponse } from './config';
 import { apiGet } from '../utils/apiClient';
-import { CACHE_CONFIG } from '../utils/cache';
 
 // Category interface for nested category in product
 export interface ProductCategoryResponse {
@@ -71,11 +70,7 @@ export async function getProducts(page: number = 0, size: number = 10): Promise<
     size: size.toString(),
   });
 
-  return apiGet<PaginatedResponse<ProductResponse>>(`/products?${queryParams}`, {
-    useCache: true,
-    cacheTTL: CACHE_CONFIG.PRODUCTS_TTL,
-    cacheTags: ['products'],
-  });
+  return apiGet<PaginatedResponse<ProductResponse>>(`/products?${queryParams}`);
 }
 
 // Search products by name with pagination (optional categoryId for more accurate filtering)
@@ -101,11 +96,7 @@ export async function searchProducts(
 
 // Get product by ID
 export async function getProductById(id: number): Promise<ApiResponse<ProductResponse>> {
-  return apiGet<ProductResponse>(`/products/${id}`, {
-    useCache: true,
-    cacheTTL: CACHE_CONFIG.PRODUCTS_TTL,
-    cacheTags: ['products', `product-${id}`],
-  });
+  return apiGet<ProductResponse>(`/products/${id}`);
 }
 
 // Get published products by category ID with pagination
@@ -119,11 +110,7 @@ export async function getProductsByCategory(
     size: size.toString(),
   });
 
-  return apiGet<PaginatedResponse<ProductResponse>>(`/products/published/category/${categoryId}?${queryParams}`, {
-    useCache: true,
-    cacheTTL: CACHE_CONFIG.PRODUCTS_TTL,
-    cacheTags: ['products', `category-${categoryId}`],
-  });
+  return apiGet<PaginatedResponse<ProductResponse>>(`/products/published/category/${categoryId}?${queryParams}`);
 }
 
 // Get published products by brand with pagination (optional categoryId for more precise filtering)
@@ -149,10 +136,6 @@ export async function getProductsByBrand(
 
 // Get brands by category ID
 export async function getBrandsByCategory(categoryId: number): Promise<ApiResponse<string[]>> {
-  return apiGet<string[]>(`/products/brands/category/${categoryId}`, {
-    useCache: true,
-    cacheTTL: CACHE_CONFIG.CATEGORIES_TTL,
-    cacheTags: ['brands', `category-${categoryId}`],
-  });
+  return apiGet<string[]>(`/products/brands/category/${categoryId}`);
 }
 
