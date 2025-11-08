@@ -4,6 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 // In Docker, this should be set to backend URL (e.g., host.docker.internal:8080)
 const API_BASE_URL = "http://163.61.182.56:8080/api/v1";
 
+// Cache configuration
+export const revalidate = 300; // Cache 5 phút cho GET requests
+
 export async function GET(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const params = await context.params;
   return handleRequest(request, params, "GET");
@@ -93,13 +96,22 @@ async function handleRequest(request: NextRequest, params: { path: string[] }, m
     // Make request to backend
     let response: Response;
     try {
-      response = await fetch(fullUrl, {
+      // Cache configuration cho GET requests
+      const fetchOptions: RequestInit & { next?: { revalidate: number } } = {
         method,
         headers,
         body,
-        // Add timeout for connection
         signal: AbortSignal.timeout(10000), // 10 seconds timeout
-      });
+      };
+
+      // Chỉ cache GET requests
+      if (method === "GET") {
+        fetchOptions.next = {
+          revalidate: 300, // Cache 5 phút
+        };
+      }
+
+      response = await fetch(fullUrl, fetchOptions);
 
       // Log response status
       console.log(`✅ Response status: ${response.status} ${response.statusText}`);
@@ -191,6 +203,18 @@ async function handleRequest(request: NextRequest, params: { path: string[] }, m
     // Ensure Content-Type is set
     if (!responseHeaders.has("Content-Type")) {
       responseHeaders.set("Content-Type", "application/json");
+    }
+
+    // Thêm cache headers cho GET requests
+    if (method === "GET" && response.status === 200) {
+      // Cache 5 phút, stale-while-revalidate 10 phút
+      responseHeaders.set(
+        "Cache-Control",
+        "public, s-maxage=300, stale-while-revalidate=600, max-age=60"
+      );
+    } else {
+      // Không cache cho POST/PUT/DELETE hoặc error responses
+      responseHeaders.set("Cache-Control", "no-store, no-cache, must-revalidate");
     }
 
     return NextResponse.json(jsonData, {
