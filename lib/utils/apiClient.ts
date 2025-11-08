@@ -1,5 +1,6 @@
 import { buildApiUrl, ApiResponse } from '../api/config'
 import { getToken, getAuthData, saveAuthData } from './cookie'
+import { generateCacheKey, getCachedData, CACHE_CONFIG } from './cache'
 
 /**
  * Custom fetch wrapper that:
@@ -78,10 +79,40 @@ export async function apiClient<T>(
 }
 
 /**
- * Wrapper for GET requests
+ * Wrapper for GET requests with caching
  * Handles token refresh automatically on JWT expiration
  */
-export async function apiGet<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+export async function apiGet<T>(
+  endpoint: string, 
+  options?: RequestInit & { 
+    cache?: boolean;
+    cacheTTL?: number;
+    cacheTags?: string[];
+  }
+): Promise<ApiResponse<T>> {
+  const { cache = true, cacheTTL, cacheTags, ...fetchOptions } = options || {};
+
+  // Nếu không cache, gọi trực tiếp
+  if (!cache) {
+    return apiGetWithoutCache<T>(endpoint, fetchOptions);
+  }
+
+  // Tạo cache key từ endpoint (endpoint đã bao gồm query params)
+  const cacheKey = generateCacheKey(endpoint);
+
+  // Sử dụng cache
+  return getCachedData<ApiResponse<T>>(
+    cacheKey,
+    () => apiGetWithoutCache<T>(endpoint, fetchOptions),
+    cacheTTL || CACHE_CONFIG.DEFAULT_TTL,
+    cacheTags
+  );
+}
+
+/**
+ * GET request without cache (internal use)
+ */
+async function apiGetWithoutCache<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
   try {
     const response = await apiClient(endpoint, {
       ...options,
