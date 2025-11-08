@@ -22,7 +22,7 @@ export default async function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "white",np
+          color: "white",
           fontWeight: "bold",
           fontFamily: "system-ui, -apple-system, sans-serif",
           borderRadius: "100%",
