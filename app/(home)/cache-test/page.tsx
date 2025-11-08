@@ -39,7 +39,7 @@ const CacheTestPage = () => {
     });
     const start = performance.now();
     await apiGet(`/products/published/category/${categoryId}?${queryParams}`, {
-      cache: false,
+      useCache: false,
     });
     return performance.now() - start;
   };

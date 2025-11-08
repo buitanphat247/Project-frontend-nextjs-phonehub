@@ -72,7 +72,7 @@ export async function getProducts(page: number = 0, size: number = 10): Promise<
   });
 
   return apiGet<PaginatedResponse<ProductResponse>>(`/products?${queryParams}`, {
-    cache: true,
+    useCache: true,
     cacheTTL: CACHE_CONFIG.PRODUCTS_TTL,
     cacheTags: ['products'],
   });
@@ -102,7 +102,7 @@ export async function searchProducts(
 // Get product by ID
 export async function getProductById(id: number): Promise<ApiResponse<ProductResponse>> {
   return apiGet<ProductResponse>(`/products/${id}`, {
-    cache: true,
+    useCache: true,
     cacheTTL: CACHE_CONFIG.PRODUCTS_TTL,
     cacheTags: ['products', `product-${id}`],
   });
@@ -120,7 +120,7 @@ export async function getProductsByCategory(
   });
 
   return apiGet<PaginatedResponse<ProductResponse>>(`/products/published/category/${categoryId}?${queryParams}`, {
-    cache: true,
+    useCache: true,
     cacheTTL: CACHE_CONFIG.PRODUCTS_TTL,
     cacheTags: ['products', `category-${categoryId}`],
   });
@@ -150,7 +150,7 @@ export async function getProductsByBrand(
 // Get brands by category ID
 export async function getBrandsByCategory(categoryId: number): Promise<ApiResponse<string[]>> {
   return apiGet<string[]>(`/products/brands/category/${categoryId}`, {
-    cache: true,
+    useCache: true,
     cacheTTL: CACHE_CONFIG.CATEGORIES_TTL,
     cacheTags: ['brands', `category-${categoryId}`],
   });

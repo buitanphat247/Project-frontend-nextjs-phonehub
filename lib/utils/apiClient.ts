@@ -79,21 +79,26 @@ export async function apiClient<T>(
 }
 
 /**
+ * Options cho apiGet với cache support
+ */
+export interface ApiGetOptions extends Omit<RequestInit, 'method'> {
+  useCache?: boolean;
+  cacheTTL?: number;
+  cacheTags?: string[];
+}
+
+/**
  * Wrapper for GET requests with caching
  * Handles token refresh automatically on JWT expiration
  */
 export async function apiGet<T>(
   endpoint: string, 
-  options?: RequestInit & { 
-    cache?: boolean;
-    cacheTTL?: number;
-    cacheTags?: string[];
-  }
+  options?: ApiGetOptions
 ): Promise<ApiResponse<T>> {
-  const { cache = true, cacheTTL, cacheTags, ...fetchOptions } = options || {};
+  const { useCache = true, cacheTTL, cacheTags, ...fetchOptions } = options || {};
 
   // Nếu không cache, gọi trực tiếp
-  if (!cache) {
+  if (!useCache) {
     return apiGetWithoutCache<T>(endpoint, fetchOptions);
   }
 
