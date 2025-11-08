@@ -1,11 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// For server-side proxy, use NEXT_PUBLIC_API_BASE_URL or fallback to localhost
-// In Docker, this should be set to backend URL (e.g., host.docker.internal:8080)
-const API_BASE_URL = "http://163.61.182.56:8080/api/v1";
+// For server-side proxy, use environment variable or fallback to localhost:8080
+// In development: use localhost:8080
+// In production: set NEXT_PUBLIC_API_BASE_URL or API_BASE_URL environment variable
+const getApiBaseUrl = (): string => {
+  // Ưu tiên API_BASE_URL (server-side only), sau đó NEXT_PUBLIC_API_BASE_URL
+  // if (process.env.API_BASE_URL) {
+  //   return process.env.API_BASE_URL;
+  // }
+  // if (process.env.NEXT_PUBLIC_API_BASE_URL) {
+  //   return process.env.NEXT_PUBLIC_API_BASE_URL;
+  // }
+  // Development: sử dụng localhost:8080
+  return "http://localhost:8080/api/v1";
+};
 
-// Cache configuration
-export const revalidate = 300; // Cache 5 phút cho GET requests
+const API_BASE_URL = getApiBaseUrl();
+
+// Disable cache để luôn fetch data mới nhất
+export const revalidate = 0; // Không cache
+export const dynamic = 'force-dynamic'; // Force dynamic rendering
 
 export async function GET(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const params = await context.params;
@@ -96,20 +110,14 @@ async function handleRequest(request: NextRequest, params: { path: string[] }, m
     // Make request to backend
     let response: Response;
     try {
-      // Cache configuration cho GET requests
-      const fetchOptions: RequestInit & { next?: { revalidate: number } } = {
+      // Không cache - luôn fetch data mới nhất
+      const fetchOptions: RequestInit = {
         method,
         headers,
         body,
         signal: AbortSignal.timeout(10000), // 10 seconds timeout
+        cache: 'no-store', // Disable cache
       };
-
-      // Chỉ cache GET requests
-      if (method === "GET") {
-        fetchOptions.next = {
-          revalidate: 300, // Cache 5 phút
-        };
-      }
 
       response = await fetch(fullUrl, fetchOptions);
 
@@ -205,17 +213,13 @@ async function handleRequest(request: NextRequest, params: { path: string[] }, m
       responseHeaders.set("Content-Type", "application/json");
     }
 
-    // Thêm cache headers cho GET requests
-    if (method === "GET" && response.status === 200) {
-      // Cache 5 phút, stale-while-revalidate 10 phút
-      responseHeaders.set(
-        "Cache-Control",
-        "public, s-maxage=300, stale-while-revalidate=600, max-age=60"
-      );
-    } else {
-      // Không cache cho POST/PUT/DELETE hoặc error responses
-      responseHeaders.set("Cache-Control", "no-store, no-cache, must-revalidate");
-    }
+    // Disable cache - luôn trả về data mới nhất
+    responseHeaders.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+    );
+    responseHeaders.set("Pragma", "no-cache");
+    responseHeaders.set("Expires", "0");
 
     return NextResponse.json(jsonData, {
       status: response.status,

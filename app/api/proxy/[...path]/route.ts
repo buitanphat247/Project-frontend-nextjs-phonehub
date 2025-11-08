@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// For server-side proxy, use NEXT_PUBLIC_API_BASE_URL or fallback to localhost
-// In Docker, this should be set to backend URL (e.g., host.docker.internal:8080)
-const API_BASE_URL = "http://163.61.182.56:8080/api/v1";
+// For server-side proxy, use environment variable or fallback to localhost:8080
+// In development: use localhost:8080
+// In production: set NEXT_PUBLIC_API_BASE_URL or API_BASE_URL environment variable
+const getApiBaseUrl = (): string => {
+  // Ưu tiên API_BASE_URL (server-side only), sau đó NEXT_PUBLIC_API_BASE_URL
+  // if (process.env.API_BASE_URL) {
+  //   return process.env.API_BASE_URL;
+  // }
+  // if (process.env.NEXT_PUBLIC_API_BASE_URL) {
+  //   return process.env.NEXT_PUBLIC_API_BASE_URL;
+  // }
+  // Development: sử dụng localhost:8080
+  return "http://localhost:8080/api/v1";
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export async function GET(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const params = await context.params;
