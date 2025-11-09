@@ -1,6 +1,18 @@
 import { MetadataRoute } from 'next';
 
+function getBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://phonehub.vn';
+  }
+  return 'https://phonehub.vn'; // Default to production URL for sitemap
+}
+
 export default function robots(): MetadataRoute.Robots {
+  const baseUrl = getBaseUrl();
+  
   return {
     rules: [
       {
@@ -28,7 +40,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: 'https://phonehub.vn/sitemap.xml',
+    sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
 

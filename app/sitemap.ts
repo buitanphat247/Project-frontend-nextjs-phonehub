@@ -1,7 +1,17 @@
 import { MetadataRoute } from 'next';
 
+function getBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://phonehub.vn';
+  }
+  return 'https://phonehub.vn'; // Default to production URL for sitemap
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://phonehub.vn';
+  const baseUrl = getBaseUrl();
   
   // Các trang tĩnh chính
   const staticPages = [
@@ -10,6 +20,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'daily' as const,
       priority: 1.0,
+      alternates: {
+        languages: {
+          'vi-VN': baseUrl,
+        },
+      },
     },
     {
       url: `${baseUrl}/about`,

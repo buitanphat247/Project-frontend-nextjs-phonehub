@@ -3,6 +3,7 @@ import "./globals.css";
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider, App } from 'antd';
 import { Toaster } from 'react-hot-toast';
+import { Analytics } from "@vercel/analytics/next";
 import { metadata } from "./metadata";
 
 // Helper function để lấy base URL (giống như trong metadata.ts)
@@ -37,6 +38,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="vi">
       <head>
         <meta name="theme-color" content="#1890ff" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+        <meta name="language" content="Vietnamese" />
+        <meta name="geo.region" content="VN" />
+        <meta name="geo.placename" content="Vietnam" />
+        <meta httpEquiv="content-language" content="vi-VN" />
         {/* Favicon cho browser tab - sử dụng logo.png từ public/logo.png */}
         <link rel="icon" href="/logo.png" type="image/png" sizes="any" />
         <link rel="shortcut icon" href="/logo.png" type="image/png" />
@@ -46,17 +52,49 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Favicon cho các kích thước khác nhau */}
         <link rel="icon" type="image/png" sizes="32x32" href="/logo.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/logo.png" />
-        {/* Explicit Open Graph meta tags để đảm bảo ảnh được nhận diện */}
-        <meta property="og:image" content={`${baseUrl}/logo.png`} />
-        <meta property="og:image:width" content="512" />
-        <meta property="og:image:height" content="512" />
-        <meta property="og:image:type" content="image/png" />
-        <meta property="og:image:alt" content="Logo PhoneHub - Mua sắm điện thoại trực tuyến" />
+        {/* Explicit Open Graph meta tags để đảm bảo banner được nhận diện */}
+        <meta property="og:image" content={`${baseUrl}/banner.jpg`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:alt" content="PhoneHub - Banner khuyến mãi mua sắm điện thoại, laptop, tablet và phụ kiện công nghệ" />
         {/* Twitter Card */}
-        <meta name="twitter:image" content={`${baseUrl}/logo.png`} />
+        <meta name="twitter:image" content={`${baseUrl}/banner.jpg`} />
         {/* Font Awesome CDN */}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-        {/* Structured Data cho SEO */}
+        {/* Structured Data cho SEO - Organization */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "PhoneHub",
+              legalName: "PhoneHub",
+              url: baseUrl,
+              logo: `${baseUrl}/logo.png`,
+              image: `${baseUrl}/banner.jpg`,
+              description: "Nền tảng mua sắm điện thoại thông minh, laptop, tablet và phụ kiện công nghệ chính hãng. Giao hàng nhanh, bảo hành uy tín, giá tốt nhất thị trường.",
+              address: {
+                "@type": "PostalAddress",
+                addressCountry: "VN",
+                addressLocality: "Vietnam",
+              },
+              contactPoint: {
+                "@type": "ContactPoint",
+                contactType: "Customer Service",
+                availableLanguage: ["Vietnamese"],
+              },
+              sameAs: [
+                // Thêm các mạng xã hội khi có
+                // "https://www.facebook.com/phonehub",
+                // "https://twitter.com/phonehub",
+                // "https://www.linkedin.com/company/phonehub",
+              ],
+            }),
+          }}
+        />
+        {/* Structured Data - Store */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -67,15 +105,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               description: "Nền tảng mua sắm điện thoại thông minh, laptop, tablet và phụ kiện công nghệ chính hãng",
               url: baseUrl,
               logo: `${baseUrl}/logo.png`,
-              image: `${baseUrl}/logo.png`,
+              image: `${baseUrl}/banner.jpg`,
               priceRange: "$$",
               address: {
                 "@type": "PostalAddress",
                 addressCountry: "VN",
               },
-              sameAs: [
-                // Thêm các mạng xã hội nếu có
-              ],
+              potentialAction: {
+                "@type": "SearchAction",
+                target: `${baseUrl}/search?q={search_term_string}`,
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
+        {/* Structured Data - WebSite */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "PhoneHub",
+              url: baseUrl,
               potentialAction: {
                 "@type": "SearchAction",
                 target: `${baseUrl}/search?q={search_term_string}`,
@@ -115,6 +167,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   },
                 }}
               />
+              <Analytics />
             </App>
           </ConfigProvider>
         </AntdRegistry>

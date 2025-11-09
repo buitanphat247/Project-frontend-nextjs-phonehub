@@ -68,18 +68,18 @@ export const metadata: Metadata = {
       "Nền tảng mua sắm điện thoại thông minh, laptop, tablet và phụ kiện công nghệ chính hãng. Giao hàng nhanh, bảo hành uy tín, giá tốt nhất thị trường.",
     images: [
       {
-        url: `${baseUrl}/logo.png`, // Logo chính từ public/logo.png
-        width: 512,
-        height: 512,
-        alt: "Logo PhoneHub - Mua sắm điện thoại trực tuyến",
-        type: "image/png",
-      },
-      {
-        url: `${baseUrl}/banner.jpg`, // Banner từ public/banner.jpg
+        url: `${baseUrl}/banner.jpg`, // Banner chính - đặt đầu tiên để hiển thị trong Open Graph
         width: 1200,
         height: 630,
         alt: "PhoneHub - Banner khuyến mãi mua sắm điện thoại, laptop, tablet và phụ kiện công nghệ",
         type: "image/jpeg",
+      },
+      {
+        url: `${baseUrl}/logo.png`, // Logo phụ từ public/logo.png
+        width: 512,
+        height: 512,
+        alt: "Logo PhoneHub - Mua sắm điện thoại trực tuyến",
+        type: "image/png",
       },
     ],
   },
@@ -87,7 +87,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "PhoneHub - Mua sắm điện thoại, laptop, tablet trực tuyến",
     description: "Nền tảng mua sắm điện thoại thông minh, laptop, tablet và phụ kiện công nghệ chính hãng.",
-    images: [`${baseUrl}/logo.png`], // Logo chính từ public/logo.png
+    images: [`${baseUrl}/banner.jpg`], // Banner từ public/banner.jpg
     creator: "@phonehub",
   },
   icons: {
@@ -108,6 +108,12 @@ export const metadata: Metadata = {
     google: "your-google-verification-code", // Thay bằng Google Search Console verification code
     // yandex: 'your-yandex-verification-code',
     // yahoo: 'your-yahoo-verification-code',
+  },
+  other: {
+    "geo.region": "VN",
+    "geo.placename": "Vietnam",
+    "geo.position": "10.8231;106.6297",
+    "ICBM": "10.8231, 106.6297",
   },
   metadataBase: new URL(baseUrl),
   applicationName: "PhoneHub",
