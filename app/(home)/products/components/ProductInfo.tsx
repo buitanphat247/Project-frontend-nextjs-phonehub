@@ -231,7 +231,7 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-500 uppercase tracking-wide">{product.brand}</span>
           {product.quantity !== undefined && (
-            <span className={`text-sm font-medium ${product.quantity > 0 ? "text-green-600" : "text-red-600"}`}>
+            <span className={`text-sm font-medium ${product.quantity > 0 ? "text-green-700" : "text-red-600"}`}>
               (Còn {product.quantity.toLocaleString("vi-VN")} sản phẩm)
             </span>
           )}
@@ -256,7 +256,7 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
       {/* Price */}
       <div className="space-y-2">
         <div className="flex items-center space-x-4">
-          <span className="text-3xl font-bold text-blue-600">{formatPrice(product.price)}</span>
+          <span className="text-3xl font-bold text-blue-700">{formatPrice(product.price)}</span>
           {product.originalPrice > product.price && <span className="text-xl text-gray-500 line-through">{formatPrice(product.originalPrice)}</span>}
         </div>
         {product.discountPercent > 0 && (

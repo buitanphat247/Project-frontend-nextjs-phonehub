@@ -27,7 +27,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-bold text-blue-600 text-lg">{order.total.toLocaleString("vi-VN")}đ</p>
+                <p className="font-bold text-blue-700 text-lg">{order.total.toLocaleString("vi-VN")}đ</p>
                 <span
                   className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                     order.status === "Đã giao"

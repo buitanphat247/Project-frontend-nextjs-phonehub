@@ -361,7 +361,7 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-gray-900 truncate">{product.name}</h4>
                         <p className="text-sm text-gray-500">{product.brand}</p>
-                        <p className="text-base font-semibold text-blue-600 mt-1">
+                        <p className="text-base font-semibold text-blue-700 mt-1">
                           {formatPrice(product.price)}
                         </p>
                       </div>
@@ -384,7 +384,7 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
           {/* Search Icon (Mobile) */}
           <button 
             onClick={() => setIsSearchOpen(!isSearchOpen)}
-            className="md:hidden p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="md:hidden p-2 text-gray-600 hover:text-blue-700 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <SearchOutlined className="text-xl" />
           </button>
@@ -397,7 +397,7 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
               trigger={['click']}
             >
               <button
-                className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-blue-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                 title={`Xin chào, ${userData.username}`}
               >
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
@@ -412,7 +412,7 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
           {authenticated && (
             <button
               onClick={onCartClick}
-              className="relative cursor-pointer p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
+              className="relative cursor-pointer p-2 text-gray-600 hover:text-blue-700 hover:bg-gray-100 rounded-lg transition-colors"
               title="Giỏ hàng"
               aria-label={`Giỏ hàng có ${totalItems} sản phẩm`}
             >
@@ -499,7 +499,7 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-gray-900 truncate">{product.name}</h4>
                         <p className="text-sm text-gray-500">{product.brand}</p>
-                        <p className="text-base font-semibold text-blue-600 mt-1">
+                        <p className="text-base font-semibold text-blue-700 mt-1">
                           {formatPrice(product.price)}
                         </p>
                       </div>

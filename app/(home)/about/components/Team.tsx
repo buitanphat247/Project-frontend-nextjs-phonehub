@@ -90,7 +90,7 @@ const Team = () => {
                   />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-1">{member.name}</h3>
-                <p className="text-blue-600 font-semibold mb-3 text-sm">{member.position}</p>
+                <p className="text-blue-700 font-semibold mb-3 text-sm">{member.position}</p>
                 <p className="text-gray-600 text-xs mb-6 leading-relaxed">{member.description}</p>
                 
                 <div className="flex justify-center space-x-3">

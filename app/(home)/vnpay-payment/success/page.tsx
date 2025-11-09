@@ -103,7 +103,7 @@ export default function VnpaySuccessPage() {
         <div className="mx-auto bg-white/80 backdrop-blur rounded-2xl border border-green-200 shadow-sm p-10 text-center">
           <div className="mx-auto mb-6 flex items-center justify-center">
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-              <svg width="28" height="28" viewBox="0 0 24 24" className="text-green-600"><path fill="currentColor" d="M12 22q-2.075 0-3.9-.788t-3.2-2.125t-2.125-3.2T2 12t.788-3.9t2.125-3.2t3.2-2.125T12 2t3.9.788t3.2 2.125t2.125 3.2T22 12t-.788 3.9t-2.125 3.2t-3.2 2.125T12 22m-1.1-6.1l6.175-6.175l-1.4-1.4L10.9 13.1l-2.6-2.6l-1.4 1.4z"/></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" className="text-green-700"><path fill="currentColor" d="M12 22q-2.075 0-3.9-.788t-3.2-2.125t-2.125-3.2T2 12t.788-3.9t2.125-3.2t3.2-2.125T12 2t3.9.788t3.2 2.125t2.125 3.2T22 12t-.788 3.9t-2.125 3.2t-3.2 2.125T12 22m-1.1-6.1l6.175-6.175l-1.4-1.4L10.9 13.1l-2.6-2.6l-1.4 1.4z"/></svg>
             </div>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900 mb-2">Cảm ơn bạn đã thanh toán</h1>

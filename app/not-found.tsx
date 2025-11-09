@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { HomeOutlined, ShoppingOutlined, CustomerServiceOutlined, FileSearchOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
@@ -9,7 +11,7 @@ export default function NotFound() {
         {/* 404 Icon */}
         <div className="mb-8">
           <div className="w-32 h-32 mx-auto bg-blue-100 rounded-full flex items-center justify-center shadow-lg">
-            <FileSearchOutlined className="text-6xl text-blue-600" />
+            <FileSearchOutlined className="text-6xl text-blue-700" />
           </div>
         </div>
 
@@ -46,7 +48,7 @@ export default function NotFound() {
               type="default" 
               size="large"
               icon={<ShoppingOutlined />}
-              className="w-full h-11 text-base border-gray-300 hover:border-blue-600 hover:text-blue-600"
+              className="w-full h-11 text-base border-gray-300 hover:border-blue-700 hover:text-blue-800"
             >
               Xem sản phẩm
             </Button>
@@ -56,7 +58,7 @@ export default function NotFound() {
               type="default" 
               size="large"
               icon={<CustomerServiceOutlined />}
-              className="w-full h-11 text-base border-gray-300 hover:border-blue-600 hover:text-blue-600"
+              className="w-full h-11 text-base border-gray-300 hover:border-blue-700 hover:text-blue-800"
             >
               Liên hệ hỗ trợ
             </Button>

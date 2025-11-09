@@ -48,7 +48,7 @@ export default function LaptopsFilters({ onFilterChange, currentFilters, brands,
         <h3 className="text-lg font-semibold text-gray-900">Bộ lọc</h3>
         <button
           onClick={clearFilters}
-          className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
+          className="text-sm text-blue-700 hover:text-blue-800 cursor-pointer"
         >
           Xóa bộ lọc
         </button>

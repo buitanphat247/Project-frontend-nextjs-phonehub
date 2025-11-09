@@ -57,7 +57,7 @@ const CacheTestPage = () => {
       <div className="container mx-auto px-4 max-w-6xl">
         <Card className="mb-6">
           <h1 className="text-3xl font-bold mb-4 flex items-center">
-            <ThunderboltOutlined className="mr-3 text-blue-600" />
+            <ThunderboltOutlined className="mr-3 text-blue-700" />
             API Performance Test
           </h1>
           <p className="text-gray-600 mb-4">

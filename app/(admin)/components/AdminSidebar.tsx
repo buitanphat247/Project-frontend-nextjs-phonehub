@@ -109,7 +109,7 @@ export default function AdminSidebar({ collapsed, setCollapsed, headerHeight = 6
       }}
     >
       <div className="border-b border-gray-200 py-2 text-center">
-        <h2 className="text-2xl font-bold text-blue-600">{collapsed ? "A" : "Admin"}</h2>
+        <h2 className="text-2xl font-bold text-blue-700">{collapsed ? "A" : "Admin"}</h2>
       </div>
       <Menu theme="light" mode="inline" selectedKeys={[pathname]} items={menuItems} />
     </Sider>

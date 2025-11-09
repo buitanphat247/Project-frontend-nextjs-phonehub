@@ -42,7 +42,7 @@ const HomePage = () => {
       link: "/phones",
       color: "from-blue-500 to-blue-600",
       bgColor: "bg-blue-50",
-      iconColor: "text-blue-600",
+      iconColor: "text-blue-700",
     },
     {
       name: "Laptop",
@@ -50,7 +50,7 @@ const HomePage = () => {
       link: "/laptops",
       color: "from-green-500 to-green-600",
       bgColor: "bg-green-50",
-      iconColor: "text-green-600",
+      iconColor: "text-green-700",
     },
     {
       name: "iPad",
@@ -58,7 +58,7 @@ const HomePage = () => {
       link: "/ipads",
       color: "from-purple-500 to-purple-600",
       bgColor: "bg-purple-50",
-      iconColor: "text-purple-600",
+      iconColor: "text-purple-700",
     },
     {
       name: "Đồng hồ thông minh",
@@ -66,7 +66,7 @@ const HomePage = () => {
       link: "/smartwatches",
       color: "from-orange-500 to-orange-600",
       bgColor: "bg-orange-50",
-      iconColor: "text-orange-600",
+      iconColor: "text-orange-700",
     },
   ];
 
@@ -125,7 +125,7 @@ const HomePage = () => {
               </Button>
               <Button
                 size="large"
-                className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 h-auto cursor-pointer"
+                className="border-white text-white hover:bg-white hover:text-blue-700 px-8 py-4 h-auto cursor-pointer"
                 onClick={handleFavoriteClick}
               >
                 <HeartOutlined className="mr-2" />
@@ -177,10 +177,10 @@ const HomePage = () => {
           <div className="mb-16">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-2xl font-bold text-gray-900 flex items-center">
-                <PhoneOutlined className="mr-3 text-blue-600" />
+                <PhoneOutlined className="mr-3 text-blue-700" />
                 Điện thoại
               </h3>
-              <Link href="/phones" className="text-blue-600 hover:text-blue-700 font-medium">
+              <Link href="/phones" className="text-blue-700 hover:text-blue-800 font-medium">
                 Xem tất cả →
               </Link>
             </div>
@@ -203,10 +203,10 @@ const HomePage = () => {
           <div className="mb-16">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-2xl font-bold text-gray-900 flex items-center">
-                <LaptopOutlined className="mr-3 text-green-600" />
+                <LaptopOutlined className="mr-3 text-green-700" />
                 Laptop
               </h3>
-              <Link href="/laptops" className="text-green-600 hover:text-green-700 font-medium">
+              <Link href="/laptops" className="text-green-700 hover:text-green-800 font-medium">
                 Xem tất cả →
               </Link>
             </div>
@@ -229,10 +229,10 @@ const HomePage = () => {
           <div className="mb-16">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-2xl font-bold text-gray-900 flex items-center">
-                <TabletOutlined className="mr-3 text-purple-600" />
+                <TabletOutlined className="mr-3 text-purple-700" />
                 iPad & Tablet
               </h3>
-              <Link href="/ipads" className="text-purple-600 hover:text-purple-700 font-medium">
+              <Link href="/ipads" className="text-purple-700 hover:text-purple-800 font-medium">
                 Xem tất cả →
               </Link>
             </div>
@@ -255,10 +255,10 @@ const HomePage = () => {
           <div className="mb-16">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-2xl font-bold text-gray-900 flex items-center">
-                <ClockCircleOutlined className="mr-3 text-purple-600" />
+                <ClockCircleOutlined className="mr-3 text-orange-700" />
                 Đồng hồ thông minh
               </h3>
-              <Link href="/smartwatches" className="text-orange-600 hover:text-orange-700 font-medium">
+              <Link href="/smartwatches" className="text-orange-700 hover:text-orange-800 font-medium">
                 Xem tất cả →
               </Link>
             </div>

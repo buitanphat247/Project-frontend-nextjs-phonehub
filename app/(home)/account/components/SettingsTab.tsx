@@ -13,7 +13,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ onOpenPasswordModal, onOpenEm
       <div className="space-y-6">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <BellOutlined className="mr-2 text-blue-600" />
+            <BellOutlined className="mr-2 text-blue-700" />
             Thông báo
           </h3>
           <div className="space-y-4">
@@ -43,7 +43,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ onOpenPasswordModal, onOpenEm
 
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <LockOutlined className="mr-2 text-green-600" />
+            <LockOutlined className="mr-2 text-green-700" />
             Bảo mật
           </h3>
           <div className="space-y-3">

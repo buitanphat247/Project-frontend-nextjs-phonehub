@@ -9,7 +9,7 @@ const ContactSection = () => {
     {
       icon: <PhoneOutlined className="text-2xl" />,
       iconBg: "bg-blue-100",
-      iconColor: "text-blue-600",
+      iconColor: "text-blue-700",
       title: "Điện thoại",
       content: "1900 1234",
       description: "Hỗ trợ 24/7"
@@ -17,7 +17,7 @@ const ContactSection = () => {
     {
       icon: <MailOutlined className="text-2xl" />,
       iconBg: "bg-green-100",
-      iconColor: "text-green-600",
+      iconColor: "text-green-700",
       title: "Email",
       content: "info@phonehub.vn",
       description: "Phản hồi trong 24h"
@@ -33,7 +33,7 @@ const ContactSection = () => {
     {
       icon: <ClockCircleOutlined className="text-2xl" />,
       iconBg: "bg-purple-100",
-      iconColor: "text-purple-600",
+      iconColor: "text-purple-700",
       title: "Giờ làm việc",
       content: "8:00 - 22:00",
       description: "Tất cả các ngày trong tuần"
@@ -60,7 +60,7 @@ const ContactSection = () => {
                 {info.icon}
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">{info.title}</h3>
-              <p className="text-base font-semibold text-blue-600 mb-2">{info.content}</p>
+              <p className="text-base font-semibold text-blue-700 mb-2">{info.content}</p>
               <p className="text-gray-600 text-sm">{info.description}</p>
             </div>
           ))}
@@ -78,7 +78,7 @@ const ContactSection = () => {
               type="primary"
               size="large"
               icon={<PhoneOutlined />}
-              className="bg-white text-blue-600 hover:bg-gray-100 border-0 font-semibold px-8 py-4 h-auto cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300"
+              className="bg-white text-blue-700 hover:bg-gray-100 border-0 font-semibold px-8 py-4 h-auto cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300"
             >
               Gọi ngay: 1900 1234
             </Button>

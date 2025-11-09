@@ -14,14 +14,14 @@ const Values = () => {
     {
       icon: <i className="fas fa-shield-alt text-3xl"></i>,
       iconBg: "bg-blue-100",
-      iconColor: "text-blue-600",
+      iconColor: "text-blue-700",
       title: "Tin cậy",
       description: "Xây dựng niềm tin thông qua sản phẩm chất lượng và dịch vụ minh bạch, rõ ràng."
     },
     {
       icon: <i className="fas fa-users text-3xl"></i>,
       iconBg: "bg-green-100",
-      iconColor: "text-green-600",
+      iconColor: "text-green-700",
       title: "Đồng đội",
       description: "Làm việc nhóm hiệu quả, hỗ trợ lẫn nhau để mang đến kết quả tốt nhất."
     },

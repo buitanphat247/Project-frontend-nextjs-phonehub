@@ -281,7 +281,7 @@ export default function CartSidebar({
                           
                           {/* Price */}
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-bold text-blue-600">
+                            <span className="text-sm font-bold text-blue-700">
                               {formatPrice(item.priceAtAdd || item.product.price)}
                             </span>
                             {typeof item.product.priceOld === 'number' && item.product.priceOld > (item.priceAtAdd || item.product.price) && (
@@ -306,7 +306,7 @@ export default function CartSidebar({
                              </span>
                              <button 
                                onClick={() => updateQuantity(item.id, (quantities[item.id] || item.quantity) + 1)}
-                               className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center hover:bg-green-100 hover:text-green-600 transition-colors cursor-pointer"
+                               className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center hover:bg-green-100 hover:text-green-700 transition-colors cursor-pointer"
                              >
                                <PlusOutlined className="text-xs" />
                              </button>
@@ -330,7 +330,7 @@ export default function CartSidebar({
                 {/* Total */}
                 <div className="flex justify-between items-center  bg-white rounded-lg">
                   <span className="text-lg font-bold text-gray-900">Tổng cộng:</span>
-                  <span className="text-2xl font-bold text-blue-600">
+                  <span className="text-2xl font-bold text-blue-700">
                     {formatPrice(totalToRender)}
                   </span>
                 </div>
@@ -357,7 +357,7 @@ export default function CartSidebar({
                 
                 {/* Free shipping notice */}
                 <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="flex items-center text-green-600 text-sm">
+                  <div className="flex items-center text-green-700 text-sm">
                     <CarOutlined className="mr-2" />
                     <span>Miễn phí vận chuyển cho đơn hàng từ 500.000 VNĐ</span>
                   </div>

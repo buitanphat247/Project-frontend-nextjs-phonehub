@@ -51,7 +51,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, onClo
     <Modal
       title={
         <div className="flex items-center space-x-2">
-          <LockOutlined className="text-green-600" />
+          <LockOutlined className="text-green-700" />
           <span>Đổi mật khẩu</span>
         </div>
       }

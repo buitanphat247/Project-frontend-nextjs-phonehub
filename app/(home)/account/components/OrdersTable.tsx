@@ -93,7 +93,7 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
             <tr key={o.id} className="hover:bg-gray-50">
               <td className="px-4 py-3 text-sm text-gray-900 font-medium border-0">{o.id}</td>
               <td className="px-4 py-3 text-sm capitalize border-0">
-                <span className={`${o.status === 'success' ? 'text-green-600' : o.status === 'failed' ? 'text-red-600' : 'text-gray-700'}`}>{o.status}</span>
+                <span className={`${o.status === 'success' ? 'text-green-700' : o.status === 'failed' ? 'text-red-600' : 'text-gray-700'}`}>{o.status}</span>
               </td>
               <td className="px-4 py-3 text-sm text-gray-700 border-0">{new Date(o.createdAt).toLocaleString('vi-VN')}</td>
               <td className="px-4 py-3 text-sm text-gray-700 border-0">
@@ -124,7 +124,7 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
                   })}
                 </div>
               </td>
-              <td className="px-4 py-3 text-sm text-right font-semibold text-blue-600 border-0">
+              <td className="px-4 py-3 text-sm text-right font-semibold text-blue-700 border-0">
                 {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(o.totalPrice)}
               </td>
             </tr>

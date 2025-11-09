@@ -50,14 +50,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {/* Sale Badge */}
           {product.isOnSale && (
             <div className="absolute top-2 left-2">
-              <span className="bg-red-500 text-white px-2 py-1 rounded-full text-sm font-semibold">Sale</span>
+              <span className="bg-red-600 text-white px-2 py-1 rounded-full text-sm font-semibold">Sale</span>
             </div>
           )}
 
           {/* Discount Badge */}
           {product.discountPercent > 0 && (
             <div className="absolute top-2 right-2">
-              <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-sm font-semibold">-{product.discountPercent}%</span>
+              <span className="bg-orange-600 text-white px-2 py-1 rounded-full text-sm font-semibold">-{product.discountPercent}%</span>
             </div>
           )}
         </div>
@@ -87,7 +87,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {/* Price */}
           <div className="flex items-center justify-between mt-auto">
             <div>
-              <div className="text-xl font-bold text-blue-600">{formatPrice(product.price)}</div>
+              <div className="text-xl font-bold text-blue-700">{formatPrice(product.price)}</div>
               {product.originalPrice > product.price && (
                 <div className="text-sm text-gray-500 line-through">{formatPrice(product.originalPrice)}</div>
               )}

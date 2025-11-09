@@ -66,7 +66,7 @@ export default function Filters({ onFilterChange, currentFilters, category }: Fi
         <h3 className="text-lg font-semibold text-gray-900">Bộ lọc</h3>
         <button
           onClick={clearFilters}
-          className="text-sm text-blue-600 hover:text-blue-800"
+          className="text-sm text-blue-700 hover:text-blue-800"
         >
           Xóa bộ lọc
         </button>

@@ -313,7 +313,7 @@ const CartPage = () => {
 
                             {/* Price */}
                             <div className="flex items-center space-x-2 mb-3">
-                              <span className="text-lg font-bold text-blue-600">{formatPrice(item.price)}</span>
+                              <span className="text-lg font-bold text-blue-700">{formatPrice(item.price)}</span>
                               {item.originalPrice > item.price && (
                                 <>
                                   <span className="text-sm text-gray-500 line-through">{formatPrice(item.originalPrice)}</span>
@@ -362,20 +362,20 @@ const CartPage = () => {
 
                     <div className="flex justify-between">
                       <span className="text-gray-600">Giảm theo hạng ( {rankPercent}% ):</span>
-                      <span className="text-green-600 font-medium">-{formatPrice(getMemberDiscount())}</span>
+                      <span className="text-green-700 font-medium">-{formatPrice(getMemberDiscount())}</span>
                     </div>
 
                     <div className="flex justify-between">
                       <span className="text-gray-600">Phí vận chuyển:</span>
                       <span className="font-medium">
-                        {getShippingFee() === 0 ? <span className="text-green-600">Miễn phí</span> : formatPrice(getShippingFee())}
+                        {getShippingFee() === 0 ? <span className="text-green-700">Miễn phí</span> : formatPrice(getShippingFee())}
                       </span>
                     </div>
 
                     <div className="border-t pt-3">
                       <div className="flex justify-between text-lg font-bold">
                         <span>Tổng cộng:</span>
-                        <span className="text-blue-600">{formatPrice(getTotal())}</span>
+                        <span className="text-blue-700">{formatPrice(getTotal())}</span>
                       </div>
                     </div>
                   </div>
@@ -398,7 +398,7 @@ const CartPage = () => {
                   </div>
 
                   <div className="mt-6 p-4 bg-green-50 rounded-lg">
-                    <div className="flex items-center text-green-600 text-sm">
+                    <div className="flex items-center text-green-700 text-sm">
                       <span className="mr-2">✓</span>
                       <span>Miễn phí vận chuyển cho đơn hàng từ 500.000 VNĐ</span>
                     </div>
