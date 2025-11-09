@@ -24,7 +24,6 @@ const nextConfig: NextConfig = {
     unoptimized: false,
   },
 
-  // Experimental features đã được loại bỏ để tránh lỗi serialize
 };
 
 export default nextConfig;
