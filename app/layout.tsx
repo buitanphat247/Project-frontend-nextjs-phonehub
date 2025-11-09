@@ -100,13 +100,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" type="image/png" sizes="32x32" href="/logo.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/logo.png" />
         {/* Explicit Open Graph meta tags để đảm bảo banner được nhận diện */}
-        <meta property="og:image" content={`${baseUrl}/banner.jpg`} />
+        <meta property="og:image" content="https://cdn.tgdd.vn/Files/2016/05/12/827516/banner-thegioididong-so1online.jpg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:type" content="image/jpeg" />
         <meta property="og:image:alt" content="PhoneHub - Banner khuyến mãi mua sắm điện thoại, laptop, tablet và phụ kiện công nghệ" />
         {/* Twitter Card */}
-        <meta name="twitter:image" content={`${baseUrl}/banner.jpg`} />
+        <meta name="twitter:image" content="https://cdn.tgdd.vn/Files/2016/05/12/827516/banner-thegioididong-so1online.jpg" />
         {/* Font Awesome CDN */}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
         {/* Structured Data cho SEO - Organization */}
@@ -120,7 +120,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               legalName: "PhoneHub",
               url: baseUrl,
               logo: `${baseUrl}/logo.png`,
-              image: `${baseUrl}/banner.jpg`,
+              image: "https://cdn.tgdd.vn/Files/2016/05/12/827516/banner-thegioididong-so1online.jpg",
               description: "Nền tảng mua sắm điện thoại thông minh, laptop, tablet và phụ kiện công nghệ chính hãng. Giao hàng nhanh, bảo hành uy tín, giá tốt nhất thị trường.",
               address: {
                 "@type": "PostalAddress",

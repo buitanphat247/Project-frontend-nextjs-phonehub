@@ -53,6 +53,11 @@ const nextConfig: NextConfig = {
         hostname: 'phonehub.vn',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.tgdd.vn',
+        pathname: '/**',
+      },
       // Có thể thêm các CDN khác ở đây
       // {
       //   protocol: 'https',

@@ -68,7 +68,7 @@ export const metadata: Metadata = {
       "Nền tảng mua sắm điện thoại thông minh, laptop, tablet và phụ kiện công nghệ chính hãng. Giao hàng nhanh, bảo hành uy tín, giá tốt nhất thị trường.",
     images: [
       {
-        url: `${baseUrl}/banner.jpg`, // Banner chính - đặt đầu tiên để hiển thị trong Open Graph
+        url: "https://cdn.tgdd.vn/Files/2016/05/12/827516/banner-thegioididong-so1online.jpg", // Banner từ Thegioididong cho SEO
         width: 1200,
         height: 630,
         alt: "PhoneHub - Banner khuyến mãi mua sắm điện thoại, laptop, tablet và phụ kiện công nghệ",
@@ -87,7 +87,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "PhoneHub - Mua sắm điện thoại, laptop, tablet trực tuyến",
     description: "Nền tảng mua sắm điện thoại thông minh, laptop, tablet và phụ kiện công nghệ chính hãng.",
-    images: [`${baseUrl}/banner.jpg`], // Banner từ public/banner.jpg
+    images: ["https://cdn.tgdd.vn/Files/2016/05/12/827516/banner-thegioididong-so1online.jpg"], // Banner từ Thegioididong cho SEO
     creator: "@phonehub",
   },
   icons: {
