@@ -56,10 +56,12 @@ export default function PhonesFilters({ onFilterChange, currentFilters, brands, 
 
       {/* Search */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="phones-search-input" className="block text-sm font-medium text-gray-700 mb-2">
           Tìm kiếm
         </label>
         <input
+          id="phones-search-input"
+          name="search"
           type="text"
           value={localFilters.search || ''}
           onChange={(e) => handleFilterChange('search', e.target.value)}

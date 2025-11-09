@@ -14,7 +14,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       <main>{children}</main>
       <Footer />
       <ToastProvider />
-      <Analytics />
+      {/* Chỉ hiển thị Analytics trong production và trên Vercel */}
+      {process.env.NODE_ENV === 'production' && process.env.VERCEL && <Analytics />}
     </>
   );
 }

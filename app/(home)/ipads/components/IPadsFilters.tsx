@@ -56,10 +56,12 @@ export default function IPadsFilters({ onFilterChange, currentFilters, brands, l
 
       {/* Search */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="ipads-search-input" className="block text-sm font-medium text-gray-700 mb-2">
           Tìm kiếm
         </label>
         <input
+          id="ipads-search-input"
+          name="search"
           type="text"
           value={localFilters.search || ''}
           onChange={(e) => handleFilterChange('search', e.target.value)}

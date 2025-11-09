@@ -299,7 +299,12 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick, onMen
         {/* Search Bar - Desktop */}
         <div className="hidden md:flex flex-1 max-w-lg mx-8" ref={searchContainerRef}>
           <div className="relative w-full">
+            <label htmlFor="desktop-search-input" className="sr-only">
+              Tìm kiếm sản phẩm
+            </label>
             <input
+              id="desktop-search-input"
+              name="search"
               type="text"
               placeholder="Tìm kiếm điện thoại, thương hiệu..."
               value={searchQuery}
@@ -557,7 +562,12 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick, onMen
           >
             <div className="p-4 border-b border-gray-200">
               <div className="relative">
+                <label htmlFor="mobile-search-input" className="sr-only">
+                  Tìm kiếm sản phẩm
+                </label>
                 <input
+                  id="mobile-search-input"
+                  name="search"
                   type="text"
                   placeholder="Tìm kiếm điện thoại..."
                   value={searchQuery}

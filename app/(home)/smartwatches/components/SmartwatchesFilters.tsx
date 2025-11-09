@@ -55,10 +55,12 @@ export default function SmartwatchesFilters({ onFilterChange, currentFilters, br
 
       {/* Search */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="smartwatches-search-input" className="block text-sm font-medium text-gray-700 mb-2">
           Tìm kiếm
         </label>
         <input
+          id="smartwatches-search-input"
+          name="search"
           type="text"
           value={localFilters.search || ''}
           onChange={(e) => handleFilterChange('search', e.target.value)}

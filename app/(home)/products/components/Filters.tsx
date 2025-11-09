@@ -74,10 +74,12 @@ export default function Filters({ onFilterChange, currentFilters, category }: Fi
 
       {/* Search */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="products-search-input" className="block text-sm font-medium text-gray-700 mb-2">
           Tìm kiếm
         </label>
         <input
+          id="products-search-input"
+          name="search"
           type="text"
           value={localFilters.search}
           onChange={(e) => handleFilterChange('search', e.target.value)}
@@ -88,10 +90,12 @@ export default function Filters({ onFilterChange, currentFilters, category }: Fi
 
       {/* Category Filter */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="products-category-filter" className="block text-sm font-medium text-gray-700 mb-2">
           Danh mục
         </label>
         <select
+          id="products-category-filter"
+          name="category"
           value={localFilters.category}
           onChange={(e) => handleFilterChange('category', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -106,10 +110,12 @@ export default function Filters({ onFilterChange, currentFilters, category }: Fi
 
       {/* Brand Filter */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="products-brand-filter" className="block text-sm font-medium text-gray-700 mb-2">
           Thương hiệu
         </label>
         <select
+          id="products-brand-filter"
+          name="brand"
           value={localFilters.brand}
           onChange={(e) => handleFilterChange('brand', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -124,10 +130,12 @@ export default function Filters({ onFilterChange, currentFilters, category }: Fi
 
       {/* Price Range Filter */}
       <div className="mb-6 opacity-50">
-        <label className="block text-sm font-medium text-gray-500 mb-2">
+        <label htmlFor="products-price-range-filter" className="block text-sm font-medium text-gray-500 mb-2">
           Mức giá (Tạm khóa)
         </label>
         <select
+          id="products-price-range-filter"
+          name="priceRange"
           value={localFilters.priceRange}
           onChange={(e) => handleFilterChange('priceRange', e.target.value)}
           disabled
