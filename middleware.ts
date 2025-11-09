@@ -127,6 +127,8 @@ export function middleware(request: NextRequest) {
   ]
 
   // Trusted Types - Giảm thiểu XSS dựa trên DOM
+  // Cho phép style tags và script tags với type="application/ld+json" thông qua TrustedHTML
+  // 'default' policy sẽ được tạo ở client-side (lib/utils/trustedTypes.ts)
   const trustedTypesPolicy = [
     "require-trusted-types-for 'script'",
     "trusted-types default 'allow-duplicates'",

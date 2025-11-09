@@ -5,6 +5,7 @@ import { ConfigProvider, App } from 'antd';
 import { Toaster } from 'react-hot-toast';
 import { Analytics } from "@vercel/analytics/next";
 import { metadata } from "./metadata";
+import { createDangerousHTML } from "@/lib/utils/trustedTypes";
 
 // Helper function để lấy base URL (giống như trong metadata.ts)
 function getBaseUrl(): string {
@@ -65,8 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Structured Data cho SEO - Organization */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+          dangerouslySetInnerHTML={createDangerousHTML(JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "PhoneHub",
@@ -91,14 +91,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 // "https://twitter.com/phonehub",
                 // "https://www.linkedin.com/company/phonehub",
               ],
-            }),
-          }}
+            }))}
         />
         {/* Structured Data - Store */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+          dangerouslySetInnerHTML={createDangerousHTML(JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Store",
               name: "PhoneHub",
@@ -116,14 +114,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 target: `${baseUrl}/search?q={search_term_string}`,
                 "query-input": "required name=search_term_string",
               },
-            }),
-          }}
+            }))}
         />
         {/* Structured Data - WebSite */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+          dangerouslySetInnerHTML={createDangerousHTML(JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
               name: "PhoneHub",
@@ -133,8 +129,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 target: `${baseUrl}/search?q={search_term_string}`,
                 "query-input": "required name=search_term_string",
               },
-            }),
-          }}
+            }))}
         />
       </head>
       <body className={inter.className}>
