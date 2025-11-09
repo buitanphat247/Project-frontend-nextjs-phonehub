@@ -1,5 +1,3 @@
-import { unstable_cache } from 'next/cache';
-
 // In-memory cache cho client-side
 class MemoryCache {
   private cache: Map<string, { data: any; timestamp: number; ttl: number }> = new Map();
@@ -76,6 +74,8 @@ export async function getCachedData<T>(
 ): Promise<T> {
   // Server-side: sử dụng Next.js cache
   if (typeof window === 'undefined') {
+    // Dynamic import để tree shaking hoạt động tốt hơn
+    const { unstable_cache } = await import('next/cache');
     const cached = unstable_cache(
       async () => fetcher(),
       [key],

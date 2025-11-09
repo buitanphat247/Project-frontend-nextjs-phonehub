@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Empty, message } from "antd";
 import { HeartOutlined } from "@ant-design/icons";
 import ProtectedRoute from "../../components/auth/ProtectedRoute";

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Select, message } from "antd";
 import { MinusOutlined, PlusOutlined, DeleteOutlined, ShoppingOutlined, ShoppingCartOutlined, PictureOutlined } from "@ant-design/icons";
 import ProtectedRoute from "../../components/auth/ProtectedRoute";
