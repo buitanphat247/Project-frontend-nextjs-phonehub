@@ -68,7 +68,7 @@ export const metadata: Metadata = {
       "Nền tảng mua sắm điện thoại thông minh, laptop, tablet và phụ kiện công nghệ chính hãng. Giao hàng nhanh, bảo hành uy tín, giá tốt nhất thị trường.",
     images: [
       {
-        url: `${baseUrl}/icon`, // Từ app/icon.tsx - dynamic icon
+        url: `${baseUrl}/logo.png`, // Logo chính từ public/logo.png
         width: 512,
         height: 512,
         alt: "Logo PhoneHub - Mua sắm điện thoại trực tuyến",
@@ -87,13 +87,13 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "PhoneHub - Mua sắm điện thoại, laptop, tablet trực tuyến",
     description: "Nền tảng mua sắm điện thoại thông minh, laptop, tablet và phụ kiện công nghệ chính hãng.",
-    images: [`${baseUrl}/icon`], // Từ app/icon.tsx - dynamic icon
+    images: [`${baseUrl}/logo.png`], // Logo chính từ public/logo.png
     creator: "@phonehub",
   },
   icons: {
-    icon: "/icon", // Từ app/icon.tsx - Next.js tự động serve tại /icon
-    shortcut: "/icon",
-    apple: "/apple-icon", // Từ app/apple-icon.tsx
+    icon: "/logo.png", // Logo từ public/logo.png
+    shortcut: "/logo.png",
+    apple: "/logo.png", // Sử dụng logo.png cho Apple touch icon
   },
   manifest: "/site.webmanifest",
   alternates: {

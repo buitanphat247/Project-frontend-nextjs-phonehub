@@ -36,20 +36,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="vi">
       <head>
-        <meta name="theme-color" content="#ffffff" />
-        {/* Explicit favicon links - ưu tiên /icon từ app/icon.tsx */}
-        {/* Thêm query string để bypass browser cache */}
-        <link rel="icon" href="/icon?v=2" type="image/png" sizes="512x512" />
-        <link rel="shortcut icon" href="/icon?v=2" type="image/png" />
-        <link rel="apple-touch-icon" href="/apple-icon?v=2" sizes="180x180" />
+        <meta name="theme-color" content="#1890ff" />
+        {/* Favicon cho browser tab - sử dụng logo.png từ public/logo.png */}
+        <link rel="icon" href="/logo.png" type="image/png" sizes="any" />
+        <link rel="shortcut icon" href="/logo.png" type="image/png" />
+        <link rel="icon" href="/logo.png" type="image/png" sizes="512x512" />
+        {/* Apple Touch Icon cho iOS */}
+        <link rel="apple-touch-icon" href="/logo.png" sizes="180x180" />
+        {/* Favicon cho các kích thước khác nhau */}
+        <link rel="icon" type="image/png" sizes="32x32" href="/logo.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/logo.png" />
         {/* Explicit Open Graph meta tags để đảm bảo ảnh được nhận diện */}
-        <meta property="og:image" content={`${baseUrl}/icon`} />
+        <meta property="og:image" content={`${baseUrl}/logo.png`} />
         <meta property="og:image:width" content="512" />
         <meta property="og:image:height" content="512" />
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:alt" content="Logo PhoneHub - Mua sắm điện thoại trực tuyến" />
         {/* Twitter Card */}
-        <meta name="twitter:image" content={`${baseUrl}/icon`} />
+        <meta name="twitter:image" content={`${baseUrl}/logo.png`} />
         {/* Font Awesome CDN */}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
         {/* Structured Data cho SEO */}
@@ -62,8 +66,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: "PhoneHub",
               description: "Nền tảng mua sắm điện thoại thông minh, laptop, tablet và phụ kiện công nghệ chính hãng",
               url: baseUrl,
-              logo: `${baseUrl}/icon`,
-              image: `${baseUrl}/icon`,
+              logo: `${baseUrl}/logo.png`,
+              image: `${baseUrl}/logo.png`,
               priceRange: "$$",
               address: {
                 "@type": "PostalAddress",
