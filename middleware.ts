@@ -71,7 +71,137 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
-  return NextResponse.next()
+  // Tạo response
+  const response = NextResponse.next()
+
+  // ============================================
+  // SECURITY HEADERS - Bảo mật và chống tấn công
+  // ============================================
+
+  // 1. Content Security Policy (CSP) - Chống XSS
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://phonehub.vn'
+  const isDev = process.env.NODE_ENV === 'development'
+  
+  // CSP Directives
+  const cspDirectives = [
+    // Default source - chỉ cho phép từ same origin
+    "default-src 'self'",
+    
+    // Scripts - chỉ cho phép inline scripts với nonce hoặc từ trusted sources
+    // 'unsafe-inline' và 'unsafe-eval' cần thiết cho Next.js và một số libraries
+    // Trong production nên sử dụng nonce thay vì 'unsafe-inline'
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://vitals.vercel-insights.com https://cdnjs.cloudflare.com`,
+    
+    // Styles - cho phép inline styles (cần cho Ant Design và Tailwind)
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+    
+    // Images - cho phép từ same origin và external CDNs
+    "img-src 'self' data: blob: https: http:",
+    
+    // Fonts - cho phép từ Google Fonts và CDN
+    "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+    
+    // Connect - cho phép API calls
+    `connect-src 'self' ${baseUrl} https://phonehub.vn http://localhost:8080 https://vercel.live https://vitals.vercel-insights.com https://*.vercel-insights.com`,
+    
+    // Media - cho phép video/audio
+    "media-src 'self'",
+    
+    // Object - chặn plugins như Flash
+    "object-src 'none'",
+    
+    // Base URI - chỉ cho phép same origin
+    "base-uri 'self'",
+    
+    // Form actions - chỉ cho phép submit về same origin
+    "form-action 'self'",
+    
+    // Frame ancestors - chống clickjacking (thay thế X-Frame-Options)
+    "frame-ancestors 'none'",
+    
+    // Upgrade insecure requests - tự động upgrade HTTP lên HTTPS
+    "upgrade-insecure-requests",
+    
+    // Block all mixed content
+    "block-all-mixed-content",
+  ]
+
+  // Trusted Types - Giảm thiểu XSS dựa trên DOM
+  const trustedTypesPolicy = [
+    "require-trusted-types-for 'script'",
+    "trusted-types default 'allow-duplicates'",
+  ]
+
+  response.headers.set(
+    'Content-Security-Policy',
+    [...cspDirectives, ...trustedTypesPolicy].join('; ')
+  )
+
+  // 2. HTTP Strict Transport Security (HSTS) - Bảo mật HTTPS
+  response.headers.set(
+    'Strict-Transport-Security',
+    'max-age=31536000; includeSubDomains; preload'
+  )
+
+  // 3. Cross-Origin-Opener-Policy (COOP) - Tách biệt nguồn gốc
+  response.headers.set(
+    'Cross-Origin-Opener-Policy',
+    'same-origin-allow-popups'
+  )
+
+  // 4. Cross-Origin-Embedder-Policy (COEP) - Bảo vệ khỏi Spectre
+  // Lưu ý: 'require-corp' có thể gây vấn đề với một số external resources
+  // Sử dụng 'credentialless' để cân bằng giữa bảo mật và tương thích
+  response.headers.set(
+    'Cross-Origin-Embedder-Policy',
+    'credentialless'
+  )
+
+  // 5. Cross-Origin-Resource-Policy (CORP) - Kiểm soát resource sharing
+  // 'cross-origin' cho phép load resources từ external domains (cần cho CDN)
+  response.headers.set(
+    'Cross-Origin-Resource-Policy',
+    'cross-origin'
+  )
+
+  // 6. X-Frame-Options - Chống clickjacking (backup cho CSP frame-ancestors)
+  response.headers.set(
+    'X-Frame-Options',
+    'DENY'
+  )
+
+  // 7. X-Content-Type-Options - Chống MIME type sniffing
+  response.headers.set(
+    'X-Content-Type-Options',
+    'nosniff'
+  )
+
+  // 8. Referrer-Policy - Kiểm soát thông tin referrer
+  response.headers.set(
+    'Referrer-Policy',
+    'strict-origin-when-cross-origin'
+  )
+
+  // 9. Permissions-Policy - Kiểm soát browser features
+  response.headers.set(
+    'Permissions-Policy',
+    [
+      'camera=()',
+      'microphone=()',
+      'geolocation=()',
+      'interest-cohort=()',
+      'payment=()',
+      'usb=()',
+    ].join(', ')
+  )
+
+  // 10. X-DNS-Prefetch-Control - Kiểm soát DNS prefetching
+  response.headers.set(
+    'X-DNS-Prefetch-Control',
+    'on'
+  )
+
+  return response
 }
 
 export const config = {
