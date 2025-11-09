@@ -15,25 +15,38 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     const updateHeaderHeight = () => {
       if (headerRef.current) {
-        const height = headerRef.current.offsetHeight;
-        setHeaderHeight(height);
+        // Sử dụng requestAnimationFrame để tránh forced reflow
+        requestAnimationFrame(() => {
+          if (headerRef.current) {
+            const height = headerRef.current.offsetHeight;
+            setHeaderHeight(height);
+          }
+        });
       }
     };
 
     // Sử dụng ResizeObserver để theo dõi thay đổi kích thước của header
-    const resizeObserver = new ResizeObserver(() => {
-      updateHeaderHeight();
+    // ResizeObserver tự động batch updates, không cần requestAnimationFrame
+    const resizeObserver = new ResizeObserver((entries) => {
+      // Chỉ update khi có thay đổi thực sự
+      for (const entry of entries) {
+        const height = entry.contentRect.height;
+        if (height !== headerHeight) {
+          setHeaderHeight(height);
+        }
+      }
     });
 
     if (headerRef.current) {
       resizeObserver.observe(headerRef.current);
+      // Initial measurement
       updateHeaderHeight();
     }
 
     return () => {
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [headerHeight]);
 
   return (
     <ProtectedAdminRoute>

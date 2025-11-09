@@ -41,14 +41,21 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
 
     if (isCartOpen) {
       document.addEventListener("keydown", handleEsc)
-      document.body.style.overflow = "hidden"
+      // Sử dụng requestAnimationFrame để tránh forced reflow
+      requestAnimationFrame(() => {
+        document.body.style.overflow = "hidden"
+      })
     } else {
-      document.body.style.overflow = "unset"
+      requestAnimationFrame(() => {
+        document.body.style.overflow = "unset"
+      })
     }
 
     return () => {
       document.removeEventListener("keydown", handleEsc)
-      document.body.style.overflow = "unset"
+      requestAnimationFrame(() => {
+        document.body.style.overflow = "unset"
+      })
     }
   }, [isCartOpen, isCartClosing])
 

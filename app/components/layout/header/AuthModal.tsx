@@ -24,17 +24,22 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   // Control body scroll when modal is open
   useEffect(() => {
-    if (isOpen) {
-      // Prevent background scroll
-      document.body.style.overflow = 'hidden'
-    } else {
-      // Restore background scroll
-      document.body.style.overflow = 'unset'
-    }
+    // Sử dụng requestAnimationFrame để tránh forced reflow
+    requestAnimationFrame(() => {
+      if (isOpen) {
+        // Prevent background scroll
+        document.body.style.overflow = 'hidden'
+      } else {
+        // Restore background scroll
+        document.body.style.overflow = 'unset'
+      }
+    })
 
     // Cleanup on unmount
     return () => {
-      document.body.style.overflow = 'unset'
+      requestAnimationFrame(() => {
+        document.body.style.overflow = 'unset'
+      })
     }
   }, [isOpen])
 

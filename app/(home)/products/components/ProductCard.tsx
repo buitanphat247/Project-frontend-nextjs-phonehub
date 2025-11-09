@@ -29,11 +29,17 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 alt={product.name}
                 className="w-full h-full object-contain"
                 onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                  if (target.parentElement) {
-                    target.parentElement.innerHTML = '<div class="text-6xl">📱</div>';
-                  }
+                  // Sử dụng requestAnimationFrame để tránh forced reflow
+                  requestAnimationFrame(() => {
+                    const target = e.target as HTMLImageElement;
+                    target.classList.add('hidden');
+                    if (target.parentElement) {
+                      const fallback = document.createElement('div');
+                      fallback.className = 'text-6xl';
+                      fallback.textContent = '📱';
+                      target.parentElement.appendChild(fallback);
+                    }
+                  });
                 }}
               />
             ) : (

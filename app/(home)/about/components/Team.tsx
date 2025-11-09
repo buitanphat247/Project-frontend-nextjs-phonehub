@@ -74,18 +74,18 @@ const Team = () => {
                     alt={member.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      // Fallback to gradient background with initials if image fails to load
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.className = 'w-24 h-24 bg-linear-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-gray-100 transform hover:scale-110 transition-transform duration-300 shadow-lg';
-                        const initials = member.name.split(' ').map(n => n[0]).join('').toUpperCase();
-                        parent.textContent = initials;
-                        parent.style.fontSize = '1.5rem';
-                        parent.style.fontWeight = 'bold';
-                        parent.style.color = '#6366f1';
-                      }
+                      // Sử dụng requestAnimationFrame để tránh forced reflow
+                      requestAnimationFrame(() => {
+                        // Fallback to gradient background with initials if image fails to load
+                        const target = e.target as HTMLImageElement;
+                        target.classList.add('hidden');
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.className = 'w-24 h-24 bg-linear-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-gray-100 transform hover:scale-110 transition-transform duration-300 shadow-lg text-[1.5rem] font-bold text-[#6366f1]';
+                          const initials = member.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                          parent.textContent = initials;
+                        }
+                      });
                     }}
                   />
                 </div>

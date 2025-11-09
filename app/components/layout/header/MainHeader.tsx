@@ -298,11 +298,15 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
                 onWheel={(e) => {
                   e.stopPropagation()
                   const target = e.currentTarget
-                  const { scrollTop, scrollHeight, clientHeight } = target
+                  // Cache layout values để tránh multiple reads
+                  const scrollTop = target.scrollTop
+                  const scrollHeight = target.scrollHeight
+                  const clientHeight = target.clientHeight
                   const isScrollingDown = e.deltaY > 0
                   const isAtTop = scrollTop === 0
                   const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1
                   
+                  // preventDefault phải được gọi đồng bộ
                   if ((isScrollingDown && isAtBottom) || (!isScrollingDown && isAtTop)) {
                     e.preventDefault()
                   }
@@ -341,9 +345,12 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
                             alt={product.name}
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              const target = e.target as HTMLImageElement
-                              target.style.display = 'none'
-                              target.nextElementSibling?.classList.remove('hidden')
+                              // Sử dụng requestAnimationFrame để tránh forced reflow
+                              requestAnimationFrame(() => {
+                                const target = e.target as HTMLImageElement
+                                target.classList.add('hidden')
+                                target.nextElementSibling?.classList.remove('hidden')
+                              })
                             }}
                           />
                         ) : null}
@@ -448,11 +455,15 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
                 onWheel={(e) => {
                   e.stopPropagation()
                   const target = e.currentTarget
-                  const { scrollTop, scrollHeight, clientHeight } = target
+                  // Cache layout values để tránh multiple reads
+                  const scrollTop = target.scrollTop
+                  const scrollHeight = target.scrollHeight
+                  const clientHeight = target.clientHeight
                   const isScrollingDown = e.deltaY > 0
                   const isAtTop = scrollTop === 0
                   const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1
                   
+                  // preventDefault phải được gọi đồng bộ
                   if ((isScrollingDown && isAtBottom) || (!isScrollingDown && isAtTop)) {
                     e.preventDefault()
                   }
@@ -472,9 +483,12 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
                             alt={product.name}
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              const target = e.target as HTMLImageElement
-                              target.style.display = 'none'
-                              target.nextElementSibling?.classList.remove('hidden')
+                              // Sử dụng requestAnimationFrame để tránh forced reflow
+                              requestAnimationFrame(() => {
+                                const target = e.target as HTMLImageElement
+                                target.classList.add('hidden')
+                                target.nextElementSibling?.classList.remove('hidden')
+                              })
                             }}
                           />
                         ) : null}
