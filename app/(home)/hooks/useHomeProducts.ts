@@ -52,21 +52,21 @@ export function useHomeProducts() {
       try {
         setLoading(true)
         
-        // Fetch top 5 products for each category
+        // Fetch top 10 products for each category
         const [phonesRes, laptopsRes, ipadsRes, smartwatchesRes] = await Promise.all([
-          getProductsByCategory(PHONES_CATEGORY_ID, 0, 5).catch(err => {
+          getProductsByCategory(PHONES_CATEGORY_ID, 0, 10).catch(err => {
             console.error(`Error fetching phones (category ${PHONES_CATEGORY_ID}):`, err)
             return { success: false, data: null }
           }),
-          getProductsByCategory(LAPTOPS_CATEGORY_ID, 0, 5).catch(err => {
+          getProductsByCategory(LAPTOPS_CATEGORY_ID, 0, 10).catch(err => {
             console.error(`Error fetching laptops (category ${LAPTOPS_CATEGORY_ID}):`, err)
             return { success: false, data: null }
           }),
-          getProductsByCategory(IPADS_CATEGORY_ID, 0, 5).catch(err => {
+          getProductsByCategory(IPADS_CATEGORY_ID, 0, 10).catch(err => {
             console.error(`Error fetching ipads (category ${IPADS_CATEGORY_ID}):`, err)
             return { success: false, data: null }
           }),
-          getProductsByCategory(SMARTWATCHES_CATEGORY_ID, 0, 5).catch(err => {
+          getProductsByCategory(SMARTWATCHES_CATEGORY_ID, 0, 10).catch(err => {
             console.error(`Error fetching smartwatches (category ${SMARTWATCHES_CATEGORY_ID}):`, err)
             return { success: false, data: null }
           }),

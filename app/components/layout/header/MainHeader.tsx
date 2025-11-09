@@ -24,12 +24,15 @@ interface MainHeaderProps {
   initialAuth: AuthState
   totalItems: number
   onCartClick: () => void
+  onMenuClick: () => void
+  isMenuOpen?: boolean
 }
 
-export default function MainHeader({ initialAuth, totalItems, onCartClick }: MainHeaderProps) {
+export default function MainHeader({ initialAuth, totalItems, onCartClick, onMenuClick, isMenuOpen = false }: MainHeaderProps) {
   const { modal } = App.useApp()
   const router = useRouter()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isSearchClosing, setIsSearchClosing] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Product[]>([])
   const [isSearching, setIsSearching] = useState(false)
@@ -215,6 +218,46 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
     }
   }, [])
 
+  // Close search function with animation
+  const closeSearch = () => {
+    setIsSearchClosing(true)
+    setTimeout(() => {
+      setIsSearchOpen(false)
+      setIsSearchClosing(false)
+      setShowResults(false)
+      setSearchQuery('')
+    }, 300) // Match animation duration
+  }
+
+  // Prevent body scroll when mobile search is open
+  useEffect(() => {
+    if (isSearchOpen && !isSearchClosing) {
+      // Sử dụng requestAnimationFrame để tránh forced reflow
+      requestAnimationFrame(() => {
+        document.body.style.overflow = 'hidden'
+      })
+
+      // Handle ESC key to close search
+      const handleEsc = (e: KeyboardEvent) => {
+        if (e.key === 'Escape' && !isSearchClosing) {
+          closeSearch()
+        }
+      }
+
+      document.addEventListener('keydown', handleEsc)
+      return () => {
+        document.removeEventListener('keydown', handleEsc)
+        requestAnimationFrame(() => {
+          document.body.style.overflow = 'unset'
+        })
+      }
+    } else {
+      requestAnimationFrame(() => {
+        document.body.style.overflow = 'unset'
+      })
+    }
+  }, [isSearchOpen, isSearchClosing])
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
   }
@@ -236,13 +279,22 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
   return (
     <>
       <div className="flex items-center justify-between h-16">
-        {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+        {/* Logo - Hidden on mobile, show on desktop */}
+        <Link href="/" className="hidden md:flex items-center space-x-2 hover:opacity-80 transition-opacity">
           <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-xl">P</span>
           </div>
           <span className="text-2xl font-bold text-gray-900">PhoneHub</span>
         </Link>
+        
+        {/* Menu Icon (Mobile) - Replace logo on mobile */}
+        <button 
+          onClick={onMenuClick}
+          className="md:hidden p-2 text-gray-600 hover:text-blue-700 hover:bg-gray-100 rounded-lg transition-colors"
+          aria-label={isMenuOpen ? "Đóng menu" : "Mở menu"}
+        >
+          <span className="text-xl">{isMenuOpen ? "✕" : "☰"}</span>
+        </button>
 
         {/* Search Bar - Desktop */}
         <div className="hidden md:flex flex-1 max-w-lg mx-8" ref={searchContainerRef}>
@@ -383,7 +435,13 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
         <div className="flex items-center space-x-2">
           {/* Search Icon (Mobile) */}
           <button 
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
+            onClick={() => {
+              if (isSearchOpen) {
+                closeSearch()
+              } else {
+                setIsSearchOpen(true)
+              }
+            }}
             className="md:hidden p-2 text-gray-600 hover:text-blue-700 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <SearchOutlined className="text-xl" />
@@ -423,35 +481,118 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
         </div>
       </div>
 
-      {/* Mobile Search Bar */}
+      {/* Mobile Search Overlay - Fixed position với animation */}
       {isSearchOpen && (
-        <div className="md:hidden py-4 border-t border-gray-200" ref={searchContainerRef}>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Tìm kiếm điện thoại..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onFocus={() => {
-                if (searchResults.length > 0) {
-                  setShowResults(true)
+        <>
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              @keyframes slideDown {
+                from {
+                  transform: translateY(-100%);
+                  opacity: 0;
                 }
-              }}
-              className="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-            />
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-              <SearchOutlined className="text-lg" />
-            </span>
-            {isSearching && (
-              <span className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <Spin size="small" />
-              </span>
-            )}
+                to {
+                  transform: translateY(0);
+                  opacity: 1;
+                }
+              }
+              
+              @keyframes slideUp {
+                from {
+                  transform: translateY(0);
+                  opacity: 1;
+                }
+                to {
+                  transform: translateY(-100%);
+                  opacity: 0;
+                }
+              }
+              
+              @keyframes fadeIn {
+                from {
+                  opacity: 0;
+                }
+                to {
+                  opacity: 1;
+                }
+              }
+              
+              @keyframes fadeOut {
+                from {
+                  opacity: 1;
+                }
+                to {
+                  opacity: 0;
+                }
+              }
+              
+              .mobile-search-enter {
+                animation: slideDown 0.3s ease-out forwards;
+              }
+              
+              .mobile-search-exit {
+                animation: slideUp 0.3s ease-in forwards;
+              }
+              
+              .mobile-search-overlay-enter {
+                animation: fadeIn 0.2s ease-out forwards;
+              }
+              
+              .mobile-search-overlay-exit {
+                animation: fadeOut 0.2s ease-in forwards;
+              }
+            `
+          }} />
+          
+          {/* Backdrop overlay */}
+          <div 
+            className={`fixed inset-0 bg-black/50 z-40 md:hidden ${isSearchClosing ? 'mobile-search-overlay-exit' : 'mobile-search-overlay-enter'}`}
+            onClick={closeSearch}
+          />
+          
+          {/* Search Container - Fixed position */}
+          <div 
+            className={`fixed top-0 left-0 right-0 bg-white z-50 md:hidden shadow-lg ${isSearchClosing ? 'mobile-search-exit' : 'mobile-search-enter'}`}
+            ref={searchContainerRef}
+          >
+            <div className="p-4 border-b border-gray-200">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm điện thoại..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onFocus={() => {
+                    if (searchResults.length > 0) {
+                      setShowResults(true)
+                    }
+                  }}
+                  autoFocus
+                  className="w-full px-4 py-3 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                />
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <SearchOutlined className="text-lg" />
+                </span>
+                {isSearching && (
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <Spin size="small" />
+                  </span>
+                )}
+                {/* Close button */}
+                <button
+                  onClick={closeSearch}
+                  className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <span className="text-xl">×</span>
+                </button>
+              </div>
+            </div>
             
-            {/* Mobile Search Results Dropdown */}
+            {/* Mobile Search Results Dropdown - Fixed position */}
             {showResults && searchResults.length > 0 && (
               <div 
-                className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl max-h-96 overflow-y-auto z-50 search-results-scrollbar"
+                className={`fixed left-0 right-0 bg-white border-t border-gray-200 shadow-xl max-h-[calc(100vh-80px)] overflow-y-auto z-50 search-results-scrollbar ${isSearchClosing ? 'mobile-search-exit' : 'mobile-search-enter'}`}
+                style={{ top: '80px', animationDelay: isSearchClosing ? '0s' : '0.1s' }}
                 onWheel={(e) => {
                   e.stopPropagation()
                   const target = e.currentTarget
@@ -473,7 +614,7 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
                   <div
                     key={product.id}
                     onClick={() => handleProductClick(product)}
-                    className="p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors"
+                    className="p-4 hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors"
                   >
                     <div className="flex items-center space-x-3">
                       <div className="w-16 h-16 shrink-0 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
@@ -509,13 +650,41 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick }: Mai
               </div>
             )}
             
+            {/* Loading Skeleton - Mobile */}
+            {isSearching && (
+              <div 
+                className={`fixed left-0 right-0 bg-white border-t border-gray-200 shadow-xl z-50 ${isSearchClosing ? 'mobile-search-exit' : 'mobile-search-enter'}`}
+                style={{ top: '80px', animationDelay: isSearchClosing ? '0s' : '0.1s' }}
+              >
+                {[...Array(5)].map((_, index) => (
+                  <div
+                    key={index}
+                    className="p-4 border-b border-gray-100 last:border-b-0"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-16 h-16 shrink-0 bg-gray-200 rounded-lg animate-pulse" />
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <div className="h-3 bg-gray-200 rounded animate-pulse w-1/4" />
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-full" />
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-1/3" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {/* No Results - Mobile */}
             {showResults && searchQuery.trim() && !isSearching && searchResults.length === 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl p-4 z-50">
+              <div 
+                className={`fixed left-0 right-0 bg-white border-t border-gray-200 shadow-xl p-4 z-50 ${isSearchClosing ? 'mobile-search-exit' : 'mobile-search-enter'}`}
+                style={{ top: '80px', animationDelay: isSearchClosing ? '0s' : '0.1s' }}
+              >
                 <p className="text-gray-500 text-center">Không tìm thấy sản phẩm</p>
               </div>
             )}
           </div>
-        </div>
+        </>
       )}
     </>
   )

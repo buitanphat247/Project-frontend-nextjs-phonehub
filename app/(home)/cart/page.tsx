@@ -275,22 +275,21 @@ const CartPage = () => {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
               {/* Cart Items */}
               <div className="lg:col-span-2">
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                  <div className="p-6 border-b border-gray-200">
-                    <h2 className="text-xl font-semibold text-gray-900">Sản phẩm đã chọn</h2>
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50">
+                    <h2 className="text-lg md:text-xl font-semibold text-gray-900">Sản phẩm đã chọn</h2>
                   </div>
 
                   <div className="divide-y divide-gray-200">
                     {cartItems.map((item) => (
-                      <div key={item.id} className="p-6">
-                        <div className="flex items-center space-x-4">
+                      <div key={item.id} className="p-4 md:p-6 hover:bg-gray-50 transition-colors">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                           {/* Product Image */}
-                          <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center text-3xl overflow-hidden">
+                          <div className="w-24 h-24 sm:w-20 sm:h-20 bg-gray-100 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
                             {typeof item.image === "string" && item.image.startsWith("http") ? (
-                              // Thumbnail URL
                               <img
                                 src={item.image}
                                 alt={item.name}
@@ -301,47 +300,85 @@ const CartPage = () => {
                                 }}
                               />
                             ) : (
-                              // Ant Design placeholder icon
                               <PictureOutlined className="text-2xl text-gray-400" />
                             )}
                           </div>
 
                           {/* Product Info */}
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-900 mb-1">{item.name}</h3>
-                            <p className="text-sm text-gray-600 mb-2">{item.brand}</p>
+                          <div className="flex-1 min-w-0 w-full sm:w-auto">
+                            <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base line-clamp-2">{item.name}</h3>
+                            <p className="text-xs sm:text-sm text-gray-600 mb-2">{item.brand}</p>
 
                             {/* Price */}
-                            <div className="flex items-center space-x-2 mb-3">
-                              <span className="text-lg font-bold text-blue-700">{formatPrice(item.price)}</span>
+                            <div className="flex items-center flex-wrap gap-2 mb-3">
+                              <span className="text-base sm:text-lg font-bold text-blue-700">{formatPrice(item.price)}</span>
                               {item.originalPrice > item.price && (
                                 <>
-                                  <span className="text-sm text-gray-500 line-through">{formatPrice(item.originalPrice)}</span>
-                                  <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">-{item.discountPercent}%</span>
+                                  <span className="text-xs sm:text-sm text-gray-500 line-through">{formatPrice(item.originalPrice)}</span>
+                                  <span className="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs font-semibold">-{item.discountPercent}%</span>
                                 </>
                               )}
                             </div>
+
+                            {/* Quantity Controls - Mobile */}
+                            <div className="flex items-center justify-between sm:hidden mt-3">
+                              <div className="flex items-center space-x-2">
+                                <Button
+                                  icon={<MinusOutlined />}
+                                  size="small"
+                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                  disabled={item.quantity <= 1}
+                                  className="flex items-center justify-center"
+                                />
+                                <span className="w-10 text-center font-medium text-sm">{item.quantity}</span>
+                                <Button 
+                                  icon={<PlusOutlined />} 
+                                  size="small" 
+                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                  className="flex items-center justify-center"
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-base font-bold text-gray-900">{formatPrice(item.price * item.quantity)}</span>
+                                <Button 
+                                  type="text" 
+                                  danger 
+                                  icon={<DeleteOutlined />} 
+                                  onClick={() => removeItem(item.id)}
+                                  size="small"
+                                />
+                              </div>
+                            </div>
                           </div>
 
-                          {/* Quantity Controls */}
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              icon={<MinusOutlined />}
-                              size="small"
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              disabled={item.quantity <= 1}
+                          {/* Quantity Controls & Total - Desktop */}
+                          <div className="hidden sm:flex items-center gap-4 w-full sm:w-auto sm:shrink-0">
+                            {/* Quantity Controls */}
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                icon={<MinusOutlined />}
+                                size="small"
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                disabled={item.quantity <= 1}
+                              />
+                              <span className="w-12 text-center font-medium">{item.quantity}</span>
+                              <Button icon={<PlusOutlined />} size="small" onClick={() => updateQuantity(item.id, item.quantity + 1)} />
+                            </div>
+
+                            {/* Item Total */}
+                            <div className="text-right min-w-[100px]">
+                              <div className="text-base sm:text-lg font-bold text-gray-900">{formatPrice(item.price * item.quantity)}</div>
+                            </div>
+
+                            {/* Remove Button */}
+                            <Button 
+                              type="text" 
+                              danger 
+                              icon={<DeleteOutlined />} 
+                              onClick={() => removeItem(item.id)}
+                              className="ml-2"
                             />
-                            <span className="w-12 text-center font-medium">{item.quantity}</span>
-                            <Button icon={<PlusOutlined />} size="small" onClick={() => updateQuantity(item.id, item.quantity + 1)} />
                           </div>
-
-                          {/* Item Total */}
-                          <div className="text-right">
-                            <div className="text-lg font-bold text-gray-900">{formatPrice(item.price * item.quantity)}</div>
-                          </div>
-
-                          {/* Remove Button */}
-                          <Button type="text" danger icon={<DeleteOutlined />} onClick={() => removeItem(item.id)} className="ml-4" />
                         </div>
                       </div>
                     ))}
@@ -351,37 +388,45 @@ const CartPage = () => {
 
               {/* Order Summary */}
               <div className="lg:col-span-1">
-                <div className="bg-white rounded-lg border border-gray-200 p-6 sticky top-4">
+                <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 md:p-6 lg:sticky lg:top-4">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Tóm tắt đơn hàng</h3>
 
                   <div className="space-y-3 mb-6">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm sm:text-base">
                       <span className="text-gray-600">Tạm tính:</span>
-                      <span className="font-medium">{formatPrice(getSubtotal())}</span>
+                      <span className="font-medium text-gray-900">{formatPrice(getSubtotal())}</span>
                     </div>
 
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Giảm theo hạng ( {rankPercent}% ):</span>
-                      <span className="text-green-700 font-medium">-{formatPrice(getMemberDiscount())}</span>
-                    </div>
+                    {rankPercent > 0 && (
+                      <div className="flex justify-between text-sm sm:text-base">
+                        <span className="text-gray-600">Giảm theo hạng ({rankPercent}%):</span>
+                        <span className="text-green-700 font-medium">-{formatPrice(getMemberDiscount())}</span>
+                      </div>
+                    )}
 
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm sm:text-base">
                       <span className="text-gray-600">Phí vận chuyển:</span>
                       <span className="font-medium">
                         {getShippingFee() === 0 ? <span className="text-green-700">Miễn phí</span> : formatPrice(getShippingFee())}
                       </span>
                     </div>
 
-                    <div className="border-t pt-3">
-                      <div className="flex justify-between text-lg font-bold">
-                        <span>Tổng cộng:</span>
+                    <div className="border-t border-gray-200 pt-3 mt-3">
+                      <div className="flex justify-between text-base sm:text-lg font-bold">
+                        <span className="text-gray-900">Tổng cộng:</span>
                         <span className="text-blue-700">{formatPrice(getTotal())}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-3">
-                    <Button type="primary" size="large" block className="bg-blue-600 hover:bg-blue-700" onClick={() => setCheckoutVisible(true)}>
+                    <Button 
+                      type="primary" 
+                      size="large" 
+                      block 
+                      className="bg-blue-600 hover:bg-blue-700 h-12 font-semibold" 
+                      onClick={() => setCheckoutVisible(true)}
+                    >
                       Thanh toán
                     </Button>
 
@@ -389,6 +434,7 @@ const CartPage = () => {
                       size="large"
                       block
                       icon={<ShoppingOutlined />}
+                      className="h-12"
                       onClick={() => {
                         router.push("/products");
                       }}
@@ -397,10 +443,10 @@ const CartPage = () => {
                     </Button>
                   </div>
 
-                  <div className="mt-6 p-4 bg-green-50 rounded-lg">
-                    <div className="flex items-center text-green-700 text-sm">
-                      <span className="mr-2">✓</span>
-                      <span>Miễn phí vận chuyển cho đơn hàng từ 500.000 VNĐ</span>
+                  <div className="mt-6 p-3 sm:p-4 bg-green-50 rounded-lg border border-green-100">
+                    <div className="flex items-start text-green-700 text-xs sm:text-sm">
+                      <span className="mr-2 mt-0.5">✓</span>
+                      <span>Miễn phí vận chuyển cho đơn hàng từ 500.000 ₫</span>
                     </div>
                   </div>
                 </div>

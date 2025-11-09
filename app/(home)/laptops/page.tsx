@@ -50,14 +50,14 @@ const LaptopsPage = () => {
           {/* Products Grid */}
           <div className="lg:col-span-3">
             {loading ? (
-              <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
+              <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 mb-8">
                 {[...Array(6)].map((_, index) => (
                   <ProductCardSkeleton key={index} />
                 ))}
               </div>
             ) : currentProducts.length > 0 ? (
               <>
-                <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 mb-8">
                   {currentProducts.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}

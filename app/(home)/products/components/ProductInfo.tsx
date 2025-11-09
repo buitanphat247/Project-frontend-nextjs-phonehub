@@ -225,7 +225,7 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Brand & Name */}
       <div>
         <div className="flex items-center space-x-2">
@@ -319,7 +319,7 @@ const ProductInfo = ({ product, category }: ProductInfoProps) => {
       </div>
 
       {/* Actions */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="flex space-x-4">
           <button
             onClick={() => handleActionClick("Thêm vào giỏ hàng")}

@@ -43,6 +43,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   }, [isOpen])
 
+  // Listen for openAuthModal event with tab parameter
+  useEffect(() => {
+    const handleOpenAuthModal = (e: Event) => {
+      const customEvent = e as CustomEvent<{ tab?: 'signin' | 'signup' }>
+      if (customEvent.detail?.tab) {
+        setActiveTab(customEvent.detail.tab)
+      }
+    }
+
+    window.addEventListener('openAuthModal', handleOpenAuthModal as EventListener)
+    return () => {
+      window.removeEventListener('openAuthModal', handleOpenAuthModal as EventListener)
+    }
+  }, [])
+
   // Handle ESC key to close modal
   useEffect(() => {
     const handleEscKey = (event: KeyboardEvent) => {

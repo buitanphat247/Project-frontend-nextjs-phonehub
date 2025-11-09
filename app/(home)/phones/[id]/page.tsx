@@ -337,7 +337,7 @@ const PhoneDetailPage = ({ params }: PageProps) => {
           {/* Product Info */}
           <ProductInfo product={product} category={getCategoryRoute(product)} />
         </div>
-        <div className="space-y-6">
+        <div className="mt-10 space-y-6">
           {/* Technical Specifications */}
           {product.specifications && product.specifications.length > 0 && (
             <div className="space-y-6">

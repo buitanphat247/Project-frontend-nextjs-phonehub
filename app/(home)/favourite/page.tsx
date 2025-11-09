@@ -93,7 +93,7 @@ const FavouritePage = () => {
           <div className="container mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Sản phẩm yêu thích</h1>
           <p className="text-gray-600 mb-8">{totalElements} sản phẩm</p>
-            <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-5 gap-4 md:gap-5">
               {[...Array(10)].map((_, index) => (
                 <ProductCardSkeleton key={index} />
               ))}
@@ -122,7 +122,7 @@ const FavouritePage = () => {
             </div>
           ) : (
             <>
-              <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-5">
+              <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-5 gap-4 md:gap-5">
                 {favoriteProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

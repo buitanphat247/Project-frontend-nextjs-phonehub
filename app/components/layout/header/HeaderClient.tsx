@@ -6,7 +6,7 @@ import MainHeader from './MainHeader'
 import Navigation from './Navigation'
 import CartSidebar from './CartSidebar'
 import { getMyCart, CartItemApi } from '../../../../lib/api/cart'
-import { getAuthData } from '../../../../lib/utils/cookie'
+import { getAuthData, isAuthenticated } from '../../../../lib/utils/cookie'
 
 interface AuthState {
   authenticated: boolean
@@ -24,12 +24,34 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isCartClosing, setIsCartClosing] = useState(false)
   const cartButtonRef = useRef<HTMLButtonElement>(null)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [authenticated, setAuthenticated] = useState(initialAuth.authenticated)
   // Cart count is driven by localStorage 'cart_count' (updated when adding cart)
   const [totalItems, setTotalItems] = useState<number>(
     typeof window !== 'undefined' ? parseInt(localStorage.getItem('cart_count') || '0', 10) || 0 : 0
   )
   const [cartItems, setCartItems] = useState<CartItemApi[]>([])
   const [totalPrice, setTotalPrice] = useState<number>(0)
+
+  // Track authentication state changes
+  useEffect(() => {
+    const checkAuth = () => {
+      const auth = isAuthenticated()
+      setAuthenticated(auth)
+    }
+
+    const handleStorageChange = () => {
+      checkAuth()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    const interval = setInterval(checkAuth, 1000)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      clearInterval(interval)
+    }
+  }, [])
 
   // Handle ESC key and focus management
   useEffect(() => {
@@ -110,8 +132,18 @@ export default function HeaderClient({ initialAuth }: HeaderClientProps) {
     <header className="bg-white shadow-lg sticky top-0 z-50">
       <TopBar initialAuth={initialAuth} />
       <div className="container mx-auto px-4">
-        <MainHeader initialAuth={initialAuth} totalItems={totalItems} onCartClick={openCart} />
-        <Navigation />
+        <MainHeader 
+          initialAuth={initialAuth} 
+          totalItems={totalItems} 
+          onCartClick={openCart}
+          onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
+          isMenuOpen={isMenuOpen}
+        />
+        <Navigation 
+          isMenuOpen={isMenuOpen} 
+          onMenuOpenChange={setIsMenuOpen}
+          authenticated={authenticated}
+        />
       </div>
       <CartSidebar
         isOpen={isCartOpen}
