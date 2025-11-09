@@ -18,6 +18,15 @@ const nextConfig: NextConfig = {
   // Bật compression
   compress: true,
 
+  // Cấu hình SWC compiler để loại bỏ console trong production
+  // Next.js 16 sử dụng SWC minifier mặc định
+  compiler: {
+    // Loại bỏ console.* trong production build
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['warn'], // Giữ lại console.warn để hiển thị cảnh báo
+    } : false,
+  },
+
   // Cấu hình images với CDN và cache tối ưu
   images: {
     // Vercel Image Optimization (tự động khi deploy trên Vercel)

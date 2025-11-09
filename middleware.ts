@@ -126,17 +126,9 @@ export function middleware(request: NextRequest) {
     "block-all-mixed-content",
   ]
 
-  // Trusted Types - Giảm thiểu XSS dựa trên DOM
-  // Cho phép style tags và script tags với type="application/ld+json" thông qua TrustedHTML
-  // 'default' policy sẽ được tạo ở client-side (lib/utils/trustedTypes.ts)
-  const trustedTypesPolicy = [
-    "require-trusted-types-for 'script'",
-    "trusted-types default 'allow-duplicates'",
-  ]
-
   response.headers.set(
     'Content-Security-Policy',
-    [...cspDirectives, ...trustedTypesPolicy].join('; ')
+    cspDirectives.join('; ')
   )
 
   // 2. HTTP Strict Transport Security (HSTS) - Bảo mật HTTPS

@@ -7,7 +7,6 @@ import { useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { getMyCart, updateCartItemQuantity, deleteCartItem } from '../../../../lib/api/cart'
 import { getAuthData } from '../../../../lib/utils/cookie'
-import { createDangerousHTML } from '@/lib/utils/trustedTypes'
 
 interface CartItem {
   id: number
@@ -152,7 +151,8 @@ export default function CartSidebar({
 
   return (
     <>
-      <style dangerouslySetInnerHTML={createDangerousHTML(`
+      <style dangerouslySetInnerHTML={{
+        __html: `
           @keyframes slideInRight {
             from {
               transform: translateX(100%);
@@ -204,7 +204,8 @@ export default function CartSidebar({
           .cart-overlay-exit {
             animation: fadeOut 0.3s ease-in forwards;
           }
-        `)} />
+        `
+      }} />
       
       {/* Overlay */}
       <div 

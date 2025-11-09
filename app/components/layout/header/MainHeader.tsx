@@ -11,7 +11,6 @@ import { Spin, Dropdown, Button, App } from 'antd'
 import type { MenuProps } from 'antd'
 import { UserOutlined, LogoutOutlined, SettingOutlined, HeartOutlined, ExclamationCircleOutlined, ShoppingCartOutlined, SearchOutlined, MobileOutlined, OrderedListOutlined } from '@ant-design/icons'
 import { isAuthenticated, getAuthData, clearAuthData } from '../../../../lib/utils/cookie'
-import { createDangerousHTML } from '@/lib/utils/trustedTypes'
 
 interface AuthState {
   authenticated: boolean
@@ -485,7 +484,8 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick, onMen
       {/* Mobile Search Overlay - Fixed position với animation */}
       {isSearchOpen && (
         <>
-          <style dangerouslySetInnerHTML={createDangerousHTML(`
+          <style dangerouslySetInnerHTML={{
+            __html: `
               @keyframes slideDown {
                 from {
                   transform: translateY(-100%);
@@ -541,7 +541,8 @@ export default function MainHeader({ initialAuth, totalItems, onCartClick, onMen
               .mobile-search-overlay-exit {
                 animation: fadeOut 0.2s ease-in forwards;
               }
-            `)} />
+            `
+          }} />
           
           {/* Backdrop overlay */}
           <div 

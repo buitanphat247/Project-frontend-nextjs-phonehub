@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { UserOutlined } from "@ant-design/icons";
-import { createDangerousHTML } from "@/lib/utils/trustedTypes";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -151,7 +150,8 @@ export default function Navigation({ isMenuOpen: externalIsMenuOpen, onMenuOpenC
       {/* Mobile Menu Overlay - Fixed position với animation */}
       {isMenuOpen && (
         <>
-          <style dangerouslySetInnerHTML={createDangerousHTML(`
+          <style dangerouslySetInnerHTML={{
+            __html: `
               @keyframes slideInLeft {
                 from {
                   transform: translateX(-100%);
@@ -207,7 +207,8 @@ export default function Navigation({ isMenuOpen: externalIsMenuOpen, onMenuOpenC
               .mobile-nav-overlay-exit {
                 animation: fadeOut 0.2s ease-in forwards;
               }
-            `)} />
+            `
+          }} />
           
           {/* Backdrop overlay */}
           <div 

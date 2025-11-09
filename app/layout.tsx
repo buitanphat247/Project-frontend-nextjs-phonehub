@@ -5,7 +5,6 @@ import { ConfigProvider, App } from 'antd';
 import { Toaster } from 'react-hot-toast';
 import { Analytics } from "@vercel/analytics/next";
 import { metadata } from "./metadata";
-import { createDangerousHTML } from "@/lib/utils/trustedTypes";
 
 // Helper function để lấy base URL (giống như trong metadata.ts)
 function getBaseUrl(): string {
@@ -63,10 +62,51 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="twitter:image" content={`${baseUrl}/banner.jpg`} />
         {/* Font Awesome CDN */}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        {/* Chặn console trong production - Chỉ hiển thị cảnh báo */}
+        {process.env.NODE_ENV === 'production' && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  const warning = '⚠️ KHÔNG ĐƯỢC ĐỤNG VÀO TERMINAL/CONSOLE!';
+                  const noop = function() {};
+                  const originalConsole = window.console;
+                  
+                  // Override tất cả console methods
+                  Object.keys(originalConsole).forEach(function(key) {
+                    if (typeof originalConsole[key] === 'function') {
+                      window.console[key] = noop;
+                    }
+                  });
+                  
+                  // Chỉ giữ lại console.warn với cảnh báo
+                  window.console.warn = function() {
+                    originalConsole.warn(warning);
+                  };
+                  
+                  // Chặn cả console.error, console.log, console.info, etc.
+                  window.console.error = noop;
+                  window.console.log = noop;
+                  window.console.info = noop;
+                  window.console.debug = noop;
+                  window.console.trace = noop;
+                  window.console.table = noop;
+                  window.console.group = noop;
+                  window.console.groupEnd = noop;
+                  window.console.time = noop;
+                  window.console.timeEnd = noop;
+                  window.console.count = noop;
+                  window.console.clear = noop;
+                })();
+              `,
+            }}
+          />
+        )}
         {/* Structured Data cho SEO - Organization */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={createDangerousHTML(JSON.stringify({
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "PhoneHub",
@@ -91,12 +131,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 // "https://twitter.com/phonehub",
                 // "https://www.linkedin.com/company/phonehub",
               ],
-            }))}
+            }),
+          }}
         />
         {/* Structured Data - Store */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={createDangerousHTML(JSON.stringify({
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Store",
               name: "PhoneHub",
@@ -114,12 +156,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 target: `${baseUrl}/search?q={search_term_string}`,
                 "query-input": "required name=search_term_string",
               },
-            }))}
+            }),
+          }}
         />
         {/* Structured Data - WebSite */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={createDangerousHTML(JSON.stringify({
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
               name: "PhoneHub",
@@ -129,7 +173,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 target: `${baseUrl}/search?q={search_term_string}`,
                 "query-input": "required name=search_term_string",
               },
-            }))}
+            }),
+          }}
         />
       </head>
       <body className={inter.className}>
