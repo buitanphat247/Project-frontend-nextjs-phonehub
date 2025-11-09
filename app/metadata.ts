@@ -58,6 +58,7 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  // Open Graph - Dùng cho Facebook, LinkedIn, Slack, Discord, WhatsApp, v.v.
   openGraph: {
     type: "website",
     locale: "vi_VN",
@@ -83,6 +84,7 @@ export const metadata: Metadata = {
       },
     ],
   },
+  // Twitter Card - Dùng cho Twitter/X
   twitter: {
     card: "summary_large_image",
     title: "PhoneHub - Mua sắm điện thoại, laptop, tablet trực tuyến",
