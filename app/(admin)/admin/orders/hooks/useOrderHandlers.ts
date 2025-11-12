@@ -16,7 +16,6 @@ const getUrlParams = () => {
 
 export function useOrderHandlers() {
   const router = useRouter();
-  const urlParams = getUrlParams();
   
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,8 +26,8 @@ export function useOrderHandlers() {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [itemsLoading, setItemsLoading] = useState(false);
   
-  const [currentPage, setCurrentPage] = useState(urlParams.page);
-  const [pageSize, setPageSize] = useState(urlParams.size);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [totalElements, setTotalElements] = useState(0);
   
   const updateUrlParams = useCallback((page: number, size: number) => {
@@ -40,7 +39,7 @@ export function useOrderHandlers() {
     router.push(newUrl, { scroll: false });
   }, [router]);
 
-  const transformOrders = (content: any[]): Order[] => {
+  const transformOrders = useCallback((content: any[]): Order[] => {
     return content.map((order: any) => ({
       id: order.id,
       userId: order.userId,
@@ -56,9 +55,9 @@ export function useOrderHandlers() {
       updatedAt: order.updatedAt,
       items: order.items || null,
     }));
-  };
+  }, []);
 
-  const fetchOrders = async (page: number = currentPage, size: number = pageSize) => {
+  const fetchOrders = useCallback(async (page: number, size: number) => {
     try {
       setPaging(false);
       setLoading(true);
@@ -76,12 +75,12 @@ export function useOrderHandlers() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [transformOrders]);
 
   const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isInitialMount = useRef(true);
-  const previousPageRef = useRef<number>(urlParams.page);
-  const previousPageSizeRef = useRef<number>(urlParams.size);
+  const previousPageRef = useRef<number>(0);
+  const previousPageSizeRef = useRef<number>(10);
 
   useEffect(() => {
     const params = getUrlParams();
@@ -98,8 +97,10 @@ export function useOrderHandlers() {
       setPageSize(params.size);
     };
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('popstate', handlePopState);
+      return () => window.removeEventListener('popstate', handlePopState);
+    }
   }, []);
 
   useEffect(() => {
@@ -135,7 +136,7 @@ export function useOrderHandlers() {
         setPaging(false);
       }
     };
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, fetchOrders]);
 
   const handleView = async (order: Order) => {
     try {
