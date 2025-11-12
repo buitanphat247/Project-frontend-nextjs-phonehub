@@ -63,12 +63,20 @@ export function useOrderHandlers() {
       setLoading(true);
       const response = await getOrdersSuccess({ page, size });
       
-      if (response.success && response.data) {
-        setOrders(transformOrders(response.data.content));
-        setTotalElements(response.data.totalElements);
-        setCurrentPage(response.data.number);
-        setPageSize(response.data.size);
+      if (!response.success || !response.data || !Array.isArray(response.data.content)) {
+        const fallbackMessage = response.message || 'Không thể tải danh sách đơn hàng';
+        message.error(fallbackMessage);
+        setOrders([]);
+        setTotalElements(0);
+        setCurrentPage(page);
+        setPageSize(size);
+        return;
       }
+
+      setOrders(transformOrders(response.data.content));
+      setTotalElements(response.data.totalElements ?? 0);
+      setCurrentPage(response.data.number ?? page);
+      setPageSize(response.data.size ?? size);
     } catch (error: any) {
       console.error('Error fetching orders:', error);
       message.error('Không thể tải danh sách đơn hàng: ' + (error.message || 'Lỗi không xác định'));
@@ -148,11 +156,13 @@ export function useOrderHandlers() {
       // Fetch order items when modal opens
       const response = await getOrderItems(order.id, { page: 0, size: 100 });
       
-      if (response.success && response.data) {
-        setOrderItems(response.data.content || []);
-      } else {
+      if (!response.success || !response.data || !Array.isArray(response.data.content)) {
         message.error(response.message || 'Không thể tải chi tiết đơn hàng');
+        setOrderItems([]);
+        return;
       }
+
+      setOrderItems(response.data.content);
     } catch (error: any) {
       console.error('Error fetching order items:', error);
       message.error('Không thể tải chi tiết đơn hàng: ' + (error.message || 'Lỗi không xác định'));
