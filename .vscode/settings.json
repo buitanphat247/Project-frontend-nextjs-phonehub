@@ -1,0 +1,30 @@
+{
+  // Encoding settings - Đảm bảo file được lưu dưới UTF-8
+  "files.encoding": "utf8",
+  "files.autoGuessEncoding": true,
+  
+  // Font settings - Hỗ trợ hiển thị emoji đẹp
+  "editor.fontFamily": "'Cascadia Code', 'Segoe UI Emoji', 'Noto Color Emoji', 'Fira Code', Consolas, monospace",
+  "editor.fontLigatures": true,
+  
+  // Markdown settings - Hiển thị emoji trong Markdown
+  "[markdown]": {
+    "editor.fontFamily": "'Cascadia Code', 'Segoe UI Emoji', 'Noto Color Emoji', monospace",
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    }
+  },
+  
+  // File associations
+  "files.associations": {
+    "*.md": "markdown"
+  },
+  
+  // Auto save
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000
+}
+

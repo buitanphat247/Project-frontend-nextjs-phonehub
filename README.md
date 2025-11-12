@@ -6,7 +6,7 @@
 
 ![PhoneHub Banner](./public/banner_1.jpeg)
 
-- **Live Demo**: [https://phonehub.vn](https://phonehub.vn) *(đang cập nhật)*
+- **Live Demo**: [https://phonehub.io.vn](https://phonehub.io.vn)
 - **Repository**: [https://github.com/buitanphat247/Project-frontend-nextjs-phonehub](https://github.com/buitanphat247/Project-frontend-nextjs-phonehub)
 
 ## 📁 Cấu trúc thư mục
