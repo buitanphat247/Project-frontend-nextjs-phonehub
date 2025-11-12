@@ -20,6 +20,8 @@ export function useOrderHandlers() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [paging, setPaging] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [searching, setSearching] = useState(false);
   
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -184,20 +186,45 @@ export function useOrderHandlers() {
     updateUrlParams(apiPage, size);
   };
 
+  const handleSearch = (value: string) => {
+    setSearchText(value);
+    setSearching(false);
+  };
+
+  // Filter orders based on search text (client-side)
+  const filteredOrders = searchText.trim()
+    ? orders.filter((order) => {
+        const keyword = searchText.trim().toLowerCase();
+        return (
+          order.buyerName?.toLowerCase().includes(keyword) ||
+          order.buyerEmail?.toLowerCase().includes(keyword) ||
+          order.buyerPhone?.toLowerCase().includes(keyword) ||
+          order.buyerAddress?.toLowerCase().includes(keyword) ||
+          String(order.id).includes(keyword) ||
+          order.username?.toLowerCase().includes(keyword)
+        );
+      })
+    : orders;
+
+  const displayedTotal = searchText.trim() ? filteredOrders.length : totalElements;
+
   return {
-    orders,
+    orders: filteredOrders,
     loading: loading || paging,
     paging,
+    searching,
+    searchText,
     modalVisible,
     selectedOrder,
     orderItems,
     itemsLoading,
     currentPage,
     pageSize,
-    totalElements,
+    totalElements: displayedTotal,
     handleView,
     handleCloseModal,
     handlePageChange,
+    handleSearch,
   };
 }
 

@@ -90,7 +90,7 @@ export function middleware(request: NextRequest) {
     // Scripts - chỉ cho phép inline scripts với nonce hoặc từ trusted sources
     // 'unsafe-inline' và 'unsafe-eval' cần thiết cho Next.js và một số libraries
     // Trong production nên sử dụng nonce thay vì 'unsafe-inline'
-    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://vitals.vercel-insights.com https://cdnjs.cloudflare.com`,
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://vitals.vercel-insights.com https://cdnjs.cloudflare.com https://accounts.google.com https://apis.google.com`,
     
     // Styles - cho phép inline styles (cần cho Ant Design và Tailwind)
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
@@ -102,7 +102,7 @@ export function middleware(request: NextRequest) {
     "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
     
     // Connect - cho phép API calls
-    `connect-src 'self' ${baseUrl} https://phonehub.vn http://localhost:8080 https://vercel.live https://vitals.vercel-insights.com https://*.vercel-insights.com`,
+    `connect-src 'self' ${baseUrl} https://phonehub.vn http://localhost:8080 https://vercel.live https://vitals.vercel-insights.com https://*.vercel-insights.com https://accounts.google.com https://apis.google.com`,
     
     // Media - cho phép video/audio
     "media-src 'self'",

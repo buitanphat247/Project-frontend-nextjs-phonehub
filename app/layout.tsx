@@ -37,53 +37,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="vi">
       <head>
-        {/* Chặn console NGAY LẬP TỨC - Phải đặt đầu tiên để chạy trước mọi thứ */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                const isProduction = ${process.env.NODE_ENV === 'production'};
-                const warning = '⚠️ KHÔNG ĐƯỢC ĐỤNG VÀO TERMINAL/CONSOLE!';
-                const noop = function() {};
-                const originalConsole = window.console;
-                
-                // Override tất cả console methods ngay lập tức
-                if (isProduction) {
-                  Object.keys(originalConsole).forEach(function(key) {
-                    if (typeof originalConsole[key] === 'function') {
-                      window.console[key] = noop;
-                    }
-                  });
-                  
-                  // Chỉ giữ lại console.warn với cảnh báo
-                  window.console.warn = function() {
-                    originalConsole.warn(warning);
-                  };
-                  
-                  // Chặn tất cả console methods
-                  window.console.error = noop;
-                  window.console.log = noop;
-                  window.console.info = noop;
-                  window.console.debug = noop;
-                  window.console.trace = noop;
-                  window.console.table = noop;
-                  window.console.group = noop;
-                  window.console.groupEnd = noop;
-                  window.console.time = noop;
-                  window.console.timeEnd = noop;
-                  window.console.count = noop;
-                  window.console.clear = noop;
-                  window.console.dir = noop;
-                  window.console.dirxml = noop;
-                  window.console.assert = noop;
-                } else {
-                  // Development: vẫn chặn nhưng có thể bật lại nếu cần
-                  // Có thể comment lại nếu muốn xem console trong dev
-                }
-              })();
-            `,
-          }}
-        />
         <meta name="theme-color" content="#1890ff" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <meta name="language" content="Vietnamese" />

@@ -1,14 +1,16 @@
-'use client';
+"use client";
 
-import OrdersHeader from './components/OrdersHeader';
-import OrdersTable from './components/OrdersTable';
-import OrderDetailModal from './components/OrderDetailModal';
-import { useOrderHandlers } from './hooks/useOrderHandlers';
+import OrdersHeader from "./components/OrdersHeader";
+import OrdersTable from "./components/OrdersTable";
+import OrderDetailModal from "./components/OrderDetailModal";
+import { useOrderHandlers } from "./hooks/useOrderHandlers";
 
 export default function OrdersPage() {
   const {
     orders,
     loading,
+    searching,
+    searchText,
     modalVisible,
     selectedOrder,
     orderItems,
@@ -19,15 +21,18 @@ export default function OrdersPage() {
     handleView,
     handleCloseModal,
     handlePageChange,
+    handleSearch,
   } = useOrderHandlers();
 
   return (
-    <div style={{ padding: '0 24px' }}>
-      <div style={{ marginBottom: 16 }}>
-        <OrdersHeader />
-      </div>
-      <OrdersTable 
-        orders={orders} 
+    <div>
+      <OrdersHeader 
+        searchValue={searchText}
+        searching={searching}
+        onSearchChange={handleSearch}
+      />
+      <OrdersTable
+        orders={orders}
         loading={loading}
         currentPage={currentPage + 1}
         pageSize={pageSize}

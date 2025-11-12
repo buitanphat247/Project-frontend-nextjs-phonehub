@@ -9,6 +9,7 @@ import {
   LogoutOutlined,
   DownOutlined,
   ExclamationCircleOutlined,
+  HomeOutlined,
 } from '@ant-design/icons';
 import { forwardRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -51,6 +52,11 @@ const AdminHeader = forwardRef<HTMLDivElement, AdminHeaderProps>(({ collapsed, s
       label: 'Thông tin cá nhân',
     },
     {
+      key: 'home',
+      icon: <HomeOutlined />,
+      label: 'Về trang chủ',
+    },
+    {
       type: 'divider',
     },
     {
@@ -64,6 +70,10 @@ const AdminHeader = forwardRef<HTMLDivElement, AdminHeaderProps>(({ collapsed, s
   const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
     if (key === 'logout') {
       handleLogout();
+    } else if (key === 'profile') {
+      router.push('/account');
+    } else if (key === 'home') {
+      router.push('/');
     }
   };
 
