@@ -12,8 +12,8 @@ const nextConfig: NextConfig = {
   // Tắt X-Powered-By header để bảo mật
   poweredByHeader: false,
   
-  // Bật React Strict Mode
-  reactStrictMode: true,
+  // Tạm tắt React Strict Mode để tránh xung đột package
+  reactStrictMode: false,
   
   // Bật compression
   compress: true,
