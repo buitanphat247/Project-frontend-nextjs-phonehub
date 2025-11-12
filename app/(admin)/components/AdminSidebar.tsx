@@ -81,11 +81,6 @@ export default function AdminSidebar({ collapsed, setCollapsed, headerHeight = 6
     },
 
     {
-      key: "/admin/settings",
-      icon: <SettingOutlined />,
-      label: <Link href="/admin/settings">Cài đặt</Link>,
-    },
-    {
       key: "/admin/test-connection",
       icon: <ApiOutlined />,
       label: <Link href="/admin/test-connection">Kiểm tra kết nối</Link>,

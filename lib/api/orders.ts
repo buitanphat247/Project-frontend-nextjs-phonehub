@@ -141,6 +141,32 @@ export async function getOrders(params: { page?: number; size?: number; userId?:
   return res.json()
 }
 
+// Get successful orders with pagination
+export async function getOrdersSuccess(params: { page?: number; size?: number }): Promise<ApiResponse<OrdersPage>> {
+  const search = new URLSearchParams()
+  if (typeof params.page === 'number') search.set('page', String(params.page))
+  if (typeof params.size === 'number') search.set('size', String(params.size))
+  const res = await apiClient(`/orders/success?${search.toString()}`, { method: 'GET' })
+  return res.json()
+}
+
+// Get order items with pagination
+export interface OrderItemsPage {
+  content: OrderDetailItem[]
+  totalElements: number
+  totalPages: number
+  number: number
+  size: number
+}
+
+export async function getOrderItems(orderId: number | string, params: { page?: number; size?: number }): Promise<ApiResponse<OrderItemsPage>> {
+  const search = new URLSearchParams()
+  if (typeof params.page === 'number') search.set('page', String(params.page))
+  if (typeof params.size === 'number') search.set('size', String(params.size))
+  const res = await apiClient(`/orders/${orderId}/items?${search.toString()}`, { method: 'GET' })
+  return res.json()
+}
+
 /**
  * Check if user has purchased a product (by productId)
  * This function will:
