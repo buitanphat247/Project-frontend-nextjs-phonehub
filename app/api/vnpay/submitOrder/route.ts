@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 
-                     process.env.API_BASE_URL || 
-                     'http://localhost:8080/api/v1'
+const getApiBaseUrl = (): string => {
+  if (process.env.NEXT_PUBLIC_API_BASE_URL) {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  }
+  if (process.env.API_BASE_URL) {
+    return process.env.API_BASE_URL;
+  }
+  // Production: sử dụng deployment host
+  if (process.env.NODE_ENV === 'production') {
+    return 'http://180.93.43.3:8080/api/v1';
+  }
+  // Development: sử dụng localhost:8080
+  return 'http://localhost:8080/api/v1';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * API route riêng cho VNPAY submitOrder

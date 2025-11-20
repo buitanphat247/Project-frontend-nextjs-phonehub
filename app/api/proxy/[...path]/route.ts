@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// For server-side proxy, use environment variable or fallback to localhost:8080
+// For server-side proxy, use environment variable or fallback
 // In development: use localhost:8080
-// In production: set NEXT_PUBLIC_API_BASE_URL or API_BASE_URL environment variable
+// In production: use deployment host http://180.93.43.3:8080/api/v1
 const getApiBaseUrl = (): string => {
   // Ưu tiên API_BASE_URL (server-side only), sau đó NEXT_PUBLIC_API_BASE_URL
   if (process.env.API_BASE_URL) {
@@ -10,6 +10,10 @@ const getApiBaseUrl = (): string => {
   }
   if (process.env.NEXT_PUBLIC_API_BASE_URL) {
     return process.env.NEXT_PUBLIC_API_BASE_URL;
+  }
+  // Production: sử dụng deployment host
+  if (process.env.NODE_ENV === 'production') {
+    return "http://180.93.43.3:8080/api/v1";
   }
   // Development: sử dụng localhost:8080
   return "http://localhost:8080/api/v1";
