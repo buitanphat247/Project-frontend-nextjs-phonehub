@@ -1,8 +1,8 @@
 // API Configuration
 const getDefaultApiUrl = (): string => {
-  // Production: sử dụng deployment host
+  // Production: sử dụng deployment domain
   if (process.env.NODE_ENV === 'production') {
-    return 'http://180.93.43.3:8080/api/v1';
+    return 'https://phonehub.io.vn/api/v1';
   }
   // Development: sử dụng localhost
   return 'http://localhost:8080/api/v1';

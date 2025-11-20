@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // For server-side proxy, use environment variable or fallback
 // In development: use localhost:8080
-// In production: use deployment host http://180.93.43.3:8080/api/v1
+// In production: use deployment domain https://phonehub.io.vn/api/v1
 const getApiBaseUrl = (): string => {
   // Ưu tiên API_BASE_URL (server-side only), sau đó NEXT_PUBLIC_API_BASE_URL
   if (process.env.API_BASE_URL) {
@@ -11,9 +11,9 @@ const getApiBaseUrl = (): string => {
   if (process.env.NEXT_PUBLIC_API_BASE_URL) {
     return process.env.NEXT_PUBLIC_API_BASE_URL;
   }
-  // Production: sử dụng deployment host
+  // Production: sử dụng deployment domain
   if (process.env.NODE_ENV === 'production') {
-    return "http://180.93.43.3:8080/api/v1";
+    return "https://phonehub.io.vn/api/v1";
   }
   // Development: sử dụng localhost:8080
   return "http://localhost:8080/api/v1";
